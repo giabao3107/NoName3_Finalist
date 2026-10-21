@@ -1,0 +1,928 @@
+{
+  "schema_version": "1.0",
+  "phase": "Phase 1 — Data Processing / Foundation only",
+  "execution_status": "SUCCESS",
+  "foundation_quality_gate": "CONDITIONAL",
+  "fatal_failures": [],
+  "business_gates_pending": [
+    "round2_feature_timestamp_lineage_audited",
+    "lead_sample_weight_semantics_approved"
+  ],
+  "round2_cutoffs": {
+    "fhs": "2025-06-05",
+    "ces": "2025-06-05",
+    "fhs_validation_asof": "2024-10-01",
+    "ces_validation_asof": "2025-02-01",
+    "common_cutoff": "2025-06-05",
+    "cutoff_provenance_state": "PRODUCTION_SCORE_SNAPSHOT_DECLARED_IN_ROUND2_CONFIG; FEATURE-LEVEL TIMESTAMP AUDIT STILL REQUIRED"
+  },
+  "table_row_counts": {
+    "contract_fact": 3775371,
+    "leads_clean": 6130637,
+    "contract_product_bridge": 784902,
+    "shop_bridge": 14231,
+    "seller_master": 11639,
+    "employee_shop_bridge": 275856,
+    "lead_contract_candidates": 339529,
+    "shop_month_foundation": 715528,
+    "lead_shop_month_product": 349564,
+    "lead_conversion_shop_month": 140230,
+    "shop_behavior_profile": 30705,
+    "r2_customer_segment": 1000528
+  },
+  "raw_inventory": [
+    {
+      "dataset": "contract",
+      "file_name": "contract.csv",
+      "source_format": "csv",
+      "source_bytes": 573943563,
+      "source_rows": 3775371.0,
+      "source_columns": 21.0,
+      "ingestion_policy": "DuckDB VARCHAR-preserving CSV scan"
+    },
+    {
+      "dataset": "leads",
+      "file_name": "leads.csv",
+      "source_format": "csv",
+      "source_bytes": 1068338893,
+      "source_rows": 6130637.0,
+      "source_columns": 19.0,
+      "ingestion_policy": "DuckDB VARCHAR-preserving CSV scan"
+    },
+    {
+      "dataset": "contract_product",
+      "file_name": "contract_product.csv",
+      "source_format": "csv",
+      "source_bytes": 48520659,
+      "source_rows": 784902.0,
+      "source_columns": 5.0,
+      "ingestion_policy": "DuckDB VARCHAR-preserving CSV scan"
+    },
+    {
+      "dataset": "employee_assignment",
+      "file_name": "emp_2_salesroom.csv",
+      "source_format": "csv",
+      "source_bytes": 17895356,
+      "source_rows": 275856.0,
+      "source_columns": 6.0,
+      "ingestion_policy": "DuckDB VARCHAR-preserving CSV scan"
+    },
+    {
+      "dataset": "shop",
+      "file_name": "salesroom.xlsx",
+      "source_format": "xlsx",
+      "source_bytes": 1091472,
+      "source_rows": 14231.0,
+      "source_columns": 13.0,
+      "ingestion_policy": "pandas/openpyxl source values"
+    },
+    {
+      "dataset": "seller",
+      "file_name": "seller.xlsx",
+      "source_format": "xlsx",
+      "source_bytes": 535791,
+      "source_rows": 11639.0,
+      "source_columns": 8.0,
+      "ingestion_policy": "pandas/openpyxl source values"
+    },
+    {
+      "dataset": "lead_reason",
+      "file_name": "cl_lead_fin_reason.xlsx",
+      "source_format": "xlsx",
+      "source_bytes": 16924,
+      "source_rows": 12.0,
+      "source_columns": 9.0,
+      "ingestion_policy": "pandas/openpyxl source values"
+    },
+    {
+      "dataset": "schema_workbook",
+      "file_name": "StructureTable.xlsx",
+      "source_format": "xlsx",
+      "source_bytes": 28840,
+      "source_rows": NaN,
+      "source_columns": NaN,
+      "ingestion_policy": "Read-only schema metadata"
+    },
+    {
+      "dataset": "r2_fhs",
+      "file_name": "BI10-Round2/output/Task1/scores/fh_scores.parquet",
+      "source_format": "parquet",
+      "source_bytes": 51764752,
+      "source_rows": 1000528.0,
+      "source_columns": 47.0,
+      "ingestion_policy": "Read-only Round 2 score output; key uniqueness validated in score bridge"
+    },
+    {
+      "dataset": "r2_ces",
+      "file_name": "BI10-Round2/output/Task2/scores/eng_scores.parquet",
+      "source_format": "parquet",
+      "source_bytes": 19137691,
+      "source_rows": 1000528.0,
+      "source_columns": 30.0,
+      "ingestion_policy": "Read-only Round 2 score output; key uniqueness validated in score bridge"
+    }
+  ],
+  "coverage_summary": [
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "contract",
+      "numerator": 3775371.0,
+      "denominator": 3775371.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "contract.csv; 21 columns; 573,943,563 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "leads",
+      "numerator": 6130637.0,
+      "denominator": 6130637.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "leads.csv; 19 columns; 1,068,338,893 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "contract_product",
+      "numerator": 784902.0,
+      "denominator": 784902.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "contract_product.csv; 5 columns; 48,520,659 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "employee_assignment",
+      "numerator": 275856.0,
+      "denominator": 275856.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "emp_2_salesroom.csv; 6 columns; 17,895,356 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "shop",
+      "numerator": 14231.0,
+      "denominator": 14231.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "salesroom.xlsx; 13 columns; 1,091,472 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "seller",
+      "numerator": 11639.0,
+      "denominator": 11639.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "seller.xlsx; 8 columns; 535,791 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "lead_reason",
+      "numerator": 12.0,
+      "denominator": 12.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "cl_lead_fin_reason.xlsx; 9 columns; 16,924 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "schema_workbook",
+      "numerator": NaN,
+      "denominator": NaN,
+      "coverage_pct": NaN,
+      "status": "INVENTORIED",
+      "details": "StructureTable.xlsx; None columns; 28,840 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "r2_fhs",
+      "numerator": 1000528.0,
+      "denominator": 1000528.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "BI10-Round2/output/Task1/scores/fh_scores.parquet; 47 columns; 51,764,752 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "r2_ces",
+      "numerator": 1000528.0,
+      "denominator": 1000528.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "BI10-Round2/output/Task2/scores/eng_scores.parquet; 30 columns; 19,137,691 bytes"
+    },
+    {
+      "coverage_area": "CURRENT_SHOP_MASTER",
+      "population": "CONTRACT_TO_CURRENT_SHOP",
+      "numerator": 621387.0,
+      "denominator": 3775371.0,
+      "coverage_pct": 16.459,
+      "status": "CURRENT_SNAPSHOT_ONLY",
+      "details": "26,654 distinct fact shop IDs; unmatched IDs preserved."
+    },
+    {
+      "coverage_area": "CURRENT_SHOP_MASTER",
+      "population": "LEAD_TO_CURRENT_SHOP",
+      "numerator": 385273.0,
+      "denominator": 6130637.0,
+      "coverage_pct": 6.2844,
+      "status": "CURRENT_SNAPSHOT_ONLY",
+      "details": "27,380 distinct fact shop IDs; unmatched IDs preserved."
+    },
+    {
+      "coverage_area": "PRODUCT_CROSSWALK",
+      "population": "LEAD_EVENT_ROWS",
+      "numerator": 6031418.0,
+      "denominator": 6130637.0,
+      "coverage_pct": 98.3816,
+      "status": "CONFIGURED",
+      "details": "0 event rows have literal candidate mappings; not approved by default."
+    },
+    {
+      "coverage_area": "LEAD_CONTRACT_CANDIDATES",
+      "population": "LEAD_CONTRACT_BRIDGE_ROWS",
+      "numerator": 339529.0,
+      "denominator": 339529.0,
+      "coverage_pct": 100.0,
+      "status": "CONDITIONAL_ON_APPROVED_PRODUCT_CROSSWALK",
+      "details": "{\"MATCHED\": 339529}"
+    },
+    {
+      "coverage_area": "ROUND2_LINKAGE",
+      "population": "R2_SCORE_FILES:ALL",
+      "numerator": 1000528.0,
+      "denominator": NaN,
+      "coverage_pct": NaN,
+      "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+      "details": "FHS 1,000,528 rows/1,000,528 clients; CES 1,000,528/1,000,528; 0 unpaired/ambiguous."
+    },
+    {
+      "coverage_area": "ROUND2_LINKAGE",
+      "population": "CONTRACT_APPLICATIONS:ALL",
+      "numerator": 349399.0,
+      "denominator": 2513153.0,
+      "coverage_pct": 13.9028,
+      "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+      "details": "Distinct clients are unweighted; duplicated lead UUID/version rows remain event rows."
+    },
+    {
+      "coverage_area": "ROUND2_LINKAGE",
+      "population": "CONTRACT_APPLICATIONS:STRICTLY_POST_COMMON_CUTOFF",
+      "numerator": 200892.0,
+      "denominator": 1974930.0,
+      "coverage_pct": 10.1721,
+      "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+      "details": "Distinct clients are unweighted; duplicated lead UUID/version rows remain event rows."
+    },
+    {
+      "coverage_area": "ROUND2_LINKAGE",
+      "population": "LEAD_ASSIGNMENTS:ALL",
+      "numerator": 228427.0,
+      "denominator": 3631389.0,
+      "coverage_pct": 6.2903,
+      "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+      "details": "Distinct clients are unweighted; duplicated lead UUID/version rows remain event rows."
+    },
+    {
+      "coverage_area": "ROUND2_LINKAGE",
+      "population": "LEAD_ASSIGNMENTS:STRICTLY_POST_COMMON_CUTOFF",
+      "numerator": 228427.0,
+      "denominator": 3631389.0,
+      "coverage_pct": 6.2903,
+      "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+      "details": "Distinct clients are unweighted; duplicated lead UUID/version rows remain event rows."
+    },
+    {
+      "coverage_area": "LEAD_WEIGHT",
+      "population": "ALL_LEAD_SOURCE_ROWS",
+      "numerator": 6130637.0,
+      "denominator": 6130637.0,
+      "coverage_pct": 100.0,
+      "status": "UNAPPROVED_QA_ONLY",
+      "details": "Observed weight sum 43454845.0002234; missing 0; nonpositive 0. Not a lead count or population estimate."
+    }
+  ],
+  "checks": [
+    {
+      "check": "all_contract_source_rows_preserved",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "3775371",
+      "expected": "3775371",
+      "note": "Every contract source row remains in contract_event_version, including duplicates and conflicting case versions."
+    },
+    {
+      "check": "all_lead_source_rows_preserved",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "Every lead source row remains in lead_event_version; repeated UUIDs are not deduplicated."
+    },
+    {
+      "check": "all_product_detail_rows_preserved",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "784902",
+      "expected": "784902",
+      "note": "Source-level detail rows remain in their bridge table."
+    },
+    {
+      "check": "all_employee_assignment_rows_preserved",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "275856",
+      "expected": "275856",
+      "note": "Source-level detail rows remain in their bridge table."
+    },
+    {
+      "check": "all_lead_reason_rows_preserved",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "12",
+      "expected": "12",
+      "note": "Source-level detail rows remain in their bridge table."
+    },
+    {
+      "check": "contract_fact_id_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "lead_row_id_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "shop_master_record_id_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "seller_master_record_id_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "r2_segment_client_key_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "lead_match_summary_one_row_per_lead",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "shop_behavior_profile_one_row_per_shop",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "contract_shop_bridge_no_row_inflation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "3775371",
+      "expected": "3775371",
+      "note": "One-row-per-source-event bridge must preserve its source grain."
+    },
+    {
+      "check": "lead_shop_bridge_no_row_inflation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "One-row-per-source-event bridge must preserve its source grain."
+    },
+    {
+      "check": "contract_segment_bridge_no_row_inflation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "3775371",
+      "expected": "3775371",
+      "note": "One-row-per-source-event bridge must preserve its source grain."
+    },
+    {
+      "check": "lead_segment_bridge_no_row_inflation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "One-row-per-source-event bridge must preserve its source grain."
+    },
+    {
+      "check": "lead_match_summary_no_row_loss",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "One-row-per-source-event bridge must preserve its source grain."
+    },
+    {
+      "check": "contract_product_summary_one_row_per_case",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Product details are aggregated before joining to contract_fact."
+    },
+    {
+      "check": "contract_shop_month_grain_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Declared aggregate grain is unique."
+    },
+    {
+      "check": "contract_shop_month_total_grain_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Declared aggregate grain is unique."
+    },
+    {
+      "check": "lead_conversion_shop_month_grain_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Declared aggregate grain is unique."
+    },
+    {
+      "check": "shop_month_foundation_grain_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "One row per shop identifier (including unknown) and month."
+    },
+    {
+      "check": "lead_product_month_event_rows_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "Product-month aggregates count raw lead events once; UUID/client counts remain separate."
+    },
+    {
+      "check": "lead_shop_month_event_rows_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "Shop-month lead event totals come directly from lead source events, not sums of product-level distinct counts."
+    },
+    {
+      "check": "contract_month_event_rows_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "3775371",
+      "expected": "3775371",
+      "note": "Contract shop-month totals reconcile to date-valid canonical application events."
+    },
+    {
+      "check": "contract_foundation_event_rows_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "3775371",
+      "expected": "3775371",
+      "note": "Shop-month foundation totals reconcile without dimension fanout."
+    },
+    {
+      "check": "raw_to_event_version_amount_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "70604962581146.0",
+      "expected": "70604962581146.0",
+      "note": "Casting to numeric must preserve the sum of parseable source credit_amount values."
+    },
+    {
+      "check": "contract_shop_bridge_amount_no_inflation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "70604962581146.0",
+      "expected": "70604962581146.0",
+      "note": "Left-joining current shop attributes must preserve canonical raw amounts."
+    },
+    {
+      "check": "contract_segment_bridge_amount_no_inflation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "70604962581146.0",
+      "expected": "70604962581146.0",
+      "note": "Left-joining Round 2 segments must preserve canonical raw amounts."
+    },
+    {
+      "check": "dated_contract_month_amount_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "70604962581146.0",
+      "expected": "70604962581146.0",
+      "note": "Raw amount sum in shop-month total must match date-valid canonical events; it is not labeled funded volume."
+    },
+    {
+      "check": "funded_month_counts_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "2715985",
+      "expected": "2715985",
+      "note": "Selected funded flag counts reconcile over dated application months."
+    },
+    {
+      "check": "funded_month_amount_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "48180834314366.0",
+      "expected": "48180834314366.0",
+      "note": "Selected funded credit amount reconciles over dated application months."
+    },
+    {
+      "check": "funded_foundation_counts_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "2715985",
+      "expected": "2715985",
+      "note": "Foundation selected-funded count reconciles without fanout."
+    },
+    {
+      "check": "funded_foundation_amount_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "48180834314366.0",
+      "expected": "48180834314366.0",
+      "note": "Foundation selected-funded amount reconciles without fanout."
+    },
+    {
+      "check": "conversion_month_primary_matches_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "260674",
+      "expected": "260674",
+      "note": "Shop-month conversion table accounts for each primary confirmed match once."
+    },
+    {
+      "check": "sample_weight_raw_and_typed_columns_are_distinct",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "{\"sample_weight\": \"DOUBLE\", \"sample_weight_raw\": \"VARCHAR\"}",
+      "expected": "{\"sample_weight\": \"DOUBLE\", \"sample_weight_raw\": \"VARCHAR\"}",
+      "note": "Raw source representation and parsed QA-only sensitivity value must not collide or be mistaken for each other."
+    },
+    {
+      "check": "round2_production_score_cutoffs_read_from_source_config",
+      "status": "PASS",
+      "severity": "CONDITIONAL",
+      "observed": "\"2025-06-05\"",
+      "expected": "\"FHS and CES SNAPSHOT_DATE\"",
+      "note": "Production score snapshots are read from Round 2 config; feature-level timestamp lineage still requires review."
+    },
+    {
+      "check": "round2_feature_timestamp_lineage_audited",
+      "status": "FAIL",
+      "severity": "BUSINESS_GATE",
+      "observed": "\"REVIEW_REQUIRED\"",
+      "expected": "\"Every score feature timestamp verified\"",
+      "note": "Code snapshot dates are known, but this pipeline does not certify every feature's point-in-time lineage."
+    },
+    {
+      "check": "lead_product_crosswalk_approved",
+      "status": "PASS",
+      "severity": "BUSINESS_GATE",
+      "observed": "4",
+      "expected": "\">=1 configured team-assumption mappings\"",
+      "note": "Configured equality mappings are competition assumptions, not owner approvals."
+    },
+    {
+      "check": "contract_status_outcome_semantics_approved",
+      "status": "PASS",
+      "severity": "BUSINESS_GATE",
+      "observed": "7",
+      "expected": "\">=1 explicit status mappings\"",
+      "note": "Current/final statuses are retained raw; funded outcome remains undefined unless approved."
+    },
+    {
+      "check": "lead_sample_weight_semantics_approved",
+      "status": "FAIL",
+      "severity": "BUSINESS_GATE",
+      "observed": "\"UNAPPROVED_QA_ONLY\"",
+      "expected": "\"source-owner scope and estimator approval\"",
+      "note": "Weights are preserved and summarized for QA only; no weighted population claim is emitted."
+    },
+    {
+      "check": "employee_active_status_codes_approved",
+      "status": "PASS",
+      "severity": "BUSINESS_GATE",
+      "observed": "1",
+      "expected": "\">=1 approved active status\"",
+      "note": "Raw assignment intervals remain available; active headcount proxy is null by default."
+    },
+    {
+      "check": "primary_matches_at_most_one_per_contract",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "At most one primary lead per contract."
+    },
+    {
+      "check": "primary_match_amount_not_above_all_contracts",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "5839719628947.0",
+      "expected": "70604962581146.0",
+      "note": "Primary-match amount cannot exceed canonical contract amount."
+    },
+    {
+      "check": "confirmed_pairs_minimum_expected",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "339529",
+      "expected": "\">=339000\"",
+      "note": "Expected approximately 339,529 criterion-qualified pairs."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:contract_fact",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "3775371",
+      "expected": "3775371",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:leads_clean",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:contract_product_bridge",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "784902",
+      "expected": "784902",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:shop_bridge",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "14231",
+      "expected": "14231",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:seller_master",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "11639",
+      "expected": "11639",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:employee_shop_bridge",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "275856",
+      "expected": "275856",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:lead_contract_candidates",
+      "status": "PASS",
+      "severity": "WARNING",
+      "observed": "339529",
+      "expected": "339529",
+      "note": "Candidate count may change under strict client/product/known-date/time eligibility; all other legacy grains remain invariant."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:shop_month_foundation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "715528",
+      "expected": "715528",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:lead_shop_month_product",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "349564",
+      "expected": "349564",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:lead_conversion_shop_month",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "140230",
+      "expected": "140230",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:shop_behavior_profile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "30705",
+      "expected": "30705",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:r2_customer_segment",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "1000528",
+      "expected": "1000528",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_amount_sum_unchanged:contract_fact_amount_sum",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "70604962581146.0",
+      "expected": "70604962581146.0",
+      "note": "Existing canonical amount sum should remain stable."
+    },
+    {
+      "check": "existing_amount_sum_unchanged:contract_month_amount_sum",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "70604962581146.0",
+      "expected": "70604962581146.0",
+      "note": "Existing canonical amount sum should remain stable."
+    }
+  ],
+  "unresolved_business_definitions": [
+    "Contract status-to-outcome and funded amount definition",
+    "Lead-to-contract product crosswalk approval",
+    "Lead sample_weight scope, target population, estimator and normalization",
+    "Employee active-status code semantics and headcount proxy",
+    "Round 2 score feature-level cutoff provenance",
+    "Historical validity of current shop/seller attributes"
+  ],
+  "join_reconciliation": {
+    "contract_version_rows": 3775371,
+    "contract_fact_rows": 3775371,
+    "contract_version_amount_sum": 70604962581146.0,
+    "contract_fact_amount_sum": 70604962581146.0,
+    "contract_shop_bridge_amount_sum": 70604962581146.0,
+    "contract_segment_bridge_amount_sum": 70604962581146.0,
+    "dated_contract_fact_rows": 3775371,
+    "dated_contract_fact_amount_sum": 70604962581146.0,
+    "contract_month_event_rows": 3775371,
+    "contract_month_amount_sum": 70604962581146.0,
+    "lead_version_rows": 6130637,
+    "lead_shop_bridge_rows": 6130637,
+    "contract_shop_bridge_rows": 3775371,
+    "contract_product_detail_rows": 784902,
+    "contract_product_case_rows": 779941,
+    "dated_lead_event_rows": 6130637,
+    "lead_month_event_rows": 6130637,
+    "foundation_contract_event_rows": 3775371,
+    "foundation_lead_event_rows": 6130637,
+    "contract_raw_rows": 3775371,
+    "contract_raw_amount_sum": 70604962581146.0,
+    "lead_raw_rows": 6130637,
+    "raw_to_event_version_amount_delta": 0.0,
+    "shop_bridge_amount_delta": 0.0,
+    "segment_bridge_amount_delta": 0.0,
+    "dated_month_amount_delta": 0.0
+  },
+  "parquet_readback": [
+    {
+      "file": "contract_clean.parquet",
+      "rows": 3775371,
+      "columns": 48,
+      "file_bytes": 318952468,
+      "readable_by_pyarrow": true,
+      "expected_rows": 3775371,
+      "row_count_match": true
+    },
+    {
+      "file": "leads_clean.parquet",
+      "rows": 6130637,
+      "columns": 63,
+      "file_bytes": 689271615,
+      "readable_by_pyarrow": true,
+      "expected_rows": 6130637,
+      "row_count_match": true
+    },
+    {
+      "file": "contract_product_clean.parquet",
+      "rows": 784902,
+      "columns": 14,
+      "file_bytes": 38455738,
+      "readable_by_pyarrow": true,
+      "expected_rows": 784902,
+      "row_count_match": true
+    },
+    {
+      "file": "shop_clean.parquet",
+      "rows": 14231,
+      "columns": 32,
+      "file_bytes": 558699,
+      "readable_by_pyarrow": true,
+      "expected_rows": 14231,
+      "row_count_match": true
+    },
+    {
+      "file": "seller_clean.parquet",
+      "rows": 11639,
+      "columns": 16,
+      "file_bytes": 154459,
+      "readable_by_pyarrow": true,
+      "expected_rows": 11639,
+      "row_count_match": true
+    },
+    {
+      "file": "employee_shop_clean.parquet",
+      "rows": 275856,
+      "columns": 26,
+      "file_bytes": 15480329,
+      "readable_by_pyarrow": true,
+      "expected_rows": 275856,
+      "row_count_match": true
+    },
+    {
+      "file": "lead_contract_candidates.parquet",
+      "rows": 339529,
+      "columns": 30,
+      "file_bytes": 20276615,
+      "readable_by_pyarrow": true,
+      "expected_rows": 339529,
+      "row_count_match": true
+    },
+    {
+      "file": "shop_month_foundation.parquet",
+      "rows": 715528,
+      "columns": 29,
+      "file_bytes": 5484703,
+      "readable_by_pyarrow": true,
+      "expected_rows": 715528,
+      "row_count_match": true
+    },
+    {
+      "file": "lead_shop_month_product.parquet",
+      "rows": 349564,
+      "columns": 13,
+      "file_bytes": 2857356,
+      "readable_by_pyarrow": true,
+      "expected_rows": 349564,
+      "row_count_match": true
+    },
+    {
+      "file": "lead_conversion_shop_month.parquet",
+      "rows": 140230,
+      "columns": 11,
+      "file_bytes": 1147715,
+      "readable_by_pyarrow": true,
+      "expected_rows": 140230,
+      "row_count_match": true
+    },
+    {
+      "file": "shop_behavior_profile.parquet",
+      "rows": 30705,
+      "columns": 14,
+      "file_bytes": 654577,
+      "readable_by_pyarrow": true,
+      "expected_rows": 30705,
+      "row_count_match": true
+    },
+    {
+      "file": "R2/r2_customer_segment.parquet",
+      "rows": 1000528,
+      "columns": 24,
+      "file_bytes": 7926280,
+      "readable_by_pyarrow": true,
+      "expected_rows": 1000528,
+      "row_count_match": true
+    }
+  ],
+  "metrics_file": "metrics_phase1.json"
+}

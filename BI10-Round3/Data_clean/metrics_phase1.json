@@ -1,0 +1,3652 @@
+{
+  "schema_version": "1.0",
+  "run_id": "20261021T234210Z",
+  "phase": "Phase 1 — Data Processing / Foundation only",
+  "raw_inventory": [
+    {
+      "dataset": "contract",
+      "file_name": "contract.csv",
+      "source_format": "csv",
+      "source_bytes": 573943563,
+      "source_rows": 3775371.0,
+      "source_columns": 21.0,
+      "ingestion_policy": "DuckDB VARCHAR-preserving CSV scan"
+    },
+    {
+      "dataset": "leads",
+      "file_name": "leads.csv",
+      "source_format": "csv",
+      "source_bytes": 1068338893,
+      "source_rows": 6130637.0,
+      "source_columns": 19.0,
+      "ingestion_policy": "DuckDB VARCHAR-preserving CSV scan"
+    },
+    {
+      "dataset": "contract_product",
+      "file_name": "contract_product.csv",
+      "source_format": "csv",
+      "source_bytes": 48520659,
+      "source_rows": 784902.0,
+      "source_columns": 5.0,
+      "ingestion_policy": "DuckDB VARCHAR-preserving CSV scan"
+    },
+    {
+      "dataset": "employee_assignment",
+      "file_name": "emp_2_salesroom.csv",
+      "source_format": "csv",
+      "source_bytes": 17895356,
+      "source_rows": 275856.0,
+      "source_columns": 6.0,
+      "ingestion_policy": "DuckDB VARCHAR-preserving CSV scan"
+    },
+    {
+      "dataset": "shop",
+      "file_name": "salesroom.xlsx",
+      "source_format": "xlsx",
+      "source_bytes": 1091472,
+      "source_rows": 14231.0,
+      "source_columns": 13.0,
+      "ingestion_policy": "pandas/openpyxl source values"
+    },
+    {
+      "dataset": "seller",
+      "file_name": "seller.xlsx",
+      "source_format": "xlsx",
+      "source_bytes": 535791,
+      "source_rows": 11639.0,
+      "source_columns": 8.0,
+      "ingestion_policy": "pandas/openpyxl source values"
+    },
+    {
+      "dataset": "lead_reason",
+      "file_name": "cl_lead_fin_reason.xlsx",
+      "source_format": "xlsx",
+      "source_bytes": 16924,
+      "source_rows": 12.0,
+      "source_columns": 9.0,
+      "ingestion_policy": "pandas/openpyxl source values"
+    },
+    {
+      "dataset": "schema_workbook",
+      "file_name": "StructureTable.xlsx",
+      "source_format": "xlsx",
+      "source_bytes": 28840,
+      "source_rows": NaN,
+      "source_columns": NaN,
+      "ingestion_policy": "Read-only schema metadata"
+    },
+    {
+      "dataset": "r2_fhs",
+      "file_name": "BI10-Round2/output/Task1/scores/fh_scores.parquet",
+      "source_format": "parquet",
+      "source_bytes": 51764752,
+      "source_rows": 1000528.0,
+      "source_columns": 47.0,
+      "ingestion_policy": "Read-only Round 2 score output; key uniqueness validated in score bridge"
+    },
+    {
+      "dataset": "r2_ces",
+      "file_name": "BI10-Round2/output/Task2/scores/eng_scores.parquet",
+      "source_format": "parquet",
+      "source_bytes": 19137691,
+      "source_rows": 1000528.0,
+      "source_columns": 30.0,
+      "ingestion_policy": "Read-only Round 2 score output; key uniqueness validated in score bridge"
+    }
+  ],
+  "schema_validation": [
+    {
+      "dataset": "contract",
+      "field": "SKP_SALESROOM",
+      "expected_type": "int64",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Identifier of the salesroom (POS) where the contract was generated"
+    },
+    {
+      "dataset": "contract",
+      "field": "SKP_CREDIT_CASE",
+      "expected_type": "int64",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Unique identifier of the credit case/contract application"
+    },
+    {
+      "dataset": "contract",
+      "field": "SKP_EMP_PRE_PROCESS",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Identifier of the employee who pre-processed the credit case"
+    },
+    {
+      "dataset": "contract",
+      "field": "SKP_PRODUCT",
+      "expected_type": "int64",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Identifier of the financed product"
+    },
+    {
+      "dataset": "contract",
+      "field": "PRODUCT",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Product category of the contract (e.g. CD, TW, BNPL)"
+    },
+    {
+      "dataset": "contract",
+      "field": "NAME_STATUS",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Current/final status of the credit case"
+    },
+    {
+      "dataset": "contract",
+      "field": "PRICE",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Cash price of the purchased product or service"
+    },
+    {
+      "dataset": "contract",
+      "field": "INIT_PAY",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Initial payment/down payment made by the customer"
+    },
+    {
+      "dataset": "contract",
+      "field": "CREDIT_AMOUNT",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Principal amount financed through credit"
+    },
+    {
+      "dataset": "contract",
+      "field": "INS_AMOUNT",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Insurance amount included in the contract"
+    },
+    {
+      "dataset": "contract",
+      "field": "PAYMENT_NUM",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Number of scheduled installment payments"
+    },
+    {
+      "dataset": "contract",
+      "field": "SKP_CLIENT",
+      "expected_type": "int64",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Unique identifier of the customer"
+    },
+    {
+      "dataset": "contract",
+      "field": "DATE_SIGN",
+      "expected_type": "timestamp",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Datetime the contract was signed"
+    },
+    {
+      "dataset": "contract",
+      "field": "DATE_APPLY",
+      "expected_type": "timestamp",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Datetime the credit application was submitted"
+    },
+    {
+      "dataset": "contract",
+      "field": "AMT_BILLING_1ST",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Billing amount recorded for the first payment period"
+    },
+    {
+      "dataset": "contract",
+      "field": "AMT_BILLING_2ND",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Billing amount recorded for the second payment period"
+    },
+    {
+      "dataset": "contract",
+      "field": "AMT_BILLING_3RD",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Billing amount recorded for the third payment period"
+    },
+    {
+      "dataset": "contract",
+      "field": "DPD_1PD",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Days-past-due measure at the first payment checkpoint"
+    },
+    {
+      "dataset": "contract",
+      "field": "DPD_2PD",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Days-past-due measure at the second payment checkpoint"
+    },
+    {
+      "dataset": "contract",
+      "field": "DPD_3PD",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Days-past-due measure at the third payment checkpoint"
+    },
+    {
+      "dataset": "contract",
+      "field": "DPD_4PD",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Days-past-due measure at the fourth payment checkpoint"
+    },
+    {
+      "dataset": "leads",
+      "field": "ID_UUID",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Unique identifier (UUID) of the lead"
+    },
+    {
+      "dataset": "leads",
+      "field": "DTIME_CREATED",
+      "expected_type": "timestamp",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Datetime the lead was created in the system"
+    },
+    {
+      "dataset": "leads",
+      "field": "DATE_ASSIGNED",
+      "expected_type": "timestamp",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Datetime the lead was assigned to an employee"
+    },
+    {
+      "dataset": "leads",
+      "field": "ID_LEAD_SOURCE",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Source/channel the lead came from"
+    },
+    {
+      "dataset": "leads",
+      "field": "TEXT_ACCEPTED_BY",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Name/account of the person who accepted the lead"
+    },
+    {
+      "dataset": "leads",
+      "field": "SKP_EMPLOYEE",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Identifier of the employee handling the lead"
+    },
+    {
+      "dataset": "leads",
+      "field": "CODE_PRODUCT_TYPE",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Product type offered in the lead (CD, TW, CL, CC, BNPL...)"
+    },
+    {
+      "dataset": "leads",
+      "field": "AMT_LOAN_LIMIT",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Loan limit amount offered to the customer"
+    },
+    {
+      "dataset": "leads",
+      "field": "CODE_POS",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Code of the point of sale (POS) linked to the lead"
+    },
+    {
+      "dataset": "leads",
+      "field": "SKP_SALESROOM",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Identifier of the salesroom (POS) linked to the lead"
+    },
+    {
+      "dataset": "leads",
+      "field": "CODE_LEAD_STATUS",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Use mapping with cl_lead_fin_reason by id_source"
+    },
+    {
+      "dataset": "leads",
+      "field": "TEXT_CONTRACT_NUMBER",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Contract number created from the lead (if converted)"
+    },
+    {
+      "dataset": "leads",
+      "field": "TEXT_TENOR",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Tenor (number of instalments) offered in the lead"
+    },
+    {
+      "dataset": "leads",
+      "field": "CODE_SA",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Code of the sales agent working on the lead"
+    },
+    {
+      "dataset": "leads",
+      "field": "RESULT",
+      "expected_type": "double",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Result/score of the lead"
+    },
+    {
+      "dataset": "leads",
+      "field": "SKP_CREDIT_CASE",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Identifier of the credit case generated from the lead"
+    },
+    {
+      "dataset": "leads",
+      "field": "SKP_CLIENT",
+      "expected_type": "number",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Identifier of the customer of the lead"
+    },
+    {
+      "dataset": "leads",
+      "field": "sample_weight",
+      "expected_type": NaN,
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "NOT_DOCUMENTED_IN_SCHEMA",
+      "schema_status": "NOT_IN_SCHEMA",
+      "description": "Observed in the supplied source but absent from StructureTable.xlsx."
+    },
+    {
+      "dataset": "leads",
+      "field": "code_product_type_original",
+      "expected_type": NaN,
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "NOT_DOCUMENTED_IN_SCHEMA",
+      "schema_status": "NOT_IN_SCHEMA",
+      "description": "Observed in the supplied source but absent from StructureTable.xlsx."
+    },
+    {
+      "dataset": "contract_product",
+      "field": "skp_credit_case",
+      "expected_type": "int64",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Unique identifier of the credit case/contract application"
+    },
+    {
+      "dataset": "contract_product",
+      "field": "name_producer",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Name of the manufacturer or producer of the financed goods (e.g. HONDA)"
+    },
+    {
+      "dataset": "contract_product",
+      "field": "name_goods_category",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Category of the financed goods (e.g. Two Wheelers)"
+    },
+    {
+      "dataset": "contract_product",
+      "field": "name_goods_type",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Type of the financed goods within the product category (e.g. Two Wheelers)"
+    },
+    {
+      "dataset": "contract_product",
+      "field": "goods_group",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Standardized product group assigned to the financed goods (e.g. Two Wheelers)"
+    },
+    {
+      "dataset": "employee_assignment",
+      "field": "ROLE",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Role of the employee in the salesroom assignment (e.g. SA)"
+    },
+    {
+      "dataset": "employee_assignment",
+      "field": "SKP_SALESROOM",
+      "expected_type": "int64",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Identifier of the assigned salesroom (POS)"
+    },
+    {
+      "dataset": "employee_assignment",
+      "field": "SKP_EMPLOYEE",
+      "expected_type": "int64",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Identifier of the employee assigned to the salesroom"
+    },
+    {
+      "dataset": "employee_assignment",
+      "field": "DTIME_VALID_FROM",
+      "expected_type": "timestamp",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Datetime from which the assignment is valid"
+    },
+    {
+      "dataset": "employee_assignment",
+      "field": "DTIME_VALID_TO",
+      "expected_type": "timestamp",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Datetime until which the assignment is valid"
+    },
+    {
+      "dataset": "employee_assignment",
+      "field": "CODE_STATUS",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "VARCHAR-preserved",
+      "type_review_state": "RAW_TEXT_PRESERVED; CHECK_TYPED_DERIVATIVES",
+      "schema_status": "PRESENT",
+      "description": "Status code of the employee-to-salesroom assignment"
+    },
+    {
+      "dataset": "shop",
+      "field": "SKP_SALESROOM",
+      "expected_type": "int64",
+      "observed_type": "INTEGER",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Unique identifier of the salesroom (POS)"
+    },
+    {
+      "dataset": "shop",
+      "field": "SALESROOM_CATEGORY",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Category of the salesroom (e.g. Physical: Big,Medium,Small; Online)"
+    },
+    {
+      "dataset": "shop",
+      "field": "SALESROOM_MODEL",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Operating model of the salesroom | Non-Aldi: Homecredit employee support to make contract | Aldi: Shop employee support to make contract"
+    },
+    {
+      "dataset": "shop",
+      "field": "SALESROOM_PRODUCT",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Main product line sold at the salesroom (CD, TW, NS...). Brand starting with 'RL' is re-classified as NS"
+    },
+    {
+      "dataset": "shop",
+      "field": "SALESROOM_STATUS",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Current status of the salesroom (e.g. Active, Closed)"
+    },
+    {
+      "dataset": "shop",
+      "field": "SALESROOM_START",
+      "expected_type": "date",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Date the salesroom started operating"
+    },
+    {
+      "dataset": "shop",
+      "field": "SALESROOM_END",
+      "expected_type": "date",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Date the salesroom stopped operating (null if still active)"
+    },
+    {
+      "dataset": "shop",
+      "field": "SALESROOM_TOWN",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Ward where the salesroom is located (including New and Old Administrative boundary - Resolution No. 202/2025/QH15)"
+    },
+    {
+      "dataset": "shop",
+      "field": "SLAESROOM_DISTRICT",
+      "expected_type": "object",
+      "observed_type": NaN,
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "MISSING_FROM_SOURCE",
+      "description": "District where the salesroom is located ( '.' is a district following new Administrative boundary, others value is a district following old Administrative boundary - Resolution No. 202/2025/QH15)"
+    },
+    {
+      "dataset": "shop",
+      "field": "SALESROOM_PROVINCE",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Province where the salesroom is located (including New and Old Administrative boundary - Resolution No. 202/2025/QH15)"
+    },
+    {
+      "dataset": "shop",
+      "field": "SALESROOM_AREA",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Area/region where the salesroom is located"
+    },
+    {
+      "dataset": "shop",
+      "field": "SKP_SELLER",
+      "expected_type": "int64",
+      "observed_type": "INTEGER",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Identifier of the seller (dealer) that owns the salesroom"
+    },
+    {
+      "dataset": "shop",
+      "field": "SALESROOM_DISTRICT",
+      "expected_type": NaN,
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "NOT_DOCUMENTED_IN_SCHEMA",
+      "schema_status": "NOT_IN_SCHEMA",
+      "description": "Observed in the supplied source but absent from StructureTable.xlsx."
+    },
+    {
+      "dataset": "shop",
+      "field": "SKP_EMP_MANAGE",
+      "expected_type": NaN,
+      "observed_type": "INTEGER",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "NOT_DOCUMENTED_IN_SCHEMA",
+      "schema_status": "NOT_IN_SCHEMA",
+      "description": "Observed in the supplied source but absent from StructureTable.xlsx."
+    },
+    {
+      "dataset": "seller",
+      "field": "SKP_SELLER",
+      "expected_type": "int64",
+      "observed_type": "INTEGER",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Unique identifier of the seller (dealer)"
+    },
+    {
+      "dataset": "seller",
+      "field": "SELLER_MODEL",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Business model of the dealer"
+    },
+    {
+      "dataset": "seller",
+      "field": "SELLER_STATUS",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Current status of the dealer (e.g. Active, Inactive)"
+    },
+    {
+      "dataset": "seller",
+      "field": "SELLER_ACTIVE_DATE",
+      "expected_type": "date",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Date of the first activation of the seller"
+    },
+    {
+      "dataset": "seller",
+      "field": "SELLER_TYPE",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Classification of the seller: Key Account, Local Partner, TW Key Dealer, Stone Shop, NS KA"
+    },
+    {
+      "dataset": "seller",
+      "field": "SELLER_PRODUCT",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Main product line of the seller (CD, TW, NS...)"
+    },
+    {
+      "dataset": "seller",
+      "field": "SELLER_PROVINCE",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Province where the seller is located"
+    },
+    {
+      "dataset": "seller",
+      "field": "SELLER_AREA",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Area/region where the seller is located"
+    },
+    {
+      "dataset": "lead_reason",
+      "field": "SKP_LDS_EMP_FSH_RSN_DICT",
+      "expected_type": "int64",
+      "observed_type": "INTEGER",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Unique identifier of the LDS employee finish-reason dictionary record"
+    },
+    {
+      "dataset": "lead_reason",
+      "field": "CODE_SOURCE_SYSTEM",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Code of the source system providing the finish reason (e.g. LDS)"
+    },
+    {
+      "dataset": "lead_reason",
+      "field": "ID_SOURCE",
+      "expected_type": "int64",
+      "observed_type": "INTEGER",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Source-system identifier of the lead finish reason; use this field to map from Leads.CODE_LEAD_STATUS"
+    },
+    {
+      "dataset": "lead_reason",
+      "field": "DATE_EFFECTIVE",
+      "expected_type": "date",
+      "observed_type": "TIMESTAMP",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Date from which the finish-reason mapping is effective"
+    },
+    {
+      "dataset": "lead_reason",
+      "field": "SKP_PROC_INSERTED",
+      "expected_type": "int64",
+      "observed_type": "INTEGER",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Identifier of the process that inserted the record"
+    },
+    {
+      "dataset": "lead_reason",
+      "field": "SKP_PROC_UPDATED",
+      "expected_type": "int64",
+      "observed_type": "INTEGER",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Identifier of the process that last updated the record"
+    },
+    {
+      "dataset": "lead_reason",
+      "field": "FLAG_DELETED",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Deletion indicator for the record (N = active/not deleted)"
+    },
+    {
+      "dataset": "lead_reason",
+      "field": "CODE_FINISH",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Standardized code of the lead finish reason (e.g. DEAL, REJECTED, NOT_INTEREST)"
+    },
+    {
+      "dataset": "lead_reason",
+      "field": "DESC_DESCRIPTION",
+      "expected_type": "object",
+      "observed_type": "VARCHAR",
+      "observed_ingest_type": "XLSX-inferred",
+      "type_review_state": "XLSX_TYPE_RECORDED",
+      "schema_status": "PRESENT",
+      "description": "Human-readable description of the lead finish reason"
+    }
+  ],
+  "missingness": [
+    {
+      "dataset": "contract",
+      "column": "skp_salesroom",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 55,
+      "blank_count": 0,
+      "null_or_blank_count": 55,
+      "null_or_blank_pct": 0.0015,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract",
+      "column": "skp_credit_case",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract",
+      "column": "skp_emp_pre_process",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 1,
+      "blank_count": 0,
+      "null_or_blank_count": 1,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract",
+      "column": "skp_product",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 7,
+      "blank_count": 0,
+      "null_or_blank_count": 7,
+      "null_or_blank_pct": 0.0002,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract",
+      "column": "product",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 49147,
+      "blank_count": 0,
+      "null_or_blank_count": 49147,
+      "null_or_blank_pct": 1.3018,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract",
+      "column": "name_status",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract",
+      "column": "price",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 2995428,
+      "blank_count": 0,
+      "null_or_blank_count": 2995428,
+      "null_or_blank_pct": 79.3413,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 0.0,
+      "numeric_sum_if_numeric": 21224263646820.0
+    },
+    {
+      "dataset": "contract",
+      "column": "init_pay",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 49147,
+      "blank_count": 0,
+      "null_or_blank_count": 49147,
+      "null_or_blank_pct": 1.3018,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 2983329.0,
+      "numeric_sum_if_numeric": 7645004854000.0
+    },
+    {
+      "dataset": "contract",
+      "column": "credit_amount",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 7,
+      "blank_count": 0,
+      "null_or_blank_count": 7,
+      "null_or_blank_pct": 0.0002,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 1137724.0,
+      "numeric_sum_if_numeric": 70604962581146.0
+    },
+    {
+      "dataset": "contract",
+      "column": "ins_amount",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 7,
+      "blank_count": 0,
+      "null_or_blank_count": 7,
+      "null_or_blank_pct": 0.0002,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 2624686.0,
+      "numeric_sum_if_numeric": 3109817679076.9004
+    },
+    {
+      "dataset": "contract",
+      "column": "payment_num",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 1417426,
+      "blank_count": 0,
+      "null_or_blank_count": 1417426,
+      "null_or_blank_pct": 37.544,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 0.0,
+      "numeric_sum_if_numeric": 37895375.0
+    },
+    {
+      "dataset": "contract",
+      "column": "skp_client",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 7,
+      "blank_count": 0,
+      "null_or_blank_count": 7,
+      "null_or_blank_pct": 0.0002,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract",
+      "column": "date_sign",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract",
+      "column": "date_apply",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract",
+      "column": "amt_billing_1st",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 2959530,
+      "blank_count": 0,
+      "null_or_blank_count": 2959530,
+      "null_or_blank_pct": 78.3904,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 26165.0,
+      "numeric_sum_if_numeric": 3212441955012.5
+    },
+    {
+      "dataset": "contract",
+      "column": "amt_billing_2nd",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 2959530,
+      "blank_count": 0,
+      "null_or_blank_count": 2959530,
+      "null_or_blank_pct": 78.3904,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 606642.0,
+      "numeric_sum_if_numeric": 952196450798.0
+    },
+    {
+      "dataset": "contract",
+      "column": "amt_billing_3rd",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 2959530,
+      "blank_count": 0,
+      "null_or_blank_count": 2959530,
+      "null_or_blank_pct": 78.3904,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 654710.0,
+      "numeric_sum_if_numeric": 808448499792.0
+    },
+    {
+      "dataset": "contract",
+      "column": "dpd_1pd",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 3593129.0,
+      "numeric_sum_if_numeric": 182242.0
+    },
+    {
+      "dataset": "contract",
+      "column": "dpd_2pd",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 3538220.0,
+      "numeric_sum_if_numeric": 237151.0
+    },
+    {
+      "dataset": "contract",
+      "column": "dpd_3pd",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 3531058.0,
+      "numeric_sum_if_numeric": 244313.0
+    },
+    {
+      "dataset": "contract",
+      "column": "dpd_4pd",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 3775371,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 3559060.0,
+      "numeric_sum_if_numeric": 216311.0
+    },
+    {
+      "dataset": "leads",
+      "column": "id_uuid",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "dtime_created",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "date_assigned",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "id_lead_source",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "text_accepted_by",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 205789,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "skp_employee",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 6130637,
+      "blank_count": 0,
+      "null_or_blank_count": 6130637,
+      "null_or_blank_pct": 100.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "amt_loan_limit",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 19372,
+      "blank_count": 0,
+      "null_or_blank_count": 19372,
+      "null_or_blank_pct": 0.316,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 0.0,
+      "numeric_sum_if_numeric": 378447352063523.0
+    },
+    {
+      "dataset": "leads",
+      "column": "code_pos",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 1229,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "skp_salesroom",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "code_lead_status",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "text_contract_number",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 6000244,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "text_tenor",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 6086540,
+      "zero_count_if_numeric": 841.0,
+      "numeric_sum_if_numeric": 1106630.0
+    },
+    {
+      "dataset": "leads",
+      "column": "code_sa",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 1434972,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "result",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 20411,
+      "blank_count": 0,
+      "null_or_blank_count": 20411,
+      "null_or_blank_pct": 0.3329,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 0.0,
+      "numeric_sum_if_numeric": 7629554.0
+    },
+    {
+      "dataset": "leads",
+      "column": "skp_credit_case",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "skp_client",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "sample_weight",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": 0.0,
+      "numeric_sum_if_numeric": 43454845.00026286
+    },
+    {
+      "dataset": "leads",
+      "column": "code_product_type_original",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "leads",
+      "column": "code_product_type",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 6130637,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract_product",
+      "column": "skp_credit_case",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 784902,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract_product",
+      "column": "name_producer",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 784902,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 238,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract_product",
+      "column": "name_goods_category",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 784902,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract_product",
+      "column": "name_goods_type",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 784902,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "contract_product",
+      "column": "goods_group",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 784902,
+      "null_count": 12476,
+      "blank_count": 0,
+      "null_or_blank_count": 12476,
+      "null_or_blank_pct": 1.5895,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "employee_assignment",
+      "column": "role",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 275856,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "employee_assignment",
+      "column": "skp_salesroom",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 275856,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "employee_assignment",
+      "column": "skp_employee",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 275856,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "employee_assignment",
+      "column": "dtime_valid_from",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 275856,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "employee_assignment",
+      "column": "dtime_valid_to",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 275856,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "employee_assignment",
+      "column": "code_status",
+      "ingest_type": "VARCHAR-preserved",
+      "source_rows": 275856,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "shop",
+      "column": "SKP_SALESROOM",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 14231,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "shop",
+      "column": "SALESROOM_CATEGORY",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 14231,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "shop",
+      "column": "SALESROOM_MODEL",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 14231,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "shop",
+      "column": "SALESROOM_PRODUCT",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 14231,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "shop",
+      "column": "SALESROOM_STATUS",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 14231,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "shop",
+      "column": "SALESROOM_START",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 14231,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "shop",
+      "column": "SALESROOM_END",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 14231,
+      "null_count": 12030,
+      "blank_count": 0,
+      "null_or_blank_count": 12030,
+      "null_or_blank_pct": 84.5338,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "shop",
+      "column": "SALESROOM_TOWN",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 14231,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 1,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "shop",
+      "column": "SALESROOM_DISTRICT",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 14231,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "shop",
+      "column": "SALESROOM_PROVINCE",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 14231,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "shop",
+      "column": "SALESROOM_AREA",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 14231,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "shop",
+      "column": "SKP_EMP_MANAGE",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 14231,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "shop",
+      "column": "SKP_SELLER",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 14231,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "seller",
+      "column": "SKP_SELLER",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 11639,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "seller",
+      "column": "SELLER_MODEL",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 11639,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "seller",
+      "column": "SELLER_STATUS",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 11639,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "seller",
+      "column": "SELLER_ACTIVE_DATE",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 11639,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "seller",
+      "column": "SELLER_TYPE",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 11639,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "seller",
+      "column": "SELLER_PRODUCT",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 11639,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "seller",
+      "column": "SELLER_PROVINCE",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 11639,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "seller",
+      "column": "SELLER_AREA",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 11639,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "lead_reason",
+      "column": "SKP_LDS_EMP_FSH_RSN_DICT",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 12,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "lead_reason",
+      "column": "CODE_SOURCE_SYSTEM",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 12,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "lead_reason",
+      "column": "ID_SOURCE",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 12,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "lead_reason",
+      "column": "DATE_EFFECTIVE",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 12,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "lead_reason",
+      "column": "SKP_PROC_INSERTED",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 12,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "lead_reason",
+      "column": "SKP_PROC_UPDATED",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 12,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "lead_reason",
+      "column": "FLAG_DELETED",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 12,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 0,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "lead_reason",
+      "column": "CODE_FINISH",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 12,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 1,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    },
+    {
+      "dataset": "lead_reason",
+      "column": "DESC_DESCRIPTION",
+      "ingest_type": "XLSX-inferred",
+      "source_rows": 12,
+      "null_count": 0,
+      "blank_count": 0,
+      "null_or_blank_count": 0,
+      "null_or_blank_pct": 0.0,
+      "placeholder_count": 1,
+      "zero_count_if_numeric": NaN,
+      "numeric_sum_if_numeric": NaN
+    }
+  ],
+  "key_integrity": [
+    {
+      "dataset": "contract",
+      "declared_key_fields": "skp_credit_case",
+      "source_rows": 3775371,
+      "distinct_key_count": 3775371.0,
+      "null_key_rows": 0.0,
+      "duplicate_key_groups": 0.0,
+      "duplicate_rows_beyond_first": 0.0,
+      "exact_duplicate_rows": 0,
+      "audit_state": "AUDITED_UNIQUE"
+    },
+    {
+      "dataset": "leads",
+      "declared_key_fields": "id_uuid",
+      "source_rows": 6130637,
+      "distinct_key_count": 5921646.0,
+      "null_key_rows": 0.0,
+      "duplicate_key_groups": 208990.0,
+      "duplicate_rows_beyond_first": 208991.0,
+      "exact_duplicate_rows": null,
+      "audit_state": "UUID_REPEAT_AUDITED; SOURCE_ROWS_PRESERVED; EXACT_ROW_FINGERPRINT_SKIPPED_PERFORMANCE"
+    },
+    {
+      "dataset": "contract_product",
+      "declared_key_fields": NaN,
+      "source_rows": 784902,
+      "distinct_key_count": NaN,
+      "null_key_rows": NaN,
+      "duplicate_key_groups": NaN,
+      "duplicate_rows_beyond_first": NaN,
+      "exact_duplicate_rows": 1400,
+      "audit_state": "NO_DECLARED_PRIMARY_KEY; ROW_FINGERPRINT_AUDITED"
+    },
+    {
+      "dataset": "employee_assignment",
+      "declared_key_fields": "role,skp_salesroom,skp_employee,dtime_valid_from,dtime_valid_to,code_status",
+      "source_rows": 275856,
+      "distinct_key_count": 274944.0,
+      "null_key_rows": 0.0,
+      "duplicate_key_groups": 912.0,
+      "duplicate_rows_beyond_first": 912.0,
+      "exact_duplicate_rows": 912,
+      "audit_state": "AUDITED; DUPLICATES_RETAINED_AND_FLAGGED"
+    },
+    {
+      "dataset": "shop",
+      "declared_key_fields": "SKP_SALESROOM",
+      "source_rows": 14231,
+      "distinct_key_count": 14231.0,
+      "null_key_rows": 0.0,
+      "duplicate_key_groups": 0.0,
+      "duplicate_rows_beyond_first": 0.0,
+      "exact_duplicate_rows": 0,
+      "audit_state": "AUDITED_UNIQUE"
+    },
+    {
+      "dataset": "seller",
+      "declared_key_fields": "SKP_SELLER",
+      "source_rows": 11639,
+      "distinct_key_count": 11639.0,
+      "null_key_rows": 0.0,
+      "duplicate_key_groups": 0.0,
+      "duplicate_rows_beyond_first": 0.0,
+      "exact_duplicate_rows": 0,
+      "audit_state": "AUDITED_UNIQUE"
+    },
+    {
+      "dataset": "lead_reason",
+      "declared_key_fields": "ID_SOURCE,DATE_EFFECTIVE,CODE_SOURCE_SYSTEM",
+      "source_rows": 12,
+      "distinct_key_count": 12.0,
+      "null_key_rows": 0.0,
+      "duplicate_key_groups": 0.0,
+      "duplicate_rows_beyond_first": 0.0,
+      "exact_duplicate_rows": 0,
+      "audit_state": "AUDITED_UNIQUE"
+    }
+  ],
+  "contract_status_mapping": [
+    {
+      "contract_status_raw": "Active",
+      "source_rows": 1407088,
+      "business_outcome": "FUNDED",
+      "definition_state": "OWNER_APPROVED_CONFIG",
+      "definition_note": "Status preserved as supplied; funded/application semantics are not inferred."
+    },
+    {
+      "contract_status_raw": "Finished",
+      "source_rows": 1221992,
+      "business_outcome": "FUNDED",
+      "definition_state": "OWNER_APPROVED_CONFIG",
+      "definition_note": "Status preserved as supplied; funded/application semantics are not inferred."
+    },
+    {
+      "contract_status_raw": "Signed",
+      "source_rows": 121,
+      "business_outcome": "FUNDED",
+      "definition_state": "OWNER_APPROVED_CONFIG",
+      "definition_note": "Status preserved as supplied; funded/application semantics are not inferred."
+    },
+    {
+      "contract_status_raw": "Paid off",
+      "source_rows": 23827,
+      "business_outcome": "PAID_OFF",
+      "definition_state": "OWNER_APPROVED_CONFIG",
+      "definition_note": "Status preserved as supplied; funded/application semantics are not inferred."
+    },
+    {
+      "contract_status_raw": "Written off",
+      "source_rows": 62957,
+      "business_outcome": "WRITTEN_OFF",
+      "definition_state": "OWNER_APPROVED_CONFIG",
+      "definition_note": "Status preserved as supplied; funded/application semantics are not inferred."
+    },
+    {
+      "contract_status_raw": "Rejected",
+      "source_rows": 565776,
+      "business_outcome": "REJECTED",
+      "definition_state": "OWNER_APPROVED_CONFIG",
+      "definition_note": "Status preserved as supplied; funded/application semantics are not inferred."
+    },
+    {
+      "contract_status_raw": "Cancelled",
+      "source_rows": 493600,
+      "business_outcome": "CANCELLED",
+      "definition_state": "OWNER_APPROVED_CONFIG",
+      "definition_note": "Status preserved as supplied; funded/application semantics are not inferred."
+    },
+    {
+      "contract_status_raw": "Approved",
+      "source_rows": 3,
+      "business_outcome": "UNMAPPED",
+      "definition_state": "OWNER_APPROVAL_REQUIRED",
+      "definition_note": "Status preserved as supplied; funded/application semantics are not inferred."
+    },
+    {
+      "contract_status_raw": "In Preprocess",
+      "source_rows": 4,
+      "business_outcome": "UNMAPPED",
+      "definition_state": "OWNER_APPROVAL_REQUIRED",
+      "definition_note": "Status preserved as supplied; funded/application semantics are not inferred."
+    },
+    {
+      "contract_status_raw": "In Process",
+      "source_rows": 3,
+      "business_outcome": "UNMAPPED",
+      "definition_state": "OWNER_APPROVAL_REQUIRED",
+      "definition_note": "Status preserved as supplied; funded/application semantics are not inferred."
+    }
+  ],
+  "product_crosswalk": [
+    {
+      "lead_product_code": "TW",
+      "lead_product_original_codes": "TW",
+      "contract_product_code": "TW",
+      "normalized_product": "TW",
+      "mapping_status": "APPROVED_COMPATIBLE",
+      "approval_state": "OWNER_APPROVED_CONFIG",
+      "mapping_evidence": "Explicit configuration entry",
+      "lead_rows": 91838,
+      "contract_rows": 329335
+    },
+    {
+      "lead_product_code": "CL",
+      "lead_product_original_codes": "CEL | CLX | PRC | SCC | SCC PR2 | SCC PR3",
+      "contract_product_code": "CL",
+      "normalized_product": "CL",
+      "mapping_status": "APPROVED_COMPATIBLE",
+      "approval_state": "OWNER_APPROVED_CONFIG",
+      "mapping_evidence": "Explicit configuration entry",
+      "lead_rows": 4409471,
+      "contract_rows": 1389963
+    },
+    {
+      "lead_product_code": "CC",
+      "lead_product_original_codes": "CCX",
+      "contract_product_code": "CC",
+      "normalized_product": "CC",
+      "mapping_status": "APPROVED_COMPATIBLE",
+      "approval_state": "OWNER_APPROVED_CONFIG",
+      "mapping_evidence": "Explicit configuration entry",
+      "lead_rows": 1245942,
+      "contract_rows": 416796
+    },
+    {
+      "lead_product_code": "CD",
+      "lead_product_original_codes": "CD",
+      "contract_product_code": "CD",
+      "normalized_product": "CD",
+      "mapping_status": "APPROVED_COMPATIBLE",
+      "approval_state": "OWNER_APPROVED_CONFIG",
+      "mapping_evidence": "Explicit configuration entry",
+      "lead_rows": 284167,
+      "contract_rows": 450608
+    },
+    {
+      "lead_product_code": "REL",
+      "lead_product_original_codes": "REL",
+      "contract_product_code": NaN,
+      "normalized_product": NaN,
+      "mapping_status": "NO_APPROVED_MAP",
+      "approval_state": "NEEDS_OWNER_APPROVAL",
+      "mapping_evidence": "No literal candidate found; original code retained",
+      "lead_rows": 99219,
+      "contract_rows": 0
+    }
+  ],
+  "weight_audit": [
+    {
+      "lead_source_raw": "CRM",
+      "lead_product_code": "CL",
+      "lead_product_original_code": "CLX",
+      "sample_weight": 1.0,
+      "source_rows": 797,
+      "raw_weight_sensitivity_sum_qa_only": 797.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "INSTANT_ONE_ALDI",
+      "lead_product_code": "CL",
+      "lead_product_original_code": "CEL",
+      "sample_weight": 1.0,
+      "source_rows": 139283,
+      "raw_weight_sensitivity_sum_qa_only": 139283.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "SOB",
+      "lead_product_code": "TW",
+      "lead_product_original_code": "TW",
+      "sample_weight": 1.0,
+      "source_rows": 61908,
+      "raw_weight_sensitivity_sum_qa_only": 61908.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "SOB",
+      "lead_product_code": "CL",
+      "lead_product_original_code": "CLX",
+      "sample_weight": 1.0,
+      "source_rows": 22438,
+      "raw_weight_sensitivity_sum_qa_only": 22438.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "INSTANT_TWO_RTDM",
+      "lead_product_code": "CL",
+      "lead_product_original_code": "SCC PR3",
+      "sample_weight": 19.662104,
+      "source_rows": 54064,
+      "raw_weight_sensitivity_sum_qa_only": 1063011.9906559088,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "INSTANT_TWO_RTDM",
+      "lead_product_code": "CL",
+      "lead_product_original_code": "SCC PR2",
+      "sample_weight": 19.662104,
+      "source_rows": 82337,
+      "raw_weight_sensitivity_sum_qa_only": 1618918.6570475744,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "INSTANT_TWO_RTDM",
+      "lead_product_code": "CL",
+      "lead_product_original_code": "SCC",
+      "sample_weight": 19.662104,
+      "source_rows": 1863599,
+      "raw_weight_sensitivity_sum_qa_only": 36642277.35244111,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "INSTANT_ONE_ALDI",
+      "lead_product_code": "REL",
+      "lead_product_original_code": "REL",
+      "sample_weight": 1.0,
+      "source_rows": 99219,
+      "raw_weight_sensitivity_sum_qa_only": 99219.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "GMA_BIG_TICKET",
+      "lead_product_code": "CL",
+      "lead_product_original_code": "CLX",
+      "sample_weight": 1.0,
+      "source_rows": 1166,
+      "raw_weight_sensitivity_sum_qa_only": 1166.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "GMA_SCORING",
+      "lead_product_code": "TW",
+      "lead_product_original_code": "TW",
+      "sample_weight": 1.0,
+      "source_rows": 6471,
+      "raw_weight_sensitivity_sum_qa_only": 6471.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "INSTANT_ONE_MOB",
+      "lead_product_code": "CL",
+      "lead_product_original_code": "CLX",
+      "sample_weight": 1.0,
+      "source_rows": 165665,
+      "raw_weight_sensitivity_sum_qa_only": 165665.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "GMA",
+      "lead_product_code": "CC",
+      "lead_product_original_code": "CCX",
+      "sample_weight": 1.0,
+      "source_rows": 2307,
+      "raw_weight_sensitivity_sum_qa_only": 2307.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "INSTANT_TWO_RTDM",
+      "lead_product_code": "CL",
+      "lead_product_original_code": "PRC",
+      "sample_weight": 1.0,
+      "source_rows": 1383839,
+      "raw_weight_sensitivity_sum_qa_only": 1383839.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "INSTANT_ONE_ALDI",
+      "lead_product_code": "CL",
+      "lead_product_original_code": "CLX",
+      "sample_weight": 1.0,
+      "source_rows": 653334,
+      "raw_weight_sensitivity_sum_qa_only": 653334.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "INSTANT_ONE_ALDI",
+      "lead_product_code": "CC",
+      "lead_product_original_code": "CCX",
+      "sample_weight": 1.0,
+      "source_rows": 1006969,
+      "raw_weight_sensitivity_sum_qa_only": 1006969.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "GMA",
+      "lead_product_code": "CL",
+      "lead_product_original_code": "CLX",
+      "sample_weight": 1.0,
+      "source_rows": 12700,
+      "raw_weight_sensitivity_sum_qa_only": 12700.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "WDE",
+      "lead_product_code": "CC",
+      "lead_product_original_code": "CCX",
+      "sample_weight": 1.0,
+      "source_rows": 6622,
+      "raw_weight_sensitivity_sum_qa_only": 6622.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "INSTANT_ONE_MOB",
+      "lead_product_code": "CC",
+      "lead_product_original_code": "CCX",
+      "sample_weight": 1.0,
+      "source_rows": 230044,
+      "raw_weight_sensitivity_sum_qa_only": 230044.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "SOB",
+      "lead_product_code": "CD",
+      "lead_product_original_code": "CD",
+      "sample_weight": 1.0,
+      "source_rows": 284167,
+      "raw_weight_sensitivity_sum_qa_only": 284167.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "WDE",
+      "lead_product_code": "CL",
+      "lead_product_original_code": "CLX",
+      "sample_weight": 1.0,
+      "source_rows": 30249,
+      "raw_weight_sensitivity_sum_qa_only": 30249.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    },
+    {
+      "lead_source_raw": "GMA",
+      "lead_product_code": "TW",
+      "lead_product_original_code": "TW",
+      "sample_weight": 1.0,
+      "source_rows": 23459,
+      "raw_weight_sensitivity_sum_qa_only": 23459.0,
+      "missing_weight_rows": 0,
+      "nonpositive_weight_rows": 0,
+      "interpretation_state": "UNAPPROVED_QA_ONLY_NOT_A_POPULATION_ESTIMATE"
+    }
+  ],
+  "funded_definition": "STATUS_MAP",
+  "funded_shares": {
+    "SIGN_DATE": 0.7221806810509483,
+    "STATUS_MAP": 0.7193955243074124,
+    "BILLING": 0.21609558371879214
+  },
+  "confirmed_lead_contract_pairs": 339529,
+  "primary_lead_contract_matches": 260674,
+  "nonprimary_pair_uuid_attribution": [
+    {
+      "attribution": "DIFFERENT_LEAD_UUID",
+      "nonprimary_pairs": 78438,
+      "affected_contracts": 54366
+    },
+    {
+      "attribution": "SAME_UUID_REPEAT",
+      "nonprimary_pairs": 417,
+      "affected_contracts": 417
+    }
+  ],
+  "employee_active_status_codes": [
+    "A"
+  ],
+  "published_parquet_row_counts": {
+    "contract_fact": 3775371,
+    "leads_clean": 6130637,
+    "contract_product_bridge": 784902,
+    "shop_bridge": 14231,
+    "seller_master": 11639,
+    "employee_shop_bridge": 275856,
+    "lead_contract_candidates": 339529,
+    "shop_month_foundation": 715528,
+    "lead_shop_month_product": 349564,
+    "lead_conversion_shop_month": 140230,
+    "shop_behavior_profile": 30705,
+    "r2_customer_segment": 1000528
+  },
+  "internal_audit_table_row_counts": {
+    "contract_product_summary": 779941,
+    "lead_match_summary": 6130637,
+    "contract_shop_month_status": 466396,
+    "contract_shop_month_total": 221984,
+    "contract_date_exceptions": 1048871,
+    "lead_date_exceptions": 0,
+    "lead_reason_lookup": 12,
+    "lead_conversion_shop_month": 140230,
+    "shop_behavior_profile": 30705
+  },
+  "round2_cutoffs": {
+    "fhs": "2025-06-05",
+    "ces": "2025-06-05",
+    "fhs_validation_asof": "2024-10-01",
+    "ces_validation_asof": "2025-02-01",
+    "common_cutoff": "2025-06-05",
+    "cutoff_provenance_state": "PRODUCTION_SCORE_SNAPSHOT_DECLARED_IN_ROUND2_CONFIG; FEATURE-LEVEL TIMESTAMP AUDIT STILL REQUIRED"
+  },
+  "join_reconciliation": {
+    "contract_version_rows": 3775371,
+    "contract_fact_rows": 3775371,
+    "contract_version_amount_sum": 70604962581146.0,
+    "contract_fact_amount_sum": 70604962581146.0,
+    "contract_shop_bridge_amount_sum": 70604962581146.0,
+    "contract_segment_bridge_amount_sum": 70604962581146.0,
+    "dated_contract_fact_rows": 3775371,
+    "dated_contract_fact_amount_sum": 70604962581146.0,
+    "contract_month_event_rows": 3775371,
+    "contract_month_amount_sum": 70604962581146.0,
+    "lead_version_rows": 6130637,
+    "lead_shop_bridge_rows": 6130637,
+    "contract_shop_bridge_rows": 3775371,
+    "contract_product_detail_rows": 784902,
+    "contract_product_case_rows": 779941,
+    "dated_lead_event_rows": 6130637,
+    "lead_month_event_rows": 6130637,
+    "foundation_contract_event_rows": 3775371,
+    "foundation_lead_event_rows": 6130637,
+    "contract_raw_rows": 3775371,
+    "contract_raw_amount_sum": 70604962581146.0,
+    "lead_raw_rows": 6130637,
+    "raw_to_event_version_amount_delta": 0.0,
+    "shop_bridge_amount_delta": 0.0,
+    "segment_bridge_amount_delta": 0.0,
+    "dated_month_amount_delta": 0.0
+  },
+  "report_path": "output/Data processing/data_quality_report.md",
+  "report_bundle_dir": "output/Data processing",
+  "validation_results": [
+    {
+      "check": "all_contract_source_rows_preserved",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "3775371",
+      "expected": "3775371",
+      "note": "Every contract source row remains in contract_event_version, including duplicates and conflicting case versions."
+    },
+    {
+      "check": "all_lead_source_rows_preserved",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "Every lead source row remains in lead_event_version; repeated UUIDs are not deduplicated."
+    },
+    {
+      "check": "all_product_detail_rows_preserved",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "784902",
+      "expected": "784902",
+      "note": "Source-level detail rows remain in their bridge table."
+    },
+    {
+      "check": "all_employee_assignment_rows_preserved",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "275856",
+      "expected": "275856",
+      "note": "Source-level detail rows remain in their bridge table."
+    },
+    {
+      "check": "all_lead_reason_rows_preserved",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "12",
+      "expected": "12",
+      "note": "Source-level detail rows remain in their bridge table."
+    },
+    {
+      "check": "contract_fact_id_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "lead_row_id_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "shop_master_record_id_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "seller_master_record_id_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "r2_segment_client_key_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "lead_match_summary_one_row_per_lead",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "shop_behavior_profile_one_row_per_shop",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Canonical bridge key must not fan out downstream joins."
+    },
+    {
+      "check": "contract_shop_bridge_no_row_inflation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "3775371",
+      "expected": "3775371",
+      "note": "One-row-per-source-event bridge must preserve its source grain."
+    },
+    {
+      "check": "lead_shop_bridge_no_row_inflation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "One-row-per-source-event bridge must preserve its source grain."
+    },
+    {
+      "check": "contract_segment_bridge_no_row_inflation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "3775371",
+      "expected": "3775371",
+      "note": "One-row-per-source-event bridge must preserve its source grain."
+    },
+    {
+      "check": "lead_segment_bridge_no_row_inflation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "One-row-per-source-event bridge must preserve its source grain."
+    },
+    {
+      "check": "lead_match_summary_no_row_loss",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "One-row-per-source-event bridge must preserve its source grain."
+    },
+    {
+      "check": "contract_product_summary_one_row_per_case",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Product details are aggregated before joining to contract_fact."
+    },
+    {
+      "check": "contract_shop_month_grain_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Declared aggregate grain is unique."
+    },
+    {
+      "check": "contract_shop_month_total_grain_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Declared aggregate grain is unique."
+    },
+    {
+      "check": "lead_conversion_shop_month_grain_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "Declared aggregate grain is unique."
+    },
+    {
+      "check": "shop_month_foundation_grain_unique",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "One row per shop identifier (including unknown) and month."
+    },
+    {
+      "check": "lead_product_month_event_rows_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "Product-month aggregates count raw lead events once; UUID/client counts remain separate."
+    },
+    {
+      "check": "lead_shop_month_event_rows_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "Shop-month lead event totals come directly from lead source events, not sums of product-level distinct counts."
+    },
+    {
+      "check": "contract_month_event_rows_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "3775371",
+      "expected": "3775371",
+      "note": "Contract shop-month totals reconcile to date-valid canonical application events."
+    },
+    {
+      "check": "contract_foundation_event_rows_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "3775371",
+      "expected": "3775371",
+      "note": "Shop-month foundation totals reconcile without dimension fanout."
+    },
+    {
+      "check": "raw_to_event_version_amount_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "70604962581146.0",
+      "expected": "70604962581146.0",
+      "note": "Casting to numeric must preserve the sum of parseable source credit_amount values."
+    },
+    {
+      "check": "contract_shop_bridge_amount_no_inflation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "70604962581146.0",
+      "expected": "70604962581146.0",
+      "note": "Left-joining current shop attributes must preserve canonical raw amounts."
+    },
+    {
+      "check": "contract_segment_bridge_amount_no_inflation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "70604962581146.0",
+      "expected": "70604962581146.0",
+      "note": "Left-joining Round 2 segments must preserve canonical raw amounts."
+    },
+    {
+      "check": "dated_contract_month_amount_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "70604962581146.0",
+      "expected": "70604962581146.0",
+      "note": "Raw amount sum in shop-month total must match date-valid canonical events; it is not labeled funded volume."
+    },
+    {
+      "check": "funded_month_counts_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "2715985",
+      "expected": "2715985",
+      "note": "Selected funded flag counts reconcile over dated application months."
+    },
+    {
+      "check": "funded_month_amount_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "48180834314366.0",
+      "expected": "48180834314366.0",
+      "note": "Selected funded credit amount reconciles over dated application months."
+    },
+    {
+      "check": "funded_foundation_counts_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "2715985",
+      "expected": "2715985",
+      "note": "Foundation selected-funded count reconciles without fanout."
+    },
+    {
+      "check": "funded_foundation_amount_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "48180834314366.0",
+      "expected": "48180834314366.0",
+      "note": "Foundation selected-funded amount reconciles without fanout."
+    },
+    {
+      "check": "conversion_month_primary_matches_reconcile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "260674",
+      "expected": "260674",
+      "note": "Shop-month conversion table accounts for each primary confirmed match once."
+    },
+    {
+      "check": "sample_weight_raw_and_typed_columns_are_distinct",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "{\"sample_weight\": \"DOUBLE\", \"sample_weight_raw\": \"VARCHAR\"}",
+      "expected": "{\"sample_weight\": \"DOUBLE\", \"sample_weight_raw\": \"VARCHAR\"}",
+      "note": "Raw source representation and parsed QA-only sensitivity value must not collide or be mistaken for each other."
+    },
+    {
+      "check": "round2_production_score_cutoffs_read_from_source_config",
+      "status": "PASS",
+      "severity": "CONDITIONAL",
+      "observed": "\"2025-06-05\"",
+      "expected": "\"FHS and CES SNAPSHOT_DATE\"",
+      "note": "Production score snapshots are read from Round 2 config; feature-level timestamp lineage still requires review."
+    },
+    {
+      "check": "round2_feature_timestamp_lineage_audited",
+      "status": "FAIL",
+      "severity": "BUSINESS_GATE",
+      "observed": "\"REVIEW_REQUIRED\"",
+      "expected": "\"Every score feature timestamp verified\"",
+      "note": "Code snapshot dates are known, but this pipeline does not certify every feature's point-in-time lineage."
+    },
+    {
+      "check": "lead_product_crosswalk_approved",
+      "status": "PASS",
+      "severity": "BUSINESS_GATE",
+      "observed": "4",
+      "expected": "\">=1 configured team-assumption mappings\"",
+      "note": "Configured equality mappings are competition assumptions, not owner approvals."
+    },
+    {
+      "check": "contract_status_outcome_semantics_approved",
+      "status": "PASS",
+      "severity": "BUSINESS_GATE",
+      "observed": "7",
+      "expected": "\">=1 explicit status mappings\"",
+      "note": "Current/final statuses are retained raw; funded outcome remains undefined unless approved."
+    },
+    {
+      "check": "lead_sample_weight_semantics_approved",
+      "status": "FAIL",
+      "severity": "BUSINESS_GATE",
+      "observed": "\"UNAPPROVED_QA_ONLY\"",
+      "expected": "\"source-owner scope and estimator approval\"",
+      "note": "Weights are preserved and summarized for QA only; no weighted population claim is emitted."
+    },
+    {
+      "check": "employee_active_status_codes_approved",
+      "status": "PASS",
+      "severity": "BUSINESS_GATE",
+      "observed": "1",
+      "expected": "\">=1 approved active status\"",
+      "note": "Raw assignment intervals remain available; active headcount proxy is null by default."
+    },
+    {
+      "check": "primary_matches_at_most_one_per_contract",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "0",
+      "expected": "0",
+      "note": "At most one primary lead per contract."
+    },
+    {
+      "check": "primary_match_amount_not_above_all_contracts",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "5839719628947.0",
+      "expected": "70604962581146.0",
+      "note": "Primary-match amount cannot exceed canonical contract amount."
+    },
+    {
+      "check": "confirmed_pairs_minimum_expected",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "339529",
+      "expected": "\">=339000\"",
+      "note": "Expected approximately 339,529 criterion-qualified pairs."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:contract_fact",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "3775371",
+      "expected": "3775371",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:leads_clean",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "6130637",
+      "expected": "6130637",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:contract_product_bridge",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "784902",
+      "expected": "784902",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:shop_bridge",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "14231",
+      "expected": "14231",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:seller_master",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "11639",
+      "expected": "11639",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:employee_shop_bridge",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "275856",
+      "expected": "275856",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:lead_contract_candidates",
+      "status": "PASS",
+      "severity": "WARNING",
+      "observed": "339529",
+      "expected": "339529",
+      "note": "Candidate count may change under strict client/product/known-date/time eligibility; all other legacy grains remain invariant."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:shop_month_foundation",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "715528",
+      "expected": "715528",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:lead_shop_month_product",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "349564",
+      "expected": "349564",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:lead_conversion_shop_month",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "140230",
+      "expected": "140230",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:shop_behavior_profile",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "30705",
+      "expected": "30705",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_table_row_count_unchanged:r2_customer_segment",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "1000528",
+      "expected": "1000528",
+      "note": "Existing published table count should remain stable."
+    },
+    {
+      "check": "existing_amount_sum_unchanged:contract_fact_amount_sum",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "70604962581146.0",
+      "expected": "70604962581146.0",
+      "note": "Existing canonical amount sum should remain stable."
+    },
+    {
+      "check": "existing_amount_sum_unchanged:contract_month_amount_sum",
+      "status": "PASS",
+      "severity": "FATAL",
+      "observed": "70604962581146.0",
+      "expected": "70604962581146.0",
+      "note": "Existing canonical amount sum should remain stable."
+    }
+  ],
+  "coverage_summary": [
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "contract",
+      "numerator": 3775371.0,
+      "denominator": 3775371.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "contract.csv; 21 columns; 573,943,563 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "leads",
+      "numerator": 6130637.0,
+      "denominator": 6130637.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "leads.csv; 19 columns; 1,068,338,893 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "contract_product",
+      "numerator": 784902.0,
+      "denominator": 784902.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "contract_product.csv; 5 columns; 48,520,659 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "employee_assignment",
+      "numerator": 275856.0,
+      "denominator": 275856.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "emp_2_salesroom.csv; 6 columns; 17,895,356 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "shop",
+      "numerator": 14231.0,
+      "denominator": 14231.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "salesroom.xlsx; 13 columns; 1,091,472 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "seller",
+      "numerator": 11639.0,
+      "denominator": 11639.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "seller.xlsx; 8 columns; 535,791 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "lead_reason",
+      "numerator": 12.0,
+      "denominator": 12.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "cl_lead_fin_reason.xlsx; 9 columns; 16,924 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "schema_workbook",
+      "numerator": NaN,
+      "denominator": NaN,
+      "coverage_pct": NaN,
+      "status": "INVENTORIED",
+      "details": "StructureTable.xlsx; None columns; 28,840 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "r2_fhs",
+      "numerator": 1000528.0,
+      "denominator": 1000528.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "BI10-Round2/output/Task1/scores/fh_scores.parquet; 47 columns; 51,764,752 bytes"
+    },
+    {
+      "coverage_area": "RAW_SOURCE",
+      "population": "r2_ces",
+      "numerator": 1000528.0,
+      "denominator": 1000528.0,
+      "coverage_pct": 100.0,
+      "status": "INVENTORIED",
+      "details": "BI10-Round2/output/Task2/scores/eng_scores.parquet; 30 columns; 19,137,691 bytes"
+    },
+    {
+      "coverage_area": "CURRENT_SHOP_MASTER",
+      "population": "CONTRACT_TO_CURRENT_SHOP",
+      "numerator": 621387.0,
+      "denominator": 3775371.0,
+      "coverage_pct": 16.459,
+      "status": "CURRENT_SNAPSHOT_ONLY",
+      "details": "26,654 distinct fact shop IDs; unmatched IDs preserved."
+    },
+    {
+      "coverage_area": "CURRENT_SHOP_MASTER",
+      "population": "LEAD_TO_CURRENT_SHOP",
+      "numerator": 385273.0,
+      "denominator": 6130637.0,
+      "coverage_pct": 6.2844,
+      "status": "CURRENT_SNAPSHOT_ONLY",
+      "details": "27,380 distinct fact shop IDs; unmatched IDs preserved."
+    },
+    {
+      "coverage_area": "PRODUCT_CROSSWALK",
+      "population": "LEAD_EVENT_ROWS",
+      "numerator": 6031418.0,
+      "denominator": 6130637.0,
+      "coverage_pct": 98.3816,
+      "status": "CONFIGURED",
+      "details": "0 event rows have literal candidate mappings; not approved by default."
+    },
+    {
+      "coverage_area": "LEAD_CONTRACT_CANDIDATES",
+      "population": "LEAD_CONTRACT_BRIDGE_ROWS",
+      "numerator": 339529.0,
+      "denominator": 339529.0,
+      "coverage_pct": 100.0,
+      "status": "CONDITIONAL_ON_APPROVED_PRODUCT_CROSSWALK",
+      "details": "{\"MATCHED\": 339529}"
+    },
+    {
+      "coverage_area": "ROUND2_LINKAGE",
+      "population": "R2_SCORE_FILES:ALL",
+      "numerator": 1000528.0,
+      "denominator": NaN,
+      "coverage_pct": NaN,
+      "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+      "details": "FHS 1,000,528 rows/1,000,528 clients; CES 1,000,528/1,000,528; 0 unpaired/ambiguous."
+    },
+    {
+      "coverage_area": "ROUND2_LINKAGE",
+      "population": "CONTRACT_APPLICATIONS:ALL",
+      "numerator": 349399.0,
+      "denominator": 2513153.0,
+      "coverage_pct": 13.9028,
+      "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+      "details": "Distinct clients are unweighted; duplicated lead UUID/version rows remain event rows."
+    },
+    {
+      "coverage_area": "ROUND2_LINKAGE",
+      "population": "CONTRACT_APPLICATIONS:STRICTLY_POST_COMMON_CUTOFF",
+      "numerator": 200892.0,
+      "denominator": 1974930.0,
+      "coverage_pct": 10.1721,
+      "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+      "details": "Distinct clients are unweighted; duplicated lead UUID/version rows remain event rows."
+    },
+    {
+      "coverage_area": "ROUND2_LINKAGE",
+      "population": "LEAD_ASSIGNMENTS:ALL",
+      "numerator": 228427.0,
+      "denominator": 3631389.0,
+      "coverage_pct": 6.2903,
+      "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+      "details": "Distinct clients are unweighted; duplicated lead UUID/version rows remain event rows."
+    },
+    {
+      "coverage_area": "ROUND2_LINKAGE",
+      "population": "LEAD_ASSIGNMENTS:STRICTLY_POST_COMMON_CUTOFF",
+      "numerator": 228427.0,
+      "denominator": 3631389.0,
+      "coverage_pct": 6.2903,
+      "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+      "details": "Distinct clients are unweighted; duplicated lead UUID/version rows remain event rows."
+    },
+    {
+      "coverage_area": "LEAD_WEIGHT",
+      "population": "ALL_LEAD_SOURCE_ROWS",
+      "numerator": 6130637.0,
+      "denominator": 6130637.0,
+      "coverage_pct": 100.0,
+      "status": "UNAPPROVED_QA_ONLY",
+      "details": "Observed weight sum 43454845.0002234; missing 0; nonpositive 0. Not a lead count or population estimate."
+    }
+  ],
+  "input_fingerprints": {
+    "contract": {
+      "relative_path": "BI10-Round3/Round3_BI10_dataset/contract.csv",
+      "source_bytes": 573943563,
+      "mtime_ns": 1792378004000000000,
+      "sha256": "8a5fadd7df51ebc322c02354164d7970a5fc3da77a7e9a3d107b983056e5732b"
+    },
+    "contract_product": {
+      "relative_path": "BI10-Round3/Round3_BI10_dataset/contract_product.csv",
+      "source_bytes": 48520659,
+      "mtime_ns": 1792379148000000000,
+      "sha256": "1b11dbc2be418496d412ce8fbc2f199e8b96bf4e562aa22fc41eb893798770cb"
+    },
+    "employee_assignment": {
+      "relative_path": "BI10-Round3/Round3_BI10_dataset/emp_2_salesroom.csv",
+      "source_bytes": 17895356,
+      "mtime_ns": 1792347553000000000,
+      "sha256": "abd7df96f6a502809890f93c1116ab9d3388295321609a9e4c65006dafce8549"
+    },
+    "lead_reason": {
+      "relative_path": "BI10-Round3/Round3_BI10_dataset/cl_lead_fin_reason.xlsx",
+      "source_bytes": 16924,
+      "mtime_ns": 1792295227000000000,
+      "sha256": "9568a6e29b710cadab8ff5e14868388431756f6521a085f174e952041a555e33"
+    },
+    "leads": {
+      "relative_path": "BI10-Round3/Round3_BI10_dataset/leads.csv",
+      "source_bytes": 1068338893,
+      "mtime_ns": 1792378559000000000,
+      "sha256": "906c62274b0b05813a49052241b57f42f0be837bbce656ba8c7858fd9b6a05e4"
+    },
+    "phase1_config": {
+      "relative_path": "BI10-Round3/Code/config/config.py",
+      "source_bytes": 3692,
+      "mtime_ns": 1792624497784229300,
+      "sha256": "ca719ac0b3dd18b35273d8e76ced3a40f1c0a3317b23f5ea6e83ae28b2f64d02"
+    },
+    "phase1_script": {
+      "relative_path": "BI10-Round3/Code/1. Data processing.py",
+      "source_bytes": 178407,
+      "mtime_ns": 1792626110628637300,
+      "sha256": "7690f5a4a472af06f145522ac49b2e0a7e352c8147408929bea08ce327ef4e9c"
+    },
+    "phase1_utils": {
+      "relative_path": "BI10-Round3/Code/config/utils.py",
+      "source_bytes": 8764,
+      "mtime_ns": 1792581438859949400,
+      "sha256": "03e6c62c8c4b38ac76b3fac4ff80c4b79be4b8d0c144d0cb3d56e03db4cacb95"
+    },
+    "r2_ces": {
+      "relative_path": "BI10-Round2/output/Task2/scores/eng_scores.parquet",
+      "source_bytes": 19137691,
+      "mtime_ns": 1792514849680972100,
+      "sha256": "5042c2a72a64def133ad043ad76361dcf44a761bc4916b52d2508ea21e55d0f6"
+    },
+    "r2_fhs": {
+      "relative_path": "BI10-Round2/output/Task1/scores/fh_scores.parquet",
+      "source_bytes": 51764752,
+      "mtime_ns": 1792514824874583100,
+      "sha256": "c1a8b9d20f721f362c5e064c12c72141746a650bed3a1ec4081a97c023284f9e"
+    },
+    "round2_config": {
+      "relative_path": "BI10-Round2/Code/config/config.py",
+      "source_bytes": 7342,
+      "mtime_ns": 1792509485350352000,
+      "sha256": "c366bcb19e11024f8e81c92fad3ecc892551e24b5d959e938e8c6e7e4a2d02b2"
+    },
+    "schema_workbook": {
+      "relative_path": "BI10-Round3/Round3_BI10_dataset/StructureTable.xlsx",
+      "source_bytes": 28840,
+      "mtime_ns": 1792585628803615800,
+      "sha256": "034738fcc11d475f181dcf9f3b2fe1add3186edc2b9e37548485299c7cf1847c"
+    },
+    "seller": {
+      "relative_path": "BI10-Round3/Round3_BI10_dataset/seller.xlsx",
+      "source_bytes": 535791,
+      "mtime_ns": 1792382999000000000,
+      "sha256": "c61fc6fbadfd5d081d8b0ae16e3d501296463f59f0ff1860b33b76c6864aa270"
+    },
+    "shop": {
+      "relative_path": "BI10-Round3/Round3_BI10_dataset/salesroom.xlsx",
+      "source_bytes": 1091472,
+      "mtime_ns": 1792386217000000000,
+      "sha256": "33b3155103026e48b8bd51fa596f07f87be5b5bbdc807981971a9d65192abc2b"
+    }
+  },
+  "pipeline_fingerprint": "3584bff661ecc0e9074ec348f90ec41ab6ac6c024c325002a77abac6ec409f88",
+  "incremental_cache": {
+    "source_audits_reused": false,
+    "reused_datasets": [],
+    "cache_source": "full refresh"
+  },
+  "stage_performance": [
+    {
+      "stage": "input_fingerprints_sha256",
+      "elapsed_seconds": 1.7668,
+      "rss_start_bytes": 111759360,
+      "rss_sampled_peak_bytes": 113360896,
+      "rss_end_bytes": 111828992,
+      "rss_peak_delta_bytes": 1601536,
+      "rss_samples": 6,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "source_view_and_dimension_ingestion",
+      "elapsed_seconds": 2.5332,
+      "rss_start_bytes": 111812608,
+      "rss_sampled_peak_bytes": 140062720,
+      "rss_end_bytes": 140062720,
+      "rss_peak_delta_bytes": 28250112,
+      "rss_samples": 9,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "read_only_status_profile",
+      "elapsed_seconds": 0.7382,
+      "rss_start_bytes": 140062720,
+      "rss_sampled_peak_bytes": 243548160,
+      "rss_end_bytes": 145383424,
+      "rss_peak_delta_bytes": 103485440,
+      "rss_samples": 2,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "source_profile_scan",
+      "elapsed_seconds": 9.08,
+      "rss_start_bytes": 144203776,
+      "rss_sampled_peak_bytes": 386252800,
+      "rss_end_bytes": 149430272,
+      "rss_peak_delta_bytes": 242049024,
+      "rss_samples": 35,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "primary_key_group_audits",
+      "elapsed_seconds": 2.4251,
+      "rss_start_bytes": 149430272,
+      "rss_sampled_peak_bytes": 729796608,
+      "rss_end_bytes": 160636928,
+      "rss_peak_delta_bytes": 580366336,
+      "rss_samples": 9,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "contract_versions_and_canonical_fact",
+      "elapsed_seconds": 5.067,
+      "rss_start_bytes": 161013760,
+      "rss_sampled_peak_bytes": 3240198144,
+      "rss_end_bytes": 3240198144,
+      "rss_peak_delta_bytes": 3079184384,
+      "rss_samples": 19,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "contract_status_mapping",
+      "elapsed_seconds": 0.0453,
+      "rss_start_bytes": 3240198144,
+      "rss_sampled_peak_bytes": 3240824832,
+      "rss_end_bytes": 3240824832,
+      "rss_peak_delta_bytes": 626688,
+      "rss_samples": 0,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "contract_product_detail_and_case_summary",
+      "elapsed_seconds": 62.567,
+      "rss_start_bytes": 3240824832,
+      "rss_sampled_peak_bytes": 7033974784,
+      "rss_end_bytes": 3535515648,
+      "rss_peak_delta_bytes": 3793149952,
+      "rss_samples": 242,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "contract_fact",
+      "elapsed_seconds": 2.0058,
+      "rss_start_bytes": 3535515648,
+      "rss_sampled_peak_bytes": 5978275840,
+      "rss_end_bytes": 5978275840,
+      "rss_peak_delta_bytes": 2442760192,
+      "rss_samples": 7,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "shop_seller_employee_dimensions",
+      "elapsed_seconds": 1.685,
+      "rss_start_bytes": 5978275840,
+      "rss_sampled_peak_bytes": 6228008960,
+      "rss_end_bytes": 6228008960,
+      "rss_peak_delta_bytes": 249733120,
+      "rss_samples": 6,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "lead_event_versions",
+      "elapsed_seconds": 16.6721,
+      "rss_start_bytes": 6228008960,
+      "rss_sampled_peak_bytes": 11093536768,
+      "rss_end_bytes": 11086327808,
+      "rss_peak_delta_bytes": 4865527808,
+      "rss_samples": 64,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "exact_duplicate_fingerprint_audits",
+      "elapsed_seconds": 0.935,
+      "rss_start_bytes": 11086327808,
+      "rss_sampled_peak_bytes": 11354968064,
+      "rss_end_bytes": 11354968064,
+      "rss_peak_delta_bytes": 268640256,
+      "rss_samples": 3,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "r2_segment_join",
+      "elapsed_seconds": 4.3706,
+      "rss_start_bytes": 11354963968,
+      "rss_sampled_peak_bytes": 12132048896,
+      "rss_end_bytes": 11939581952,
+      "rss_peak_delta_bytes": 777084928,
+      "rss_samples": 16,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "lead_product_crosswalk",
+      "elapsed_seconds": 0.1458,
+      "rss_start_bytes": 11939581952,
+      "rss_sampled_peak_bytes": 11939610624,
+      "rss_end_bytes": 11939610624,
+      "rss_peak_delta_bytes": 28672,
+      "rss_samples": 0,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "matching_monthly_coverage_aggregates",
+      "elapsed_seconds": 94.352,
+      "rss_start_bytes": 11939610624,
+      "rss_sampled_peak_bytes": 29761118208,
+      "rss_end_bytes": 28914073600,
+      "rss_peak_delta_bytes": 17821507584,
+      "rss_samples": 366,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "integrity_validation_and_row_reconciliation",
+      "elapsed_seconds": 6.1707,
+      "rss_start_bytes": 28914401280,
+      "rss_sampled_peak_bytes": 28929708032,
+      "rss_end_bytes": 28922572800,
+      "rss_peak_delta_bytes": 15306752,
+      "rss_samples": 23,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "parquet_exports_10_outputs",
+      "elapsed_seconds": 32.3627,
+      "rss_start_bytes": 28922966016,
+      "rss_sampled_peak_bytes": 29769334784,
+      "rss_end_bytes": 29007552512,
+      "rss_peak_delta_bytes": 846368768,
+      "rss_samples": 125,
+      "memory_measurement": "psutil_sampled_rss"
+    },
+    {
+      "stage": "parquet_readability_verification",
+      "elapsed_seconds": 0.0171,
+      "rss_start_bytes": 29007556608,
+      "rss_sampled_peak_bytes": 29007769600,
+      "rss_end_bytes": 29007769600,
+      "rss_peak_delta_bytes": 212992,
+      "rss_samples": 0,
+      "memory_measurement": "psutil_sampled_rss"
+    }
+  ],
+  "runtime_seconds_before_final_publish": 244.3589,
+  "peak_rss_sampled_bytes": 29769334784,
+  "duckdb_configuration": {
+    "threads": 6,
+    "memory_limit": "30GB",
+    "parquet_compression": "ZSTD",
+    "row_group_size": 122880
+  },
+  "parquet_file_sizes_bytes": {
+    "contract_clean.parquet": 318952468,
+    "leads_clean.parquet": 689271615,
+    "contract_product_clean.parquet": 38455738,
+    "shop_clean.parquet": 558699,
+    "seller_clean.parquet": 154459,
+    "employee_shop_clean.parquet": 15480329,
+    "lead_contract_candidates.parquet": 20276615,
+    "shop_month_foundation.parquet": 5484703,
+    "lead_shop_month_product.parquet": 2857356,
+    "lead_conversion_shop_month.parquet": 1147715,
+    "shop_behavior_profile.parquet": 654577,
+    "R2/r2_customer_segment.parquet": 7926280
+  },
+  "r2_source_manifest": {
+    "description": "Original R2 scores remain read-only inputs and are not copied under Round 3.",
+    "join_key": "SKP_CLIENT -> skp_client_id",
+    "common_post_score_cutoff": "2025-06-05",
+    "sources": {
+      "fhs": {
+        "relative_path": "BI10-Round2/output/Task1/scores/fh_scores.parquet",
+        "source_bytes": 51764752,
+        "mtime_ns": 1792514824874583100,
+        "sha256": "c1a8b9d20f721f362c5e064c12c72141746a650bed3a1ec4081a97c023284f9e",
+        "copied_into_round3": false,
+        "rows": 1000528,
+        "columns": [
+          "SKP_CLIENT",
+          "Financial_Health_Score",
+          "Financial_Health_Tier",
+          "fh_short",
+          "fh_band",
+          "fh_segment",
+          "fh_thin_file",
+          "fh_thin_type",
+          "fh_policy_cap",
+          "expected_bad_rate",
+          "fh_drivers",
+          "fh_main_drag",
+          "fh_main_strength",
+          "n_open_delinquent",
+          "n_signed",
+          "n_delinquent",
+          "any_default",
+          "n_clean_completed",
+          "n_rejected",
+          "n_cancelled",
+          "n_applications",
+          "apps_90d",
+          "income",
+          "monthly_obligations",
+          "n_open_contracts",
+          "dti",
+          "dp_ratio",
+          "reject_rate",
+          "history_months",
+          "months_since_delinq",
+          "max_offer",
+          "total_credit",
+          "open_annuity",
+          "insurance_share",
+          "pts_delinq_sev",
+          "pts_clean_track",
+          "pts_months_since_delinq",
+          "pts_reject_rate",
+          "pts_history_months",
+          "pts_dti",
+          "pts_dp_ratio",
+          "pts_max_offer",
+          "pillar_Repayment History",
+          "pillar_Credit Standing",
+          "pillar_Debt Burden (DTI)",
+          "pillar_Down-payment Buffer",
+          "pillar_Pre-approved Capacity"
+        ],
+        "production_score_snapshot": "2025-06-05",
+        "validation_asof_not_used_as_export_cutoff": "2024-10-01"
+      },
+      "ces": {
+        "relative_path": "BI10-Round2/output/Task2/scores/eng_scores.parquet",
+        "source_bytes": 19137691,
+        "mtime_ns": 1792514849680972100,
+        "sha256": "5042c2a72a64def133ad043ad76361dcf44a761bc4916b52d2508ea21e55d0f6",
+        "copied_into_round3": false,
+        "rows": 1000528,
+        "columns": [
+          "SKP_CLIENT",
+          "Engagement_Score",
+          "Engagement_Tier",
+          "eng_short",
+          "E1_digital",
+          "E2_recency",
+          "E3_frequency",
+          "E4_responsiveness",
+          "E5_breadth",
+          "e4_available",
+          "app_sessions_wk",
+          "days_since_last_activity",
+          "active_months_12m",
+          "events_12m",
+          "digital_events_12m",
+          "product_families_24m",
+          "applications_12m",
+          "leads_24m",
+          "lead_deals_24m",
+          "latest_max_offer",
+          "max_offer_24m",
+          "latest_lead_product",
+          "out_attempts",
+          "out_connected",
+          "inbound_calls",
+          "sales_outcomes",
+          "positive_reactions",
+          "conversions",
+          "opted_out",
+          "collection_calls"
+        ],
+        "production_score_snapshot": "2025-06-05",
+        "validation_asof_not_used_as_export_cutoff": "2025-02-01"
+      }
+    }
+  },
+  "parquet_output_paths": [
+    "R2/r2_customer_segment.parquet",
+    "contract_clean.parquet",
+    "contract_product_clean.parquet",
+    "employee_shop_clean.parquet",
+    "lead_contract_candidates.parquet",
+    "lead_conversion_shop_month.parquet",
+    "lead_shop_month_product.parquet",
+    "leads_clean.parquet",
+    "seller_clean.parquet",
+    "shop_behavior_profile.parquet",
+    "shop_clean.parquet",
+    "shop_month_foundation.parquet"
+  ],
+  "superseded_generated_paths_removed_on_publish": [
+    "lead_reason_clean.parquet",
+    "customer_segment_shop_product_month.parquet",
+    "R2/r2_link_coverage.parquet",
+    "R2/r2_source_manifest.json"
+  ],
+  "previous_38_parquet_run_comparison": {
+    "baseline_run_id": "20261021T120850Z",
+    "baseline_parquet_count": 38,
+    "baseline_counts": {
+      "contract_event_version": 3775371,
+      "contract_fact": 3775371,
+      "leads": 6130637,
+      "contract_product_detail": 784902,
+      "employee_assignments": 275856,
+      "shop_master": 14231,
+      "seller_master": 11639,
+      "r2_customer_segment": 1000528,
+      "lead_match_summary": 6130637,
+      "lead_contract_bridge_with_unmatched_placeholders": 6597227,
+      "shop_month_foundation": 715528
+    },
+    "matched_grain_comparisons": {
+      "contract_fact": {
+        "previous_rows": 3775371,
+        "current_rows": 3775371,
+        "delta": 0
+      },
+      "leads_clean": {
+        "previous_rows": 6130637,
+        "current_rows": 6130637,
+        "delta": 0
+      },
+      "contract_product_bridge": {
+        "previous_rows": 784902,
+        "current_rows": 784902,
+        "delta": 0
+      },
+      "employee_shop_bridge": {
+        "previous_rows": 275856,
+        "current_rows": 275856,
+        "delta": 0
+      },
+      "seller_master": {
+        "previous_rows": 11639,
+        "current_rows": 11639,
+        "delta": 0
+      },
+      "shop_month_foundation": {
+        "previous_rows": 715528,
+        "current_rows": 715528,
+        "delta": 0
+      },
+      "r2_customer_segment": {
+        "previous_rows": 1000528,
+        "current_rows": 1000528,
+        "delta": 0
+      }
+    },
+    "row_count_differences": {},
+    "candidate_bridge_note": "Legacy count includes unmatched placeholder rows; current candidate Parquet excludes them by design.",
+    "previous_38_run_contract_amount_sum": 70604962581146.0,
+    "current_contract_amount_sum": 70604962581146.0,
+    "contract_amount_sum_delta_vs_legacy": 0.0,
+    "amount_reconciliation_deltas_current": {
+      "raw_to_event_version_amount_delta": 0.0,
+      "shop_bridge_amount_delta": 0.0,
+      "segment_bridge_amount_delta": 0.0,
+      "dated_month_amount_delta": 0.0
+    },
+    "amount_reconciliation_pass": true,
+    "comparison_state": "COMPARED; candidate bridge grain differs by design"
+  },
+  "warnings": [
+    "Peak RSS is a sampled process RSS high-water mark, not exact per-query memory.",
+    "Lead rows use source ordinals and UUID-repeat counts rather than full-row hashing; exact lead-row duplicate counts are not computed."
+  ]
+}

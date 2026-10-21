@@ -1,0 +1,50 @@
+{
+  "product_mapping": {
+    "TW->TW": "TW",
+    "CL->CL": "CL",
+    "CC->CC": "CC",
+    "CD->CD": "CD"
+  },
+  "product_mapping_basis": "Team assumption of exact code equality; not owner approval. REL remains unmapped.",
+  "funded_definition_chosen": "STATUS_MAP",
+  "funded_status_mapping": {
+    "Active": "FUNDED",
+    "Finished": "FUNDED",
+    "Signed": "FUNDED",
+    "Paid off": "PAID_OFF",
+    "Written off": "WRITTEN_OFF",
+    "Rejected": "REJECTED",
+    "Cancelled": "CANCELLED"
+  },
+  "funded_status_outcomes": [
+    "FUNDED",
+    "PAID_OFF",
+    "WRITTEN_OFF"
+  ],
+  "funded_definition_options": {
+    "SIGN_DATE": "valid parsed date_sign; sentinels are excluded",
+    "STATUS_MAP": "business_outcome in configured FUNDED_STATUS_OUTCOMES; status map is a competition assumption",
+    "BILLING": "amt_billing_1st is non-null"
+  },
+  "employee_active_status_codes": [
+    "A"
+  ],
+  "employee_active_status_basis": "Status profile: a has 100% open-ended valid_to; n has 0%. A is provisionally treated as active per requested assumption.",
+  "lead_primary_match_tie_break": "Latest date_assigned_ts <= date_apply_ts; tie-break lead_row_id ascending.",
+  "direct_case_key": "Validation signal only; does not bypass client, product, or time criteria.",
+  "nonprimary_pair_uuid_attribution": [
+    {
+      "attribution": "DIFFERENT_LEAD_UUID",
+      "nonprimary_pairs": 78438,
+      "affected_contracts": 54366
+    },
+    {
+      "attribution": "SAME_UUID_REPEAT",
+      "nonprimary_pairs": 417,
+      "affected_contracts": 417
+    }
+  ],
+  "round2_common_cutoff": "2025-06-05",
+  "round2_cutoff_expected": "2025-06-05",
+  "sample_weight": "QA-only, not used as an estimator or applied to counts/conversions/amounts."
+}
