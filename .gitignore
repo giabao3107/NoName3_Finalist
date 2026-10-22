@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# DuckDB temp / local databases
+*.duckdb
+*.duckdb.wal
+*.tmp
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+~$*
+
+# Submission files are produced locally, not versioned
+*_R03_BI10_Slide*.pdf
+*_R03_BI10_Attachments*.zip
+*.zip
