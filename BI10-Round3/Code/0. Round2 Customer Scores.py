@@ -294,6 +294,18 @@ def figure_group_sensitivity(sens:pd.DataFrame)->None:
     save(fig,"R2_05_Group_Threshold_Sensitivity.png")
 
 
+def figure_network_monthly(monthly:pd.DataFrame)->None:
+    m=monthly.copy();m["month_start"]=pd.to_datetime(m.month_start)
+    fig,ax=plt.subplots(figsize=(8,3),dpi=200)
+    pre_tet=m.month_start.isin([pd.Timestamp("2025-01-01"),pd.Timestamp("2026-01-01"),pd.Timestamp("2026-02-01")])
+    ax.bar(m.month_start,m.applications,width=20,color=np.where(pre_tet,COLORS["amber"],COLORS["mid"]))
+    for t,label in ((pd.Timestamp("2025-01-29"),"Tet 2025"),(pd.Timestamp("2026-02-17"),"Tet 2026")):
+        ax.axvline(t,color=COLORS["red"],linestyle=":",linewidth=1);ax.text(t,m.applications.max()*1.02,label,ha="center",fontsize=7,color=COLORS["red"])
+    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v,_:f"{v/1e3:,.0f}K"));ax.set_ylabel("Applications per month, Round 3 network")
+    ax.set_ylim(0,m.applications.max()*1.12);ax.tick_params(axis="x",rotation=30)
+    save(fig,"R2_06_Network_Monthly_No_Tet_Peak.png")
+
+
 # %% Pipeline ----------------------------------------------------------------------------------------
 def build()->dict[str,Any]:
     OUT.mkdir(parents=True,exist_ok=True)
@@ -335,7 +347,7 @@ def build()->dict[str,Any]:
     keep=["skp_client_id","train_half","one_time_tet","fhs_r2","fh_tier","ces_r2","ces_v2","ces_tier","matrix_cell","action_group","customer_profile","fh_thin_file",
           "phone_suppressed","arrears_check","applied_after","funded_after","applied_tet26","late_after"]
     grouped[keep].to_parquet(R2_DATA/"r2_customer_groups.parquet",index=False,compression="zstd")
-    figure_ces_weights(ces);figure_ces_cuts(cuts);figure_fhs_weights(fhs);figure_group_validation(validation);figure_group_sensitivity(sens)
+    figure_ces_weights(ces);figure_ces_cuts(cuts);figure_fhs_weights(fhs);figure_group_validation(validation);figure_group_sensitivity(sens);figure_network_monthly(monthly)
     playbook=GROUP_PLAYBOOK.copy()
     playbook["action"]=playbook.action.str.replace("{retime}",f"{tet_check['RE-TIME']:.1%}").str.replace("{grow}",f"{validation.set_index('action_group').applied_tet26['GROW']:.1%}")
     playbook.to_csv(OUT/"r2_group_playbook.csv",index=False)

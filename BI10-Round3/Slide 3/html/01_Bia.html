@@ -1,0 +1,58 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#004AAD;--navy:#14213D;--light:#EEF3FA;--mid:#8FAAD1;--grey:#6B7280;--line:#D5DCE6;--red:#C51E1E;--amber:#C98A1B}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#fff;font-family:'Be Vietnam Pro',Arial,sans-serif;color:#1F2937}
+.slide{position:relative;width:1920px;height:1080px;padding:40px 64px 0}
+.hdr{padding-left:24px;border-left:9px solid var(--blue)}
+.eyebrow{font-family:Oswald,sans-serif;font-weight:700;color:var(--blue);font-size:28px;letter-spacing:.5px;text-transform:uppercase}
+.title{font-weight:800;color:var(--navy);font-size:42px;line-height:1.15;margin-top:2px}
+.pageno{position:absolute;top:38px;right:64px;font-family:Oswald,sans-serif;font-size:32px;color:#B8C2D0;font-weight:600}
+.key{margin-top:18px;background:var(--navy);color:#fff;border-radius:10px;padding:16px 26px;font-size:26px;font-weight:600;line-height:1.35}
+.key b{color:#FFD166}
+.body{position:absolute;top:262px;left:64px;right:64px;bottom:104px;display:flex;gap:28px}
+.left{flex:0 0 36%;display:flex;flex-direction:column;gap:16px;min-height:0}
+.right{flex:1;display:flex;flex-direction:column;min-height:0}
+.foot{position:absolute;left:30px;right:30px;bottom:0;height:84px;border-top:2px solid var(--line);display:flex;justify-content:space-around;align-items:center}
+.foot div{font-weight:700;font-size:20px;color:#111827;position:relative;padding:6px 10px}
+.foot div.on{color:var(--blue)}
+.foot div.on:before{content:'';position:absolute;left:10%;right:10%;top:-20px;height:7px;border-radius:4px;background:var(--blue)}
+.big{border-left:8px solid var(--blue);background:var(--light);border-radius:8px;padding:12px 18px;flex:1;display:flex;flex-direction:column;justify-content:center}
+.big .n{font-weight:800;color:var(--blue);font-size:54px;line-height:1.05}
+.big .c{font-size:21px;color:#1F2937;margin-top:6px;line-height:1.35}
+.big.red{border-color:var(--red);background:#FFF4F4}.big.red .n{color:var(--red)}
+.big.amber{border-color:var(--amber);background:#FFF8EC}.big.amber .n{color:var(--amber)}
+.big.grey{border-color:#9CA3AF;background:#F3F4F6}.big.grey .n{color:#4B5563}
+.mean{border:2px solid var(--blue);border-radius:10px;padding:12px 18px;font-size:21px;line-height:1.42;background:#fff}
+.mean li{margin:10px 0;font-size:22px}
+.mean b.t{display:block;color:var(--blue);font-size:21px;margin-bottom:2px}
+.chart{flex:1;border:2px solid #E3E8F0;border-radius:12px;padding:14px 18px 8px;display:flex;flex-direction:column;min-height:0}
+.chart .cap{font-weight:700;font-size:22px;color:var(--navy);margin-bottom:6px}
+.chart img{flex:1;min-height:0;width:100%;object-fit:contain}
+.chart .src{font-size:14px;font-style:italic;color:var(--grey);text-align:right;margin-top:4px}
+table{border-collapse:collapse;width:100%;font-size:21px}
+th{background:var(--blue);color:#fff;text-align:left;padding:10px 14px;font-weight:700}
+td{padding:10px 14px;border-bottom:1px solid #E5EAF1;vertical-align:top;line-height:1.35}
+tr:nth-child(even) td{background:#F4F7FB}
+.pill{display:inline-block;font-size:16px;font-weight:700;padding:3px 12px;border-radius:14px;color:#fff;background:var(--blue);white-space:nowrap}
+.pill.n{background:var(--navy)}.pill.r{background:var(--red)}
+.card{border:2px solid var(--blue);border-radius:12px;padding:14px 18px;background:#fff;display:flex;flex-direction:column}
+.card h4{font-size:24px;color:var(--navy);font-weight:800;margin-bottom:4px}
+.card p{font-size:20px;line-height:1.4}
+
+.cv{width:1920px;height:1080px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 72% 62%,#1d4fd8 0%,#0b2a7a 28%,#06143d 60%,#030a22 100%)}
+.ring{position:absolute;border-radius:50%;border:3px solid rgba(120,170,255,.35)}
+.streak{position:absolute;height:3px;background:linear-gradient(90deg,transparent,rgba(255,80,110,.9),transparent);transform:rotate(-18deg)}
+.bi{position:absolute;top:150px;left:0;right:0;text-align:center;font-family:Oswald,sans-serif;font-weight:700;font-size:118px;letter-spacing:6px;color:#E8EEFF;text-shadow:0 0 28px rgba(110,160,255,.8)}
+.s10{position:absolute;top:300px;left:0;right:0;text-align:center;font-family:Oswald,sans-serif;font-weight:600;font-size:64px;letter-spacing:10px;color:#C9D6FF}
+.r3{position:absolute;left:120px;top:610px;font-family:Oswald,sans-serif;font-weight:700;font-size:110px;color:#fff;letter-spacing:2px}
+.q{position:absolute;left:124px;top:770px;font-weight:700;font-size:42px;color:#DCE6FF}
+.team{position:absolute;left:124px;top:850px;font-family:Oswald,sans-serif;font-weight:600;font-size:46px;color:#AFC4F0;letter-spacing:2px}
+.canva{position:absolute;right:60px;bottom:40px;font-size:24px;color:#E5ECFF;font-weight:600;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.35);border-radius:22px;padding:8px 20px}
+</style></head><body><div class="cv">
+<div class="ring" style="width:900px;height:900px;left:1080px;top:380px"></div><div class="ring" style="width:600px;height:600px;left:1230px;top:530px"></div>
+<div class="ring" style="width:300px;height:300px;left:1380px;top:680px;border-color:rgba(255,90,120,.6)"></div>
+<div class="streak" style="width:900px;left:900px;top:420px"></div><div class="streak" style="width:700px;left:-100px;top:560px;opacity:.6"></div>
+<div class="bi">BUSINESS INTELLIGENCE</div><div class="s10">— SEASON 10 —</div>
+<div class="r3">ROUND 3 : PARALLAX</div><div class="q">Cửa hàng này còn có thể lớn đến đâu?</div><div class="team">TEAM: SHOOTING STAR</div>
+<div class="canva">Visual supported by Canva</div></div></body></html>

@@ -103,14 +103,14 @@
   "four_concepts_assessed": {
     "current_3m": 87445.0,
     "bau_3m": 88034.0,
-    "attainable_low": 90182.02433757223,
-    "attainable_base": 93499.12423149707,
-    "attainable_high": 99278.09499470713,
-    "ceiling_internal": 115881.52202611548
+    "attainable_low": 90182.02433757222,
+    "attainable_base": 93499.12423149706,
+    "attainable_high": 99278.09499470715,
+    "ceiling_internal": 115881.52202611549
   },
   "levers_base": {
     "leads_booked_here": 4221.59778932406,
-    "leads_booked_elsewhere": 1602.681432729396,
+    "leads_booked_elsewhere": 1602.6814327293957,
     "grow": 1243.5264421730126
   },
   "assessed_share_of_network_funded": 0.2132368002653115,
@@ -124,17 +124,17 @@
   "top_n_all": {
     "10": {
       "gap_low": 412.550128879494,
-      "gap_base": 748.4996308865035,
+      "gap_base": 748.4996308865036,
       "gap_high": 1121.7500843308928
     },
     "20": {
-      "gap_low": 572.0756059479204,
-      "gap_base": 1064.8015395794125,
+      "gap_low": 572.0756059479205,
+      "gap_base": 1064.8015395794123,
       "gap_high": 1683.2927780566922
     },
     "50": {
-      "gap_low": 851.8835668248439,
-      "gap_base": 1766.960855272766,
+      "gap_low": 851.883566824844,
+      "gap_base": 1766.9608552727655,
       "gap_high": 3139.2709613653587
     }
   },
@@ -212,7 +212,7 @@
       "grow_share": 0.35294117647058826,
       "protect_share": 0.029411764705882353,
       "linked_customers": 34.0,
-      "agent_fte": 1.0284469141900634,
+      "agent_fte": 1.0284469141900636,
       "primary_constraint": "EXECUTION: leads convert below peers",
       "action": "TEST: lead follow-up SLA"
     },
@@ -233,7 +233,7 @@
       "grow_share": 0.42857142857142855,
       "protect_share": 0.0,
       "linked_customers": 35.0,
-      "agent_fte": 2.3956783044069576,
+      "agent_fte": 2.395678304406957,
       "primary_constraint": "NO CLEAR GAP",
       "action": "MONITOR"
     }
@@ -249,7 +249,7 @@
     {
       "model": "Non-Aldi",
       "agents": 23.0,
-      "fte": 0.610011036435185,
+      "fte": 0.6100110364351851,
       "shops_per_agent": 40.111111111111114,
       "current": 28.0
     }
