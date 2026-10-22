@@ -516,7 +516,7 @@ def publish_task1(summary, forecasts, backtest, decisions_by_outcome, raw, month
                 "recent_observations":[{"month":r.month_start,"observed":bool(r.contract_observed),"funded":float(r.funded_contract_count) if r.contract_observed else None,"applications":float(r.contract_application_event_rows) if r.contract_observed else None} for r in recent.itertuples()],
                 "partial_3m_observed_funded_sum":float(recent[recent.month_start.isin(months[-3:])&recent.contract_observed].funded_contract_count.sum()),
                 "recent_lead_rows":shop.lead_rows_3m,"recent_lead_uuids":shop.lead_uuids_3m,"lead_match_rate":shop.lead_match_rate,
-                "forecast_path":forecasts[(forecasts.shop_key==sid)&(forecasts.outcome=="funded")&forecasts.horizon.isin(HORIZONS)][["horizon","point","model","forecast_reliability","interval_status","lo","hi"]].to_dict("records")}
+                "forecast_path":forecasts[(forecasts.shop_key==sid)&(forecasts.outcome=="funded")&forecasts.horizon.astype(str).isin([str(h) for h in HORIZONS])][["horizon","point","model","forecast_reliability","interval_status","lo","hi"]].to_dict("records")}
         pair={"status":"ILLUSTRATIVE_ONLY" if reasons else "SUPPORTED_PAIR","pair_ids":ids,
               "selection_rule":"closest adjacent complete actuals within 10%, same available category/model, peer n>=30; lead-match contrast breaks ties",
               "peer_group":candidate["peer_group"],"peer_support":candidate["peer_support"],"actual_delta_pct":candidate["actual_delta_pct"],

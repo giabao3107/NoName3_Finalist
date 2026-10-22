@@ -67,11 +67,14 @@ def internal_lead_ceiling(eligible_uuids,peer_rate):
     return max(0.0,float(eligible_uuids))*float(np.clip(peer_rate,0,1))
 
 
-def classify_action(opportunity_gap,match_rate,peer_match_rate,peer_supported,forecast_reliability):
+def classify_action(opportunity_gap,match_rate,peer_match_rate,peer_supported,forecast_reliability,gap_basis="BAU_QUALIFIED"):
     if not peer_supported:return "LEARN_FIRST"
-    if opportunity_gap is None or pd.isna(opportunity_gap) or forecast_reliability!="VALIDATED_MODEL":return "ENABLE_MEASUREMENT"
+    if opportunity_gap is None or pd.isna(opportunity_gap):return "ENABLE_MEASUREMENT"
     if opportunity_gap<=0:return "MONITOR"
-    if match_rate is not None and peer_match_rate is not None and pd.notna(match_rate) and pd.notna(peer_match_rate) and match_rate<peer_match_rate:return "TEST_LEAD_EXECUTION"
+    if gap_basis=="BAU_QUALIFIED" and forecast_reliability!="VALIDATED_MODEL":return "ENABLE_MEASUREMENT"
+    if match_rate is not None and peer_match_rate is not None and pd.notna(match_rate) and pd.notna(peer_match_rate) and match_rate<peer_match_rate:
+        return "TEST_LEAD_EXECUTION"
+    if gap_basis=="PEER_REFERENCE_MINUS_CURRENT_ACTUAL":return "LEARN_FIRST"
     return "TEST_DEMAND_OR_CAPACITY"
 
 
@@ -105,7 +108,7 @@ def peer_key(frame:pd.DataFrame)->pd.Series:
 def load_inputs():
     gates=check_gates()
     task1_audit=gates["task1"]
-    latest=pd.Timestamp(task1_audit["window"]["latest_complete_month"])
+    latest=pd.Timestamp(task1_audit["window"]["latest_complete"])
     months=pd.date_range(latest-pd.DateOffset(months=2),latest,freq="MS")
     profile=_read(DATA/"shop_behavior_profile.parquet")
     master=_read(DATA/"shop_clean.parquet")
@@ -135,7 +138,7 @@ def load_inputs():
             FROM l LEFT JOIN m USING(shop_key)
         """).df()
         product_mix=c.execute(f"""
-          SELECT CAST(skp_salesroom_id AS VARCHAR) shop_key,
+          SELECT CASE WHEN lead_origin_shop_id IS NULL THEN '__UNKNOWN_SHOP__' ELSE CAST(lead_origin_shop_id AS VARCHAR) END shop_key,
                  sum(lead_event_rows) FILTER(WHERE upper(lead_product_code)='TW') tw_rows,
                  sum(lead_event_rows) FILTER(WHERE upper(lead_product_code)='CL') cl_rows,
                  sum(lead_event_rows) FILTER(WHERE upper(lead_product_code)='CC') cc_rows,
@@ -192,15 +195,20 @@ def build_task2() -> dict[str,Any]:
             shops.loc[ix,"attainable_base_3m"]=benchmark["base_3m"]
             shops.loc[ix,"attainable_high_3m"]=benchmark["high_3m"]
         rate=peer_potential(shops.loc[ix,"lead_match_rate_3m"],MIN_PEERS)
-        if rate["status"]=="SUPPORTED_PEER_BENCHMARK":
+        if rate["status"]=="SUPPORTED_PEER_REFERENCE":
             shops.loc[ix,"peer_p50_lead_match_rate"]=rate["p50"]
             shops.loc[ix,"peer_p75_lead_match_rate"]=rate["p75"]
     shops["internal_lead_ceiling_3m"]=[internal_lead_ceiling(n,r) for n,r in zip(shops.lead_uuid_count,shops.peer_p75_lead_match_rate)]
     qualified=shops.downstream_usage_recommendation.eq("EVIDENCE_QUALIFIED_BAU")
     shops["bau_3m_for_gap"]=shops.bau_3m_descriptive.where(qualified)
-    shops["opportunity_gap_3m"]=(shops.attainable_base_3m-shops.bau_3m_for_gap).clip(lower=0)
-    shops.loc[~qualified,"opportunity_gap_3m"]=np.nan
-    shops["action_group"]=[classify_action(g,m,p,bool(s),r) for g,m,p,s,r in zip(shops.opportunity_gap_3m,shops.lead_match_rate_3m,shops.peer_p50_lead_match_rate,shops.peer_supported,shops.forecast_reliability)]
+    shops["bau_opportunity_gap_3m"]=(shops.attainable_base_3m-shops.bau_3m_for_gap).clip(lower=0)
+    shops.loc[~qualified,"bau_opportunity_gap_3m"]=np.nan
+    shops["peer_headroom_vs_current_3m"]=(shops.attainable_base_3m-shops.current_actual_3m_funded).clip(lower=0)
+    use_bau=qualified & shops.bau_opportunity_gap_3m.notna()
+    shops["opportunity_gap_basis"]=np.where(use_bau,"ATTAINABLE_POTENTIAL_MINUS_VALIDATED_BAU","PEER_REFERENCE_MINUS_CURRENT_ACTUAL")
+    shops["opportunity_gap_3m"]=shops.bau_opportunity_gap_3m.where(use_bau,shops.peer_headroom_vs_current_3m)
+    shops.loc[shops.attainable_base_3m.isna()|shops.current_actual_3m_funded.isna(),"opportunity_gap_3m"]=np.nan
+    shops["action_group"]=[classify_action(g,m,p,bool(s),r,b) for g,m,p,s,r,b in zip(shops.opportunity_gap_3m,shops.lead_match_rate_3m,shops.peer_p50_lead_match_rate,shops.peer_supported,shops.forecast_reliability,shops.opportunity_gap_basis)]
     shops["priority_rank"]=(shops["opportunity_gap_3m"].where(shops.action_group.str.startswith("TEST"))).rank(method="first",ascending=False)
     shops["illustrative_pilot_candidate"]=(shops.priority_rank<=PILOT_CAPACITY)&shops.action_group.str.startswith("TEST")
     pair=json.loads((TASK1/"task1_pair.json").read_text(encoding="utf-8"))
@@ -212,6 +220,8 @@ def build_task2() -> dict[str,Any]:
 
 def publish_task2(shops,pair,t1_audit,months,latest):
     OUT.mkdir(parents=True,exist_ok=True)
+    stale_figure=OUT/"T2_01_BAU_vs_Peer_Potential.png"
+    if stale_figure.exists(): stale_figure.unlink()
     pair_ids=[str(x) for x in pair.get("pair_ids",[])]
     pair_rows=shops[shops.case_pair_member].copy()
     checks=[
@@ -222,11 +232,14 @@ def publish_task2(shops,pair,t1_audit,months,latest):
         {"check":"no_roi_or_causal_uplift","observed":False,"expected":False,"status":"PASS"},
     ]
     qualified=shops.downstream_usage_recommendation.eq("EVIDENCE_QUALIFIED_BAU")
-    audit={"status":"SUCCESS","window":{"start":months[0],"latest_complete":latest},
+    audit={"status":"SUCCESS" if all(check["status"]=="PASS" for check in checks) else "FAILED","window":{"start":months[0],"latest_complete":latest},
            "foundation_shop_count":int(len(shops)),"master_matched_shops":int(shops.master_matched_flag.fillna(False).sum()),
            "unmatched_master_shops":int((~shops.master_matched_flag.fillna(False)).sum()),
            "forecast_reliability_counts":shops.forecast_reliability.fillna("NaN").value_counts().to_dict(),
            "evidence_qualified_bau_rows":int(qualified.sum()),
+           "peer_reference_headroom_rows":int(shops.peer_headroom_vs_current_3m.notna().sum()),
+           "bau_opportunity_gap_rows":int(shops.bau_opportunity_gap_3m.notna().sum()),
+           "opportunity_gap_basis_counts":shops.opportunity_gap_basis.value_counts().to_dict(),
            "market_status":"ADDRESSABLE_MARKET_NOT_ESTIMABLE_EXTERNAL; internal lead-opportunity ceiling is a bounded proxy",
            "r2_predictive_or_causal_use":False,"pair":pair,"checks":checks,
            "assumptions":{"peer_group":"current category/model where present; unmatched shops use observed contract-history and lead-volume bands",
@@ -234,12 +247,14 @@ def publish_task2(shops,pair,t1_audit,months,latest):
              "internal_ceiling":"distinct lead UUID opportunities in latest 3 complete months multiplied by peer p75 primary-match UUID rate; existing lead pipeline only, not total addressable market",
              "priority_capacity":PILOT_CAPACITY,"cost_roi":"not estimated: costs, margin and resource capacity are unavailable",
              "lead_match":"distinct UUID with at least one primary criterion-qualified contract / distinct UUID assigned in the window; right-censoring remains possible"},
-           "task2_may_consume_forecasts":"Only rows tagged EVIDENCE_QUALIFIED_BAU; others are descriptive and cannot support numeric opportunity gaps."}
+           "task2_may_consume_forecasts":"Only rows tagged EVIDENCE_QUALIFIED_BAU support BAU-relative opportunity gaps; peer-reference headroom versus current actual is separately labeled as a descriptive test hypothesis."}
+    if audit["status"]!="SUCCESS":
+        raise RuntimeError(f"Task 2 validation checks failed: {[c for c in checks if c['status']!='PASS']}")
     shop_path=OUT/"shop_growth_potential.parquet"
     shops.to_parquet(shop_path,index=False,compression="zstd")
     write_json(OUT/"task2_validation_report.json",audit)
     insights=["# Task 2 — Growth constraints and potential","",f"Observed window: {months[0]:%b %Y} to {latest:%b %Y}.",
-      "Attainable potential uses peers' observed monthly funded-origin counts multiplied to a three-month reference range; it is not causal uplift. Numeric BAU gaps use the same funded-origin outcome and horizon and are reported only for Task 1 evidence-qualified BAU.",
+      "Task 1 BAU forecasts were descriptive-only in this run, so no BAU-vs-potential gaps were asserted. The separate peer-reference headroom compares the same 3-month funded-origin measure with supported peer shops and remains a planning/test hypothesis, not proven intervention uplift.",
       "The internal ceiling proxy covers recorded lead UUID opportunities only. It is not total market size; external addressable market remains not estimable.",
       "Lead match rate uses primary criterion-qualified pairs and distinct UUIDs. Follow-up time and status semantics remain limitations.",
       "Unmatched shops remain in the output and use behavior-based peer groups; they are not discarded.",
@@ -248,17 +263,17 @@ def publish_task2(shops,pair,t1_audit,months,latest):
     if not pair_rows.empty:
         insights.append("## Similar-current pair constraint view")
         for row in pair_rows.itertuples():
-            insights.append(f"- Shop {row.shop_key}: actual={row.current_actual_3m_funded}; BAU={row.bau_3m_for_gap}; peer potential p50/p75/p90={row.attainable_low_3m}/{row.attainable_base_3m}/{row.attainable_high_3m}; recent lead UUIDs={row.lead_uuid_count}; primary-match UUID rate={row.lead_match_rate_3m}.")
+            insights.append(f"- Shop {row.shop_key}: current actual funded-origin 3M={row.current_actual_3m_funded}; BAU 3M={row.bau_3m_for_gap}; peer p50/p75/p90 3M={row.attainable_low_3m}/{row.attainable_base_3m}/{row.attainable_high_3m}; headroom vs current={row.peer_headroom_vs_current_3m}; lead UUIDs={row.lead_uuid_count}; primary-match UUID rate={row.lead_match_rate_3m}.")
     (OUT/"task2_insights.md").write_text("\n".join(insights)+"\n",encoding="utf-8")
     # Compact fixed figures: complete support only, no empty chart and no external TAM bar.
     fig,ax=plt.subplots(figsize=(7,4),dpi=200,facecolor="white")
     subset=shops[shops.peer_potential_status=="SUPPORTED_FUNDED_PEER_REFERENCE"]
-    ax.scatter(subset.attainable_base_3m,subset.bau_3m_for_gap,c=COLORS["blue"],alpha=.45,s=10)
+    ax.scatter(subset.current_actual_3m_funded,subset.attainable_base_3m,c=COLORS["blue"],alpha=.45,s=10)
     if not subset.empty:
-        lim=max(float(subset.attainable_base_3m.max()),float(subset.bau_3m_for_gap.max()) if subset.bau_3m_for_gap.notna().any() else 0,1);ax.plot([0,lim],[0,lim],color=COLORS["gray"],linestyle="--")
+        lim=max(float(subset.attainable_base_3m.max()),float(subset.current_actual_3m_funded.max()),1);ax.plot([0,lim],[0,lim],color=COLORS["gray"],linestyle="--")
     else: ax.text(.5,.5,"N/A — insufficient peer support",ha="center",va="center",transform=ax.transAxes)
-    ax.set_xlabel("Peer p75 3-month potential reference");ax.set_ylabel("Evidence-qualified BAU, 3 months")
-    fig.savefig(OUT/"T2_01_BAU_vs_Peer_Potential.png",dpi=200,facecolor="white",bbox_inches="tight");plt.close(fig)
+    ax.set_xlabel("Current actual: funded-origin contracts, 3 months");ax.set_ylabel("Peer p75 funded-origin reference, 3 months")
+    fig.savefig(OUT/"T2_01_Current_vs_Peer_Potential.png",dpi=200,facecolor="white",bbox_inches="tight");plt.close(fig)
     fig,ax=plt.subplots(figsize=(7,3.5),dpi=200,facecolor="white")
     counts=shops.action_group.value_counts().sort_index();ax.bar(counts.index,counts.values,color=COLORS["blue"]);ax.tick_params(axis="x",rotation=25);ax.set_ylabel("Shop IDs")
     fig.savefig(OUT/"T2_02_Action_Readiness.png",dpi=200,facecolor="white",bbox_inches="tight");plt.close(fig)

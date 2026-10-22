@@ -71,7 +71,35 @@
       "recent_lead_rows": 11.0,
       "recent_lead_uuids": 11.0,
       "lead_match_rate": 0.0,
-      "forecast_path": []
+      "forecast_path": [
+        {
+          "horizon": "1",
+          "point": 0.6666666666666666,
+          "model": "trailing_3m",
+          "forecast_reliability": "TRAILING_BASELINE_FALLBACK",
+          "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL",
+          "lo": 0.0,
+          "hi": 5.666666666666667
+        },
+        {
+          "horizon": "2",
+          "point": 0.6666666666666666,
+          "model": "trailing_3m",
+          "forecast_reliability": "TRAILING_BASELINE_FALLBACK",
+          "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL",
+          "lo": 0.0,
+          "hi": 5.000000000000001
+        },
+        {
+          "horizon": "3",
+          "point": 0.6666666666666666,
+          "model": "trailing_3m",
+          "forecast_reliability": "TRAILING_BASELINE_FALLBACK",
+          "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL",
+          "lo": 0.0,
+          "hi": 4.666666666666667
+        }
+      ]
     },
     "99363629": {
       "actual_observed_months_of_3": 3,
@@ -119,7 +147,35 @@
       "recent_lead_rows": 3.0,
       "recent_lead_uuids": 3.0,
       "lead_match_rate": 1.0,
-      "forecast_path": []
+      "forecast_path": [
+        {
+          "horizon": "1",
+          "point": 0.6666666666666666,
+          "model": "trailing_3m",
+          "forecast_reliability": "TRAILING_BASELINE_FALLBACK",
+          "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL",
+          "lo": 0.0,
+          "hi": 4.333333333333333
+        },
+        {
+          "horizon": "2",
+          "point": 0.6666666666666666,
+          "model": "trailing_3m",
+          "forecast_reliability": "TRAILING_BASELINE_FALLBACK",
+          "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL",
+          "lo": 0.0,
+          "hi": 4.333333333333334
+        },
+        {
+          "horizon": "3",
+          "point": 0.6666666666666666,
+          "model": "trailing_3m",
+          "forecast_reliability": "TRAILING_BASELINE_FALLBACK",
+          "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL",
+          "lo": 0.0,
+          "hi": 4.333333333333334
+        }
+      ]
     }
   },
   "reliability_reasons": [

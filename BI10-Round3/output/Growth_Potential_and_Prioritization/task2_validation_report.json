@@ -1,0 +1,250 @@
+{
+  "status": "SUCCESS",
+  "window": {
+    "start": "2026-07-01T00:00:00",
+    "latest_complete": "2026-09-01T00:00:00"
+  },
+  "foundation_shop_count": 30705,
+  "master_matched_shops": 12412,
+  "unmatched_master_shops": 18293,
+  "forecast_reliability_counts": {
+    "NaN": 16652,
+    "TRAILING_BASELINE_FALLBACK": 10235,
+    "INSUFFICIENT_VALIDATION": 3818
+  },
+  "evidence_qualified_bau_rows": 0,
+  "peer_reference_headroom_rows": 8216,
+  "bau_opportunity_gap_rows": 0,
+  "opportunity_gap_basis_counts": {
+    "PEER_REFERENCE_MINUS_CURRENT_ACTUAL": 30705
+  },
+  "market_status": "ADDRESSABLE_MARKET_NOT_ESTIMABLE_EXTERNAL; internal lead-opportunity ceiling is a bounded proxy",
+  "r2_predictive_or_causal_use": false,
+  "pair": {
+    "status": "ILLUSTRATIVE_ONLY",
+    "pair_ids": [
+      "99180387",
+      "99363629"
+    ],
+    "selection_rule": "closest adjacent complete actuals within 10%, same available category/model, peer n>=30; lead-match contrast breaks ties",
+    "peer_group": "Small|Non-Aldi",
+    "peer_support": 5593,
+    "actual_delta_pct": 0.0,
+    "current_actual_3m_funded": {
+      "99180387": 2.0,
+      "99363629": 2.0
+    },
+    "bau_3m_total": {
+      "99180387": {
+        "point": 2.0,
+        "lo": 0.0,
+        "hi": 15.333333333333336
+      },
+      "99363629": {
+        "point": 2.0,
+        "lo": 0.0,
+        "hi": 13.0
+      }
+    },
+    "reliability_diagnostics": {
+      "99180387": {
+        "actual_observed_months_of_3": 3,
+        "observation_quality_state": "COMPLETE_3M_OBSERVED",
+        "last_recorded_activity": "2026-09-01T00:00:00",
+        "recent_observations": [
+          {
+            "month": "2026-04-01T00:00:00",
+            "observed": true,
+            "funded": 4.0,
+            "applications": 4.0
+          },
+          {
+            "month": "2026-05-01T00:00:00",
+            "observed": true,
+            "funded": 1.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-06-01T00:00:00",
+            "observed": true,
+            "funded": 1.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-07-01T00:00:00",
+            "observed": true,
+            "funded": 0.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-08-01T00:00:00",
+            "observed": true,
+            "funded": 1.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-09-01T00:00:00",
+            "observed": true,
+            "funded": 1.0,
+            "applications": 2.0
+          }
+        ],
+        "partial_3m_observed_funded_sum": 2.0,
+        "recent_lead_rows": 11.0,
+        "recent_lead_uuids": 11.0,
+        "lead_match_rate": 0.0,
+        "forecast_path": [
+          {
+            "horizon": "1",
+            "point": 0.6666666666666666,
+            "model": "trailing_3m",
+            "forecast_reliability": "TRAILING_BASELINE_FALLBACK",
+            "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL",
+            "lo": 0.0,
+            "hi": 5.666666666666667
+          },
+          {
+            "horizon": "2",
+            "point": 0.6666666666666666,
+            "model": "trailing_3m",
+            "forecast_reliability": "TRAILING_BASELINE_FALLBACK",
+            "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL",
+            "lo": 0.0,
+            "hi": 5.000000000000001
+          },
+          {
+            "horizon": "3",
+            "point": 0.6666666666666666,
+            "model": "trailing_3m",
+            "forecast_reliability": "TRAILING_BASELINE_FALLBACK",
+            "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL",
+            "lo": 0.0,
+            "hi": 4.666666666666667
+          }
+        ]
+      },
+      "99363629": {
+        "actual_observed_months_of_3": 3,
+        "observation_quality_state": "COMPLETE_3M_OBSERVED",
+        "last_recorded_activity": "2026-09-01T00:00:00",
+        "recent_observations": [
+          {
+            "month": "2026-04-01T00:00:00",
+            "observed": false,
+            "funded": null,
+            "applications": null
+          },
+          {
+            "month": "2026-05-01T00:00:00",
+            "observed": true,
+            "funded": 0.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-06-01T00:00:00",
+            "observed": false,
+            "funded": null,
+            "applications": null
+          },
+          {
+            "month": "2026-07-01T00:00:00",
+            "observed": true,
+            "funded": 1.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-08-01T00:00:00",
+            "observed": true,
+            "funded": 1.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-09-01T00:00:00",
+            "observed": true,
+            "funded": 0.0,
+            "applications": 1.0
+          }
+        ],
+        "partial_3m_observed_funded_sum": 2.0,
+        "recent_lead_rows": 3.0,
+        "recent_lead_uuids": 3.0,
+        "lead_match_rate": 1.0,
+        "forecast_path": [
+          {
+            "horizon": "1",
+            "point": 0.6666666666666666,
+            "model": "trailing_3m",
+            "forecast_reliability": "TRAILING_BASELINE_FALLBACK",
+            "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL",
+            "lo": 0.0,
+            "hi": 4.333333333333333
+          },
+          {
+            "horizon": "2",
+            "point": 0.6666666666666666,
+            "model": "trailing_3m",
+            "forecast_reliability": "TRAILING_BASELINE_FALLBACK",
+            "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL",
+            "lo": 0.0,
+            "hi": 4.333333333333334
+          },
+          {
+            "horizon": "3",
+            "point": 0.6666666666666666,
+            "model": "trailing_3m",
+            "forecast_reliability": "TRAILING_BASELINE_FALLBACK",
+            "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL",
+            "lo": 0.0,
+            "hi": 4.333333333333334
+          }
+        ]
+      }
+    },
+    "reliability_reasons": [
+      "99180387:DESCRIPTIVE_ONLY_BAU",
+      "99363629:DESCRIPTIVE_ONLY_BAU"
+    ],
+    "causal_claim": false
+  },
+  "checks": [
+    {
+      "check": "phase1_and_task1_gates_pass",
+      "observed": true,
+      "status": "PASS"
+    },
+    {
+      "check": "one_row_per_shop_key",
+      "observed": 0,
+      "expected": 0,
+      "status": "PASS"
+    },
+    {
+      "check": "unmatched_master_shops_retained",
+      "observed": 18293,
+      "expected": ">=0; retained in output",
+      "status": "PASS"
+    },
+    {
+      "check": "no_sample_weights_applied",
+      "observed": false,
+      "expected": false,
+      "status": "PASS"
+    },
+    {
+      "check": "no_roi_or_causal_uplift",
+      "observed": false,
+      "expected": false,
+      "status": "PASS"
+    }
+  ],
+  "assumptions": {
+    "peer_group": "current category/model where present; unmatched shops use observed contract-history and lead-volume bands",
+    "minimum_peer_support": 30,
+    "attainable_potential": "p50/p75/p90 of each peer shop's average monthly funded-origin count across up to six recent observed contract months, multiplied by three; same outcome unit/horizon as funded BAU, descriptive peer benchmark, not intervention uplift",
+    "internal_ceiling": "distinct lead UUID opportunities in latest 3 complete months multiplied by peer p75 primary-match UUID rate; existing lead pipeline only, not total addressable market",
+    "priority_capacity": 10,
+    "cost_roi": "not estimated: costs, margin and resource capacity are unavailable",
+    "lead_match": "distinct UUID with at least one primary criterion-qualified contract / distinct UUID assigned in the window; right-censoring remains possible"
+  },
+  "task2_may_consume_forecasts": "Only rows tagged EVIDENCE_QUALIFIED_BAU support BAU-relative opportunity gaps; peer-reference headroom versus current actual is separately labeled as a descriptive test hypothesis."
+}
