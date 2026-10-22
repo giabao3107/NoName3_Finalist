@@ -1,0 +1,64 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#004AAD;--navy:#14213D;--light:#EEF3FA;--mid:#8FAAD1;--grey:#6B7280;--line:#D5DCE6;--red:#C51E1E;--amber:#C98A1B}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#fff;font-family:Inter,Helvetica,Arial,sans-serif;color:#1F2937}
+.slide{position:relative;width:1920px;height:1080px;padding:44px 64px 0 64px}
+.hdr{position:relative;padding-left:26px;border-left:9px solid var(--blue);margin-bottom:22px}
+.eyebrow{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:700;color:var(--blue);font-size:32px;letter-spacing:.5px;text-transform:uppercase;line-height:1.05}
+.title{font-weight:800;color:var(--navy);font-size:42px;line-height:1.15;margin-top:4px}
+.sub{font-style:italic;color:var(--grey);font-size:21px;margin-top:6px}
+.pageno{position:absolute;top:40px;right:64px;font-family:Oswald,sans-serif;font-size:34px;color:#B8C2D0;font-weight:600}
+.body{position:absolute;top:212px;left:64px;right:64px;bottom:108px;display:flex;gap:30px}
+.stack{flex-direction:column;gap:18px}
+.row{display:flex;gap:26px;min-height:0}
+.col{display:flex;flex-direction:column;gap:20px;min-width:0}
+.foot{position:absolute;left:30px;right:30px;bottom:0;height:86px;border-top:2px solid var(--line);display:flex;justify-content:space-around;align-items:center}
+.foot div{font-weight:700;font-size:20px;color:#111827;position:relative;padding:6px 10px}
+.foot div.on{color:var(--blue)}
+.foot div.on:before{content:'';position:absolute;left:10%;right:10%;top:-22px;height:7px;border-radius:4px;background:var(--blue)}
+.fig{border:2px dashed #C9D3E0;border-radius:10px;padding:14px 16px 10px;display:flex;flex-direction:column;min-height:0}
+.fig .cap{font-weight:700;font-style:italic;font-size:19px;color:var(--navy);text-align:center;margin-bottom:8px}
+.fig img{width:100%;flex:1;min-height:0;object-fit:contain}
+.fig .src{font-style:italic;font-size:14px;color:var(--grey);text-align:right;margin-top:6px}
+.box{border:2px solid var(--blue);border-radius:10px;overflow:hidden}
+.box .bh{background:var(--blue);color:#fff;font-weight:700;font-size:22px;padding:8px 16px;text-align:center}
+.box .bb{padding:14px 18px;font-size:20px;line-height:1.42}
+.guard{border:2.5px dashed var(--red);border-radius:10px;background:#FFF7F7;padding:14px 18px;font-size:19px;line-height:1.4}
+.guard b.t{color:var(--red);display:block;margin-bottom:4px;font-size:20px}
+.kpis{display:flex;gap:16px}
+.kpi{flex:1;border:2px solid #9DB4D6;border-radius:10px;padding:12px 16px;background:#fff}
+.kpi .n{font-weight:800;color:var(--blue);font-size:44px;line-height:1.05}
+.kpi .c{font-size:17px;color:#374151;margin-top:6px;line-height:1.3}
+.kpi.risk{border-color:var(--red)} .kpi.risk .n{color:var(--red)}
+.kpi.amber .n{color:var(--amber)} .kpi.amber{border-color:var(--amber)}
+table{border-collapse:collapse;width:100%;font-size:18.5px}
+th{background:var(--blue);color:#fff;text-align:left;padding:9px 12px;font-weight:700}
+td{padding:8px 12px;border-bottom:1px solid #E5EAF1;vertical-align:top;line-height:1.3}
+tr:nth-child(even) td{background:#F4F7FB}
+.tcap{font-weight:700;color:var(--blue);font-size:21px;margin-bottom:8px}
+ul{padding-left:24px} li{margin:4px 0}
+.small{font-size:16px;color:var(--grey);font-style:italic}
+.tag{display:inline-block;font-size:15px;font-weight:700;padding:2px 10px;border-radius:12px;color:#fff;background:var(--blue)}
+.tag.bold{background:var(--navy)} .tag.g{background:var(--red)}
+.chain{display:flex;gap:18px;align-items:stretch}
+.step{flex:1;border:2px solid var(--blue);border-radius:12px;background:var(--light);padding:18px;position:relative}
+.step .k{font-family:Oswald,sans-serif;font-size:40px;color:var(--blue);font-weight:700}
+.step .q{font-weight:800;color:var(--navy);font-size:28px;margin:6px 0 12px;line-height:1.2}
+.step .a{font-size:22px;line-height:1.45}
+.step .k{font-size:56px !important}
+.step:not(:last-child):after{content:'\2192';position:absolute;right:-17px;top:42%;font-size:30px;color:var(--blue);font-weight:800}
+.def{border-left:7px solid var(--blue);background:var(--light);border-radius:8px;padding:12px 16px;font-size:19px;line-height:1.38}
+.def b{color:var(--navy);font-size:21px}
+.tl{display:flex;gap:14px}
+.tl .ph{flex:1;border-radius:10px;padding:18px 18px;color:#fff;font-size:21px;line-height:1.42;min-height:190px}
+.tl .ph b{display:block;font-family:Oswald,sans-serif;font-size:26px;letter-spacing:.3px;margin-bottom:4px}
+.scqa{display:grid;grid-template-columns:62px 1fr;gap:10px 14px;align-items:start}
+.scqa .L{font-family:Oswald,sans-serif;font-weight:700;font-size:44px;color:#fff;background:var(--blue);border-radius:8px;text-align:center;line-height:62px;height:62px}
+.scqa .T{font-size:20px;line-height:1.4;padding-top:4px}
+.scqa .T b.h{color:var(--blue);display:block;font-size:19px;letter-spacing:.4px}
+.bottomline{background:var(--navy);color:#fff;border-radius:10px;padding:16px 22px;font-size:24px;font-weight:700;text-align:center}
+</style></head><body><div class="slide">
+<div class="pageno">04</div><div class="hdr"><div class="eyebrow">R2 foundation</div><div class="title">Round 2 scores hold out of time, after fixing what the judges flagged</div><div class="sub">Weights and cut-offs fit on a random half of 1,000,528 customers; every result shown is on the other half</div></div>
+<div class="body"><div class="col" style="flex:1;gap:18px"><div class="fig" style="height:430px"><div class="cap">Figure 1 · R2 action groups on the hold-out half: applied again (left), applied before Tết 2026 (middle), late on a new loan (right)</div><img src="file:///Users/quynhlu/Documents/UEL/YEAR3/BI10/ROUND%2003/NoName3_Finalist/BI10-Round3/output/R2_Customer_Foundation/R2_04_Group_Out_of_Time_Validation.png"><div class="src">Source: Round 2 scores (snapshot 5 Jun 2025); Round 3 contracts to Sep 2026; hold-out half n≈500K.</div></div><div class="row" style="flex:1"><div class="col" style="flex:1.35"><table style="font-size:17.5px"><colgroup><col style="width:22%"><col style="width:32%"><col style="width:46%"></colgroup><tr><th>Round 2 feedback</th><th>Our fix</th><th>Result</th></tr><tr><td>CES weights not justified</td><td>8 weightings compared on a hold-out half</td><td>AUC 0.718–0.733: ranking is robust; recency dropped (redundant with frequency)</td></tr><tr><td>Cut-offs look arbitrary</td><td>Outcome-anchored, same rule as FHS</td><td>High ≥ 1.5× avg re-application (score ≥ 44); Low ≤ 2/3 (&lt; 17)</td></tr><tr><td>FHS weights not justified</td><td>Out-of-time check on Round 3 late payments</td><td>R2 weights beat equal weights (Gini 0.084 vs 0.078)</td></tr><tr><td>No outcome validation</td><td>Hold-out test on Round 3 contracts after 5 Jun 2025</td><td>GROW re-applied 34.0% vs 8–13%</td></tr></table></div>
+<div class="col" style="flex:.65"><div class="box" style=""><div class="bh">Insight</div><div class="bb"><b>The groups predict real behaviour.</b> GROW customers re-borrow 3–4× more often and PROTECT customers are late most often, so the customer lens is safe to carry into the shop analysis.</div></div></div></div></div></div><div class="foot"><div class="">Overview &amp; Data</div><div class="on">R2 Foundation</div><div class="">Shop Performance &amp; BAU</div><div class="">Growth Potential</div><div class="">Prioritisation &amp; Actions</div></div></div></body></html>

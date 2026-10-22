@@ -366,6 +366,18 @@ def fig_capacity(r:pd.DataFrame)->None:
     save(fig,"R3_06_Agent_Time_Share.png")
 
 
+def fig_network_concepts(r:pd.DataFrame)->None:
+    e=r[r.gap_base.notna()]
+    vals=[e.current_3m.sum(),e.bau_3m.sum(),e.attainable_base.sum(),e.ceiling_internal.sum()]
+    names=["Current actual","BAU","Attainable (peer p75)","Internal ceiling"]
+    fig,ax=plt.subplots(figsize=(7,3.2),dpi=200)
+    ax.bar(names,vals,color=[COLORS["gray"],COLORS["mid"],COLORS["blue"],COLORS["navy"]])
+    ax.errorbar(2,vals[2],yerr=[[vals[2]-e.attainable_low.sum()],[e.attainable_high.sum()-vals[2]]],color=COLORS["red"],capsize=4,linewidth=1)
+    for i,v in enumerate(vals):ax.text(i,v,f"{v/1e3:,.1f}K",ha="center",va="bottom",fontsize=8)
+    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v,_:f"{v/1e3:,.0f}K"));ax.set_ylabel("Funded contracts recorded at shop, 3 months")
+    save(fig,"R3_07_Network_Four_Concepts.png")
+
+
 # %% Pipeline ----------------------------------------------------------------------------------------
 def build()->dict[str,Any]:
     OUT.mkdir(parents=True,exist_ok=True)
@@ -383,7 +395,7 @@ def build()->dict[str,Any]:
         robust.append({"pilot_size":n,"overlap_low":len(base&set(ranked.loc[ranked.rank_low<=n,"shop"]))/n,"overlap_high":len(base&set(ranked.loc[ranked.rank_high<=n,"shop"]))/n})
     robust=pd.DataFrame(robust)
     hi,lo,pair_meta=choose_pair(ranked)
-    fig_leakage(conc,prod);fig_mix(ranked);fig_pair(hi,lo,monthly);fig_constraints(ranked);fig_priority(ranked,robust);fig_capacity(ranked)
+    fig_leakage(conc,prod);fig_mix(ranked);fig_pair(hi,lo,monthly);fig_constraints(ranked);fig_priority(ranked,robust);fig_capacity(ranked);fig_network_concepts(ranked)
     ranked.to_parquet(OUT/"shop_growth_priority.parquet",index=False,compression="zstd")
     shortlist=ranked[ranked.rank_base<=max(PILOT_SIZES)].sort_values("rank_base")[["rank_base","shop","peer","province","current_3m","bau_3m","attainable_low","attainable_base","attainable_high",
         "ceiling_internal","gap_base","primary_constraint","action","confidence","lead_conversion","conversion_vs_peer","exported_share","credit_leakage_flag","grow_share","protect_share","linked_customers","rank_low","rank_high"]]
