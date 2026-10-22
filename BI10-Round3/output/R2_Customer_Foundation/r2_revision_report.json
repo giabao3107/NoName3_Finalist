@@ -1,0 +1,524 @@
+{
+  "status": "SUCCESS",
+  "snapshot": "2025-06-05T00:00:00",
+  "customers": 1000528,
+  "round3_coverage_of_r2_contracts": {
+    "status": "OK",
+    "window": "2025-01-01 to 2025-05-31",
+    "r2_credit_cases": 880181,
+    "found_in_r3": 280986,
+    "share_found": 0.31923661156057676
+  },
+  "ces_weights": {
+    "round2": {
+      "E1_digital": 0.2,
+      "E2_recency": 0.2,
+      "E3_frequency": 0.25,
+      "E4_responsiveness": 0.2,
+      "E5_breadth": 0.15
+    },
+    "learned": {
+      "E1_digital": 0.03384344334494733,
+      "E2_recency": 0.11409910908611522,
+      "E3_frequency": 0.24778757628440426,
+      "E4_responsiveness": 0.2064447920663108,
+      "E5_breadth": 0.3978250792182225
+    },
+    "final": {
+      "E1_digital": 0.25,
+      "E2_recency": 0.0,
+      "E3_frequency": 0.312,
+      "E4_responsiveness": 0.25,
+      "E5_breadth": 0.187
+    },
+    "final_rule": "highest train-half 6-month AUC: Round 2 without recency",
+    "comparison": [
+      {
+        "weights": "Round 2 weights",
+        "E1_digital": 0.2,
+        "E2_recency": 0.2,
+        "E3_frequency": 0.25,
+        "E4_responsiveness": 0.2,
+        "E5_breadth": 0.15,
+        "train_auc_6m": 0.730385581797126,
+        "test_auc_6m": 0.7310725353408521,
+        "test_auc_15m": 0.7245361294315177
+      },
+      {
+        "weights": "Equal weights",
+        "E1_digital": 0.2,
+        "E2_recency": 0.2,
+        "E3_frequency": 0.2,
+        "E4_responsiveness": 0.2,
+        "E5_breadth": 0.2,
+        "train_auc_6m": 0.7303468823499207,
+        "test_auc_6m": 0.7310821457540454,
+        "test_auc_15m": 0.7244761383425419
+      },
+      {
+        "weights": "Learned (non-negative logit)",
+        "E1_digital": 0.034,
+        "E2_recency": 0.114,
+        "E3_frequency": 0.248,
+        "E4_responsiveness": 0.206,
+        "E5_breadth": 0.398,
+        "train_auc_6m": 0.7315644923630276,
+        "test_auc_6m": 0.7323890455183897,
+        "test_auc_15m": 0.7237765766475239
+      },
+      {
+        "weights": "Round 2 without digital",
+        "E1_digital": 0.0,
+        "E2_recency": 0.25,
+        "E3_frequency": 0.312,
+        "E4_responsiveness": 0.25,
+        "E5_breadth": 0.187,
+        "train_auc_6m": 0.7261734375409047,
+        "test_auc_6m": 0.7271134419066323,
+        "test_auc_15m": 0.7191850169998766
+      },
+      {
+        "weights": "Round 2 without recency",
+        "E1_digital": 0.25,
+        "E2_recency": 0.0,
+        "E3_frequency": 0.312,
+        "E4_responsiveness": 0.25,
+        "E5_breadth": 0.187,
+        "train_auc_6m": 0.7322936408211563,
+        "test_auc_6m": 0.7334476207905876,
+        "test_auc_15m": 0.7275552902542999
+      },
+      {
+        "weights": "Round 2 without frequency",
+        "E1_digital": 0.267,
+        "E2_recency": 0.267,
+        "E3_frequency": 0.0,
+        "E4_responsiveness": 0.267,
+        "E5_breadth": 0.2,
+        "train_auc_6m": 0.7193979855358781,
+        "test_auc_6m": 0.7202948052539624,
+        "test_auc_15m": 0.7150665246802523
+      },
+      {
+        "weights": "Round 2 without responsiveness",
+        "E1_digital": 0.25,
+        "E2_recency": 0.25,
+        "E3_frequency": 0.312,
+        "E4_responsiveness": 0.0,
+        "E5_breadth": 0.187,
+        "train_auc_6m": 0.7258648660034823,
+        "test_auc_6m": 0.7260510305743149,
+        "test_auc_15m": 0.7169288318784278
+      },
+      {
+        "weights": "Round 2 without breadth",
+        "E1_digital": 0.235,
+        "E2_recency": 0.235,
+        "E3_frequency": 0.294,
+        "E4_responsiveness": 0.235,
+        "E5_breadth": 0.0,
+        "train_auc_6m": 0.7178814083655963,
+        "test_auc_6m": 0.718281784316392,
+        "test_auc_15m": 0.7115095749430826
+      }
+    ],
+    "single_component": [
+      {
+        "component": "E1_digital",
+        "test_auc_6m": 0.6420169434573375
+      },
+      {
+        "component": "E2_recency",
+        "test_auc_6m": 0.648944577203234
+      },
+      {
+        "component": "E3_frequency",
+        "test_auc_6m": 0.7004871579791946
+      },
+      {
+        "component": "E4_responsiveness",
+        "test_auc_6m": 0.5618028357488442
+      },
+      {
+        "component": "E5_breadth",
+        "test_auc_6m": 0.7017841816862462
+      }
+    ],
+    "train_n": 500462,
+    "test_n": 500066,
+    "outcome": "any Round 3 application within 6 months after snapshot"
+  },
+  "ces_cutoffs": {
+    "average_rate": 0.10995640028613561,
+    "high_cut": 44.344344344344336,
+    "low_cut": 16.64998331664998
+  },
+  "ces_tier_counts": {
+    "round2": {
+      "Low": 763123,
+      "Medium": 187049,
+      "High": 50356
+    },
+    "v2": {
+      "Medium": 467298,
+      "Low": 270554,
+      "High": 262676
+    }
+  },
+  "fhs_weights": {
+    "round2": {
+      "Repayment History": 0.35,
+      "Credit Standing": 0.26,
+      "Debt Burden (DTI)": 0.13,
+      "Down-payment Buffer": 0.13,
+      "Pre-approved Capacity": 0.13
+    },
+    "learned": {
+      "Repayment History": 0.679705441033658,
+      "Credit Standing": 0.0,
+      "Debt Burden (DTI)": 0.0,
+      "Down-payment Buffer": 0.0,
+      "Pre-approved Capacity": 0.32029455896634196
+    },
+    "comparison": [
+      {
+        "weights": "Round 2 weights",
+        "Repayment History": 0.35,
+        "Credit Standing": 0.26,
+        "Debt Burden (DTI)": 0.13,
+        "Down-payment Buffer": 0.13,
+        "Pre-approved Capacity": 0.13,
+        "test_gini": 0.08440180081799076
+      },
+      {
+        "weights": "Equal weights",
+        "Repayment History": 0.2,
+        "Credit Standing": 0.2,
+        "Debt Burden (DTI)": 0.2,
+        "Down-payment Buffer": 0.2,
+        "Pre-approved Capacity": 0.2,
+        "test_gini": 0.07751974343628643
+      },
+      {
+        "weights": "Learned (non-negative logit)",
+        "Repayment History": 0.68,
+        "Credit Standing": 0.0,
+        "Debt Burden (DTI)": 0.0,
+        "Down-payment Buffer": 0.0,
+        "Pre-approved Capacity": 0.32,
+        "test_gini": 0.0997095326698183
+      },
+      {
+        "weights": "Round 2 without Repayment History",
+        "Repayment History": 0.0,
+        "Credit Standing": 0.4,
+        "Debt Burden (DTI)": 0.2,
+        "Down-payment Buffer": 0.2,
+        "Pre-approved Capacity": 0.2,
+        "test_gini": 0.07290719540623725
+      },
+      {
+        "weights": "Round 2 without Credit Standing",
+        "Repayment History": 0.473,
+        "Credit Standing": 0.0,
+        "Debt Burden (DTI)": 0.176,
+        "Down-payment Buffer": 0.176,
+        "Pre-approved Capacity": 0.176,
+        "test_gini": 0.07989116379210337
+      },
+      {
+        "weights": "Round 2 without Debt Burden (DTI)",
+        "Repayment History": 0.402,
+        "Credit Standing": 0.299,
+        "Debt Burden (DTI)": 0.0,
+        "Down-payment Buffer": 0.149,
+        "Pre-approved Capacity": 0.149,
+        "test_gini": 0.09485057956911414
+      },
+      {
+        "weights": "Round 2 without Down-payment Buffer",
+        "Repayment History": 0.402,
+        "Credit Standing": 0.299,
+        "Debt Burden (DTI)": 0.149,
+        "Down-payment Buffer": 0.0,
+        "Pre-approved Capacity": 0.149,
+        "test_gini": 0.08582388477204228
+      },
+      {
+        "weights": "Round 2 without Pre-approved Capacity",
+        "Repayment History": 0.402,
+        "Credit Standing": 0.299,
+        "Debt Burden (DTI)": 0.149,
+        "Down-payment Buffer": 0.149,
+        "Pre-approved Capacity": 0.0,
+        "test_gini": 0.058800184072579365
+      },
+      {
+        "weights": "Round 2 published FHS",
+        "Repayment History": null,
+        "Credit Standing": null,
+        "Debt Burden (DTI)": null,
+        "Down-payment Buffer": null,
+        "Pre-approved Capacity": null,
+        "test_gini": 0.08540478510391392
+      }
+    ],
+    "customers_with_mature_loan": 130642,
+    "late_rate": 0.2507310053428453
+  },
+  "group_validation": [
+    {
+      "action_group": "GROW",
+      "customers": 190001,
+      "applied_after": 0.339792948458166,
+      "applied_6m": 0.1987147436066126,
+      "funded_after": 0.29371424360924414,
+      "applied_tet26": 0.06239967158067589,
+      "late_after": 0.2406675068445526,
+      "customers_with_mature_loan": 46022,
+      "share": 0.379951846356281,
+      "tet_share_of_returners": 0.1836402781865213
+    },
+    {
+      "action_group": "NURTURE",
+      "customers": 200587,
+      "applied_after": 0.1302726497729165,
+      "applied_6m": 0.061300084252718275,
+      "funded_after": 0.10387014113576652,
+      "applied_tet26": 0.020185754809633725,
+      "late_after": 0.2734063429765145,
+      "customers_with_mature_loan": 15797,
+      "share": 0.4011210520211332,
+      "tet_share_of_returners": 0.1549500593165206
+    },
+    {
+      "action_group": "PROTECT",
+      "customers": 30353,
+      "applied_after": 0.11530985405067044,
+      "applied_6m": 0.05706190491878892,
+      "funded_after": 0.08269363819062366,
+      "applied_tet26": 0.01696702138174151,
+      "late_after": 0.3029518384256862,
+      "customers_with_mature_loan": 1931,
+      "share": 0.06069798786560174,
+      "tet_share_of_returners": 0.14714285714285716
+    },
+    {
+      "action_group": "RE-TIME",
+      "customers": 79125,
+      "applied_after": 0.0813649289099526,
+      "applied_6m": 0.04063191153238547,
+      "funded_after": 0.06515007898894155,
+      "applied_tet26": 0.010767772511848342,
+      "late_after": 0.24668367346938774,
+      "customers_with_mature_loan": 3920,
+      "share": 0.1582291137569841,
+      "tet_share_of_returners": 0.13233923578751167
+    }
+  ],
+  "validation_sample": "hold-out half (weights and cut-offs fit on the other half)",
+  "tet26_application_rate": {
+    "all other": 0.03900784195409808,
+    "RE-TIME": 0.010767772511848342,
+    "R2 definition RE-TIME": 0.020708807867716374,
+    "R2 definition others": 0.0434729659898427,
+    "R2 definition customers (full base)": 392164
+  },
+  "tet26_window": [
+    "2026-01-01T00:00:00",
+    "2026-02-17T00:00:00"
+  ],
+  "network_monthly_applications": [
+    {
+      "month_start": "2025-01-01T00:00:00",
+      "applications": 202108
+    },
+    {
+      "month_start": "2025-02-01T00:00:00",
+      "applications": 152116
+    },
+    {
+      "month_start": "2025-03-01T00:00:00",
+      "applications": 179858
+    },
+    {
+      "month_start": "2025-04-01T00:00:00",
+      "applications": 179824
+    },
+    {
+      "month_start": "2025-05-01T00:00:00",
+      "applications": 184311
+    },
+    {
+      "month_start": "2025-06-01T00:00:00",
+      "applications": 189207
+    },
+    {
+      "month_start": "2025-07-01T00:00:00",
+      "applications": 185955
+    },
+    {
+      "month_start": "2025-08-01T00:00:00",
+      "applications": 183557
+    },
+    {
+      "month_start": "2025-09-01T00:00:00",
+      "applications": 179505
+    },
+    {
+      "month_start": "2025-10-01T00:00:00",
+      "applications": 191151
+    },
+    {
+      "month_start": "2025-11-01T00:00:00",
+      "applications": 176365
+    },
+    {
+      "month_start": "2025-12-01T00:00:00",
+      "applications": 184333
+    },
+    {
+      "month_start": "2026-01-01T00:00:00",
+      "applications": 179832
+    },
+    {
+      "month_start": "2026-02-01T00:00:00",
+      "applications": 149894
+    },
+    {
+      "month_start": "2026-03-01T00:00:00",
+      "applications": 164567
+    },
+    {
+      "month_start": "2026-04-01T00:00:00",
+      "applications": 165409
+    },
+    {
+      "month_start": "2026-05-01T00:00:00",
+      "applications": 171448
+    },
+    {
+      "month_start": "2026-06-01T00:00:00",
+      "applications": 176291
+    },
+    {
+      "month_start": "2026-07-01T00:00:00",
+      "applications": 184814
+    },
+    {
+      "month_start": "2026-08-01T00:00:00",
+      "applications": 197331
+    },
+    {
+      "month_start": "2026-09-01T00:00:00",
+      "applications": 197495
+    }
+  ],
+  "threshold_sensitivity": [
+    {
+      "scenario": "Base",
+      "action_group": "NURTURE",
+      "customers": 401126
+    },
+    {
+      "scenario": "Base",
+      "action_group": "GROW",
+      "customers": 380637
+    },
+    {
+      "scenario": "Base",
+      "action_group": "RE-TIME",
+      "customers": 158168
+    },
+    {
+      "scenario": "Base",
+      "action_group": "PROTECT",
+      "customers": 60597
+    },
+    {
+      "scenario": "FHS -5",
+      "action_group": "GROW",
+      "customers": 447490
+    },
+    {
+      "scenario": "FHS -5",
+      "action_group": "NURTURE",
+      "customers": 260079
+    },
+    {
+      "scenario": "FHS -5",
+      "action_group": "RE-TIME",
+      "customers": 257064
+    },
+    {
+      "scenario": "FHS -5",
+      "action_group": "PROTECT",
+      "customers": 35895
+    },
+    {
+      "scenario": "FHS +5",
+      "action_group": "NURTURE",
+      "customers": 424857
+    },
+    {
+      "scenario": "FHS +5",
+      "action_group": "GROW",
+      "customers": 322296
+    },
+    {
+      "scenario": "FHS +5",
+      "action_group": "RE-TIME",
+      "customers": 146094
+    },
+    {
+      "scenario": "FHS +5",
+      "action_group": "PROTECT",
+      "customers": 107281
+    },
+    {
+      "scenario": "CES -5",
+      "action_group": "NURTURE",
+      "customers": 457867
+    },
+    {
+      "scenario": "CES -5",
+      "action_group": "GROW",
+      "customers": 414808
+    },
+    {
+      "scenario": "CES -5",
+      "action_group": "RE-TIME",
+      "customers": 67256
+    },
+    {
+      "scenario": "CES -5",
+      "action_group": "PROTECT",
+      "customers": 60597
+    },
+    {
+      "scenario": "CES +5",
+      "action_group": "NURTURE",
+      "customers": 362451
+    },
+    {
+      "scenario": "CES +5",
+      "action_group": "GROW",
+      "customers": 319430
+    },
+    {
+      "scenario": "CES +5",
+      "action_group": "RE-TIME",
+      "customers": 258050
+    },
+    {
+      "scenario": "CES +5",
+      "action_group": "PROTECT",
+      "customers": 60597
+    }
+  ],
+  "limits": [
+    "Validation measures business-as-usual behaviour, not the effect of any action.",
+    "Round 3 holds about a third of the Round 2 customers' Jan-May 2025 contracts, so outcome rates are 'observed in the Round 3 shop network', not total re-borrowing; group comparisons assume this sampling does not depend on the group.",
+    "Late payment uses Round 3 dpd_1pd-dpd_4pd > 0 on loans funded before May 2026; checkpoint timing is undocumented."
+  ]
+}

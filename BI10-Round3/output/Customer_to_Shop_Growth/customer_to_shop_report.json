@@ -1,0 +1,266 @@
+{
+  "status": "SUCCESS",
+  "window": [
+    "2026-07-01T00:00:00",
+    "2026-10-01T00:00:00"
+  ],
+  "network": {
+    "shop_ids": 32524,
+    "funded_3m": 410084.0,
+    "top3_booking_share": 0.39466304464451185,
+    "master_shops": 14231,
+    "assessed_shops": 2051
+  },
+  "leakage": {
+    "by_product": [
+      {
+        "origin_type": "Origin not in shop master",
+        "product": "CL",
+        "funded": 18860,
+        "booked_elsewhere_share": 0.9399257688229056
+      },
+      {
+        "origin_type": "Origin not in shop master",
+        "product": "CC",
+        "funded": 12268,
+        "booked_elsewhere_share": 0.879768503423541
+      },
+      {
+        "origin_type": "Origin not in shop master",
+        "product": "TW",
+        "funded": 4654,
+        "booked_elsewhere_share": 0.15535023635582296
+      },
+      {
+        "origin_type": "Origin not in shop master",
+        "product": "CD",
+        "funded": 210,
+        "booked_elsewhere_share": 1.0
+      },
+      {
+        "origin_type": "Physical shop (in master)",
+        "product": "CD",
+        "funded": 17194,
+        "booked_elsewhere_share": 0.008956612771897174
+      },
+      {
+        "origin_type": "Physical shop (in master)",
+        "product": "CC",
+        "funded": 4538,
+        "booked_elsewhere_share": 0.8968708682238872
+      },
+      {
+        "origin_type": "Physical shop (in master)",
+        "product": "TW",
+        "funded": 3906,
+        "booked_elsewhere_share": 0.13287250384024576
+      },
+      {
+        "origin_type": "Physical shop (in master)",
+        "product": "CL",
+        "funded": 1021,
+        "booked_elsewhere_share": 0.9049951028403526
+      }
+    ],
+    "cross_booking_evidence": [
+      {
+        "product": "CC",
+        "central_id": false,
+        "contracts": 301,
+        "processed_by_origin_staff": 0.9368770764119602,
+        "within_24h": 0.9069767441860465,
+        "median_hours": 0.0
+      },
+      {
+        "product": "CC",
+        "central_id": true,
+        "contracts": 3769,
+        "processed_by_origin_staff": 0.8885646059962855,
+        "within_24h": 0.8806049349960202,
+        "median_hours": 0.0
+      },
+      {
+        "product": "CL",
+        "central_id": false,
+        "contracts": 362,
+        "processed_by_origin_staff": 0.8149171270718232,
+        "within_24h": 0.2955801104972376,
+        "median_hours": 243.0
+      },
+      {
+        "product": "CL",
+        "central_id": true,
+        "contracts": 562,
+        "processed_by_origin_staff": 0.1423487544483986,
+        "within_24h": 0.20106761565836298,
+        "median_hours": 289.0
+      }
+    ],
+    "physical_cl_booked_elsewhere": 0.9049951028403526,
+    "exported_3m_master": 5667.0,
+    "current_3m_master": 115738.0
+  },
+  "four_concepts_assessed": {
+    "current_3m": 87445.0,
+    "bau_3m": 88034.0,
+    "attainable_low": 90182.02433757223,
+    "attainable_base": 93499.12423149707,
+    "attainable_high": 99278.09499470713,
+    "ceiling_internal": 115881.52202611548
+  },
+  "levers_base": {
+    "leads_booked_here": 4221.59778932406,
+    "leads_booked_elsewhere": 1602.681432729396,
+    "grow": 1243.5264421730126
+  },
+  "assessed_share_of_network_funded": 0.2132368002653115,
+  "credit_leakage_flag_shops": 23,
+  "top20_execution": {
+    "gap_low": 577.8344654124991,
+    "gap_base": 970.1159989173298,
+    "gap_high": 1463.0735458357608,
+    "current_3m": 1839.0
+  },
+  "top_n_all": {
+    "10": {
+      "gap_low": 412.550128879494,
+      "gap_base": 748.4996308865035,
+      "gap_high": 1121.7500843308928
+    },
+    "20": {
+      "gap_low": 572.0756059479204,
+      "gap_base": 1064.8015395794125,
+      "gap_high": 1683.2927780566922
+    },
+    "50": {
+      "gap_low": 851.8835668248439,
+      "gap_base": 1766.960855272766,
+      "gap_high": 3139.2709613653587
+    }
+  },
+  "constraints": [
+    {
+      "primary_constraint": "DEMAND: thin pipeline",
+      "shops": 495,
+      "gap_base": 88.26489330803736
+    },
+    {
+      "primary_constraint": "EXECUTION: leads convert below peers",
+      "shops": 268,
+      "gap_base": 2812.8228452111307
+    },
+    {
+      "primary_constraint": "NO CLEAR GAP",
+      "shops": 753,
+      "gap_base": 2143.0526127499684
+    },
+    {
+      "primary_constraint": "QUALITY: high PROTECT share",
+      "shops": 25,
+      "gap_base": 220.7087432089981
+    },
+    {
+      "primary_constraint": "UNTAPPED BASE: warm customers, thin pipeline",
+      "shops": 510,
+      "gap_base": 200.27513701893838
+    }
+  ],
+  "actions": {
+    "MONITOR": 753,
+    "TEST: warm-base reactivation": 510,
+    "LEARN: demand test": 495,
+    "TEST: lead follow-up SLA": 268,
+    "PROTECT FIRST: no volume push": 25
+  },
+  "robustness": [
+    {
+      "pilot_size": 10,
+      "overlap_low": 0.8,
+      "overlap_high": 0.5
+    },
+    {
+      "pilot_size": 20,
+      "overlap_low": 0.8,
+      "overlap_high": 0.55
+    },
+    {
+      "pilot_size": 50,
+      "overlap_low": 0.64,
+      "overlap_high": 0.56
+    }
+  ],
+  "pair": {
+    "meta": {
+      "peer": "Medium | Non-Aldi",
+      "rule": "same category|model, current funded 3M within 5%, current>=30, linked R2 customers>=30; A has the EXECUTION constraint, B has none; largest base-gap difference",
+      "gap_spread": 41.1851268970653
+    },
+    "A": {
+      "shop": 101125364,
+      "peer": "Medium | Non-Aldi",
+      "province": "TP. Đồng Nai",
+      "current_3m": 74.0,
+      "bau_3m": 74.0,
+      "attainable_low": 102.11428571428571,
+      "attainable_base": 120.8857142857143,
+      "attainable_high": 136.76097959183676,
+      "ceiling_internal": 203.13369667067627,
+      "lead_uuids_3m": 661.0,
+      "lead_conversion": 0.2118003025718608,
+      "conversion_vs_peer": 0.6381039197812215,
+      "exported_share": 0.5542168674698795,
+      "grow_share": 0.35294117647058826,
+      "protect_share": 0.029411764705882353,
+      "linked_customers": 34.0,
+      "agent_fte": 1.0284469141900634,
+      "primary_constraint": "EXECUTION: leads convert below peers",
+      "action": "TEST: lead follow-up SLA"
+    },
+    "B": {
+      "shop": 104947973,
+      "peer": "Medium | Non-Aldi",
+      "province": "Đồng Tháp",
+      "current_3m": 77.0,
+      "bau_3m": 77.0,
+      "attainable_low": 77.55424813424148,
+      "attainable_base": 82.700587388649,
+      "attainable_high": 99.69317962739017,
+      "ceiling_internal": 104.32556057977112,
+      "lead_uuids_3m": 50.0,
+      "lead_conversion": 0.12,
+      "conversion_vs_peer": 1.2218726049764128,
+      "exported_share": 0.04938271604938271,
+      "grow_share": 0.42857142857142855,
+      "protect_share": 0.0,
+      "linked_customers": 35.0,
+      "agent_fte": 2.3956783044069576,
+      "primary_constraint": "NO CLEAR GAP",
+      "action": "MONITOR"
+    }
+  },
+  "capacity": [
+    {
+      "model": "Aldi",
+      "agents": 5.0,
+      "fte": 3.0136986301369864,
+      "shops_per_agent": 14.5,
+      "current": 28.0
+    },
+    {
+      "model": "Non-Aldi",
+      "agents": 23.0,
+      "fte": 0.610011036435185,
+      "shops_per_agent": 40.111111111111114,
+      "current": 28.0
+    }
+  ],
+  "assumptions": {
+    "unit": "funded contracts, three months",
+    "bau": "Task 1 trailing baseline (descriptive)",
+    "attainable": "BAU + lead lever + GROW lever at peer p50/p75/p90 (low/base/high)",
+    "ceiling": "internal serviceable proxy, not external market size",
+    "peer": "category|model in shop master, >=30 shops with >=15 funded contracts",
+    "customer_mix": "R2 groups of customers touching the shop after 2025-06-05; shown only with >=30 linked customers",
+    "causality": "levers are peer-benchmark scenarios to be tested, not causal uplift"
+  }
+}
