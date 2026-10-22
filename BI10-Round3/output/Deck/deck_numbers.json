@@ -1,0 +1,188 @@
+{
+ "views": {
+  "recorded": 87445.0,
+  "credited": 91354.0,
+  "booked_elsewhere": 3909.0,
+  "booked_elsewhere_share_of_credited": 0.04278958775751472,
+  "lead_driven_share_of_recorded": 0.15585796786551548,
+  "lead_driven_share_median_shop": 0.06666666666666667,
+  "shops_undercounted_20pct": 23
+ },
+ "four_concepts_assessed": {
+  "current_3m": 87445.0,
+  "bau_3m": 88034.0,
+  "attainable_low": 90182.02433757223,
+  "attainable_base": 93499.12423149707,
+  "attainable_high": 99278.09499470713,
+  "ceiling_theoretical": 142421.9202355849,
+  "ceiling_script5_double_counted": 115881.52202611548,
+  "shops_floored_at_attainable_high": 0
+ },
+ "pair": {
+  "A": {
+   "shop": 101125364.0,
+   "province": "TP. Đồng Nai",
+   "peer": "Medium | Non-Aldi",
+   "current_3m": 74.0,
+   "exported_3m": 92.0,
+   "credited_3m": 166.0,
+   "bau_3m": 74.0,
+   "attainable_low": 102.11428571428571,
+   "attainable_base": 120.8857142857143,
+   "attainable_high": 136.76097959183676,
+   "ceiling_theoretical": 252.62857142857143,
+   "ceiling_internal": 203.13369667067627,
+   "lead_uuids_3m": 661.0,
+   "converted_uuids": 140.0,
+   "lead_conversion": 0.2118003025718608,
+   "conversion_vs_peer": 0.6381039197812215,
+   "lever_leads_base": 46.88571428571429,
+   "lever_leads_elsewhere_base": 89.86428571428573,
+   "lever_grow_base": 0.0,
+   "agent_fte": 1.0284469141900634,
+   "assigned_agents": 31.0
+  },
+  "B": {
+   "shop": 104947973.0,
+   "province": "Đồng Tháp",
+   "peer": "Medium | Non-Aldi",
+   "current_3m": 77.0,
+   "exported_3m": 4.0,
+   "credited_3m": 81.0,
+   "bau_3m": 77.0,
+   "attainable_low": 77.55424813424148,
+   "attainable_base": 82.700587388649,
+   "attainable_high": 99.69317962739017,
+   "ceiling_theoretical": 113.46212121212123,
+   "ceiling_internal": 104.32556057977112,
+   "lead_uuids_3m": 50.0,
+   "converted_uuids": 6.0,
+   "lead_conversion": 0.12,
+   "conversion_vs_peer": 1.2218726049764128,
+   "lever_leads_base": 0.27235772357723576,
+   "lever_leads_elsewhere_base": 0.5447154471544716,
+   "lever_grow_base": 5.42822966507177,
+   "agent_fte": 2.3956783044069576,
+   "assigned_agents": 39.0
+  }
+ },
+ "pilot": {
+  "pool_size": 40,
+  "current_3m": 2913.0,
+  "gap_low": 818.0815178842475,
+  "gap_base": 1404.0183866770235,
+  "gap_high": 2194.8247635415264,
+  "leads_min": 66.0,
+  "leads_max": 694.0,
+  "peer_median_leads": [
+   33.0,
+   36.0,
+   37.0
+  ],
+  "lead_multiple_min": 1.8333333333333333,
+  "lead_multiple_max": 18.756756756756758,
+  "conv_vs_peer_min": 0.2504696305572949,
+  "conv_vs_peer_max": 0.7452877879685129,
+  "agent_fte_median": 0.7067441940892759,
+  "nonaldi_fte_median_network": 0.6098601030664803,
+  "shop_A_pool_rank": 7,
+  "execution_shops": 268,
+  "execution_gap_base": 2812.8228452111307,
+  "qoq_log_sd": 0.7492765757571378,
+  "mde_log": 0.6634377615051921,
+  "mde_pct": 0.9414551350076388,
+  "quarters_used": [
+   "2025Q2",
+   "2025Q3",
+   "2025Q4",
+   "2026Q1",
+   "2026Q2",
+   "2026Q3"
+  ],
+  "gap_low_pct_of_test_arm": 0.28083814551467473,
+  "gap_base_pct_of_test_arm": 0.4819836548839765
+ },
+ "context": {
+  "central_id": {
+   "funded": 410084,
+   "central": 113540,
+   "cards": 48636,
+   "central_cards": 35497,
+   "central_employees": 3995,
+   "central_products": "CW,CL,CC",
+   "central_share": 0.276870104661484,
+   "central_card_share": 0.7298503166378814
+  },
+  "funnel": {
+   "ids_funded_in_window": 14768,
+   "master_ids_funded_in_window": 7886,
+   "assessed": 2051,
+   "execution": 268,
+   "pool": 40,
+   "share_booked_outside_master": 0.7177700178500015,
+   "share_master_not_assessed": 0.06899318188468705,
+   "share_assessed": 0.2132368002653115
+  },
+  "holdout_wape_pooled": [
+   {
+    "tier": "A",
+    "horizon": 1,
+    "linear_trend": 0.211,
+    "trailing_3m": 0.258
+   },
+   {
+    "tier": "A",
+    "horizon": 2,
+    "linear_trend": 0.225,
+    "trailing_3m": 0.286
+   },
+   {
+    "tier": "A",
+    "horizon": 3,
+    "linear_trend": 0.23,
+    "trailing_3m": 0.3
+   },
+   {
+    "tier": "B",
+    "horizon": 1,
+    "linear_trend": 0.358,
+    "trailing_3m": 0.311
+   },
+   {
+    "tier": "B",
+    "horizon": 2,
+    "linear_trend": 0.467,
+    "trailing_3m": 0.383
+   },
+   {
+    "tier": "B",
+    "horizon": 3,
+    "linear_trend": 0.53,
+    "trailing_3m": 0.407
+   },
+   {
+    "tier": "C",
+    "horizon": 1,
+    "linear_trend": 0.607,
+    "trailing_3m": 0.489
+   },
+   {
+    "tier": "C",
+    "horizon": 2,
+    "linear_trend": 0.762,
+    "trailing_3m": 0.517
+   },
+   {
+    "tier": "C",
+    "horizon": 3,
+    "linear_trend": 0.875,
+    "trailing_3m": 0.531
+   }
+  ],
+  "bau_reliability": {
+   "TRAILING_BASELINE_FALLBACK": 1766,
+   "INSUFFICIENT_VALIDATION": 183,
+   "NO_FORECAST": 102
+  }
+ }
+}
