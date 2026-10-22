@@ -1,0 +1,259 @@
+{
+  "phase": "Phase 2 ? Exploratory Data Analysis only",
+  "execution_status": "VALIDATION_WARNING",
+  "figure_count": 9,
+  "figures": [
+    {
+      "figure_id": "FND_01",
+      "title": "Coverage by definition and join",
+      "file": "fnd_01.png"
+    },
+    {
+      "figure_id": "FND_02",
+      "title": "Observed event dates and monthly volume",
+      "file": "fnd_02.png"
+    },
+    {
+      "figure_id": "FND_03",
+      "title": "Lead UUID and weight-cell audit",
+      "file": "fnd_03.png"
+    },
+    {
+      "figure_id": "FND_04",
+      "title": "Lead-contract match states and primary attribution",
+      "file": "fnd_04.png"
+    },
+    {
+      "figure_id": "FND_05",
+      "title": "Lead product mapping and contract detail",
+      "file": "fnd_05.png"
+    },
+    {
+      "figure_id": "FND_06",
+      "title": "Shop behavior across the full fact universe",
+      "file": "fnd_06.png"
+    },
+    {
+      "figure_id": "FND_07",
+      "title": "Customer Profile coverage after cutoff",
+      "file": "fnd_07.png"
+    },
+    {
+      "figure_id": "FND_08",
+      "title": "Employee assignment status and intervals",
+      "file": "fnd_08.png"
+    },
+    {
+      "figure_id": "FND_09",
+      "title": "DPD checkpoint field availability",
+      "file": "fnd_09.png"
+    }
+  ],
+  "validation": {
+    "reconciliation": {
+      "phase1_amount_deltas_zero": true,
+      "source_event_rows_match_phase1": true,
+      "aggregate_totals_match_phase1": true,
+      "r2_cutoff_present": true,
+      "all_nine_fnd_figures_present": true
+    },
+    "aggregate_checks": [
+      {
+        "check": "contract_month_events_reconcile",
+        "status": "PASS",
+        "observed_rows": 3775371,
+        "expected_rows": 3775371,
+        "delta": 0
+      },
+      {
+        "check": "lead_month_events_reconcile",
+        "status": "PASS",
+        "observed_rows": 6130637,
+        "expected_rows": 6130637,
+        "delta": 0
+      },
+      {
+        "check": "lead_state_rows_reconcile",
+        "status": "PASS",
+        "observed_rows": 6130637,
+        "expected_rows": 6130637,
+        "delta": 0
+      },
+      {
+        "check": "candidate_pairs_reconcile",
+        "status": "PASS",
+        "observed_rows": 339529,
+        "expected_rows": 339529,
+        "delta": 0
+      },
+      {
+        "check": "contract_product_details_reconcile",
+        "status": "PASS",
+        "observed_rows": 784902,
+        "expected_rows": 784902,
+        "delta": 0
+      },
+      {
+        "check": "shop_month_contract_rows_reconcile",
+        "status": "PASS",
+        "observed_rows": 3775371,
+        "expected_rows": 3775371,
+        "delta": 0
+      },
+      {
+        "check": "shop_month_lead_rows_reconcile",
+        "status": "PASS",
+        "observed_rows": 6130637,
+        "expected_rows": 6130637,
+        "delta": 0
+      },
+      {
+        "check": "employee_interval_rows_reconcile",
+        "status": "PASS",
+        "observed_rows": 275856,
+        "expected_rows": 275856,
+        "delta": 0
+      },
+      {
+        "check": "dpd_vintage_rows_reconcile",
+        "status": "PASS",
+        "observed_rows": 3775371,
+        "expected_rows": 3775371,
+        "delta": 0
+      },
+      {
+        "check": "uuid_multiplicity_events_reconcile",
+        "status": "PASS",
+        "observed_rows": 6130637,
+        "expected_rows": 6130637,
+        "delta": 0
+      },
+      {
+        "check": "phase1_internal_lead_summary_reconcile",
+        "status": "PASS",
+        "observed_rows": 6130637,
+        "expected_rows": 6130637,
+        "delta": 0
+      },
+      {
+        "check": "primary_matches_reconcile",
+        "status": "PASS",
+        "observed_rows": 260674,
+        "expected_rows": 260674,
+        "delta": 0
+      },
+      {
+        "check": "confirmed_pairs_reconcile",
+        "status": "PASS",
+        "observed_rows": 339529,
+        "expected_rows": 339529,
+        "delta": 0
+      },
+      {
+        "check": "conversion_primary_matches_reconcile",
+        "status": "PASS",
+        "observed_rows": 260674,
+        "expected_rows": 260674,
+        "delta": 0
+      },
+      {
+        "check": "shop_behavior_profile_rows_reconcile",
+        "status": "PASS",
+        "observed_rows": 30705,
+        "expected_rows": 30705,
+        "delta": 0
+      }
+    ],
+    "figure_layout_validation": "NOT_RECORDED_AFTER_SUMMARY_SERIALIZATION_FAILURE",
+    "failed_checks": []
+  },
+  "warnings": [
+    "The aggregate and figure pass completed, but the original summary write failed on a non-finite layout value; this finalizer did not rerun the EDA pipeline.",
+    "Figure layout diagnostics are not persisted for this run.",
+    "Phase 1 product and status mappings, and employee status A, are provisional assumptions.",
+    "sample_weight is QA-only; DPD fields are not matured outcomes; shop attributes are snapshots."
+  ],
+  "number_traceability": {
+    "phase1_run_id": "20261021T234210Z",
+    "phase1_source_row_counts": {
+      "contract": 3775371.0,
+      "leads": 6130637.0,
+      "contract_product": 784902.0,
+      "employee_assignment": 275856.0,
+      "shop": 14231.0,
+      "seller": 11639.0,
+      "lead_reason": 12.0,
+      "schema_workbook": null,
+      "r2_fhs": 1000528.0,
+      "r2_ces": 1000528.0
+    },
+    "phase1_published_table_rows": {
+      "contract_fact": 3775371,
+      "leads_clean": 6130637,
+      "contract_product_bridge": 784902,
+      "shop_bridge": 14231,
+      "seller_master": 11639,
+      "employee_shop_bridge": 275856,
+      "lead_contract_candidates": 339529,
+      "shop_month_foundation": 715528,
+      "lead_shop_month_product": 349564,
+      "lead_conversion_shop_month": 140230,
+      "shop_behavior_profile": 30705,
+      "r2_customer_segment": 1000528
+    },
+    "aggregate_row_counts": {
+      "fnd01_coverage": 13,
+      "fnd02_date_quality": 5,
+      "fnd02_monthly": 22,
+      "fnd03_uuid_multiplicity": 3,
+      "fnd03_uuid_variation": 1,
+      "fnd03_weights": 21,
+      "fnd04_candidate_quality": 1,
+      "fnd04_conversion_channels": 3,
+      "fnd04_lag_bins": 5,
+      "fnd04_lead_states": 4,
+      "fnd04_primary_summary": 1,
+      "fnd05_contract_details": 100,
+      "fnd05_crosswalk": 5,
+      "fnd06_shop_behavior": 2,
+      "fnd06_shop_month_by_shop": 32524,
+      "fnd07_r2_segment_product_role": 120,
+      "fnd08_employee_interval_states": 2,
+      "fnd09_dpd_availability": 7
+    },
+    "confirmed_pairs": 339529,
+    "primary_matches": 260674,
+    "nonprimary_pair_uuid_attribution": [
+      {
+        "attribution": "DIFFERENT_LEAD_UUID",
+        "nonprimary_pairs": 78438,
+        "affected_contracts": 54366
+      },
+      {
+        "attribution": "SAME_UUID_REPEAT",
+        "nonprimary_pairs": 417,
+        "affected_contracts": 417
+      }
+    ],
+    "funded_shares": {
+      "SIGN_DATE": 0.7221806810509483,
+      "STATUS_MAP": 0.7193955243074124,
+      "BILLING": 0.21609558371879214
+    }
+  },
+  "input_fingerprints": {
+    "candidate": "acaf5b772babbe548767af650382a03a5fc6587094897d5b703b89f02d3bd6bd",
+    "contract": "a3c4bfd24cf71173abb1257e2a9f048e4101e2c1c5aa5b9d965118e3bf297867",
+    "contract_product": "fb016b92dc3728b6a150c368d0d0ffc3461cb5ece6de17f5d203e5db32fc302c",
+    "employee": "91e7ce3fea5bad4b7d73dcf1fe037a9945a58119ca60069c667480c460f2c4e8",
+    "lead_conversion": "fc0fb95fc84a1d76da0e4db8205c41bc8800c5f15e6d41c6ed08f59f7d4e75d0",
+    "lead_month_product": "977465f28b26665756bca3dae2414ab96e7c358f5512675fde07d21e3c329eba",
+    "leads": "e4a323a056c6cd9aafd9d9dac71098f39c10a858b640a1135d3436a905b705c5",
+    "phase1_metrics": "fdad80602d8ab03d0b476ac90ea3d5d9bc286ee38c07931d1444390f1056214b",
+    "r2_segment": "f7adc3c695253ec39859fb83fb0ec7f2d3a29f2d5ab85850f7faf685dc70c6bd",
+    "seller": "d0fa0be4e7b7df1683bf40ed002123a24c078e721333c13b4cb58b0b0aee901a",
+    "shop": "7a7afe7456bf71b4a27f4f78abb14c6724ddb902f3eb6e06011b91a6b158604f",
+    "shop_behavior": "bfceb0466b9c6edd0fe021a21aa74ece75ee6045d01c4a508aeac028d67a13f7",
+    "shop_month": "1ddcd124506f6d7697d0c030805da17421e8ed751531f9ca18047b3b3461c951"
+  }
+}

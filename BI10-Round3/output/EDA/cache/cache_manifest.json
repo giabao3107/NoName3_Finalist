@@ -1,0 +1,111 @@
+{
+  "transformation_version": "bi10-r3-phase2-eda-v1",
+  "base_signature": "d55113c09d8231115ae3e3ec9a2a9412d34abeed05d63cd5c88a6b23c85a7884",
+  "inputs": {
+    "candidate": "acaf5b772babbe548767af650382a03a5fc6587094897d5b703b89f02d3bd6bd",
+    "contract": "a3c4bfd24cf71173abb1257e2a9f048e4101e2c1c5aa5b9d965118e3bf297867",
+    "contract_product": "fb016b92dc3728b6a150c368d0d0ffc3461cb5ece6de17f5d203e5db32fc302c",
+    "employee": "91e7ce3fea5bad4b7d73dcf1fe037a9945a58119ca60069c667480c460f2c4e8",
+    "lead_conversion": "fc0fb95fc84a1d76da0e4db8205c41bc8800c5f15e6d41c6ed08f59f7d4e75d0",
+    "lead_month_product": "977465f28b26665756bca3dae2414ab96e7c358f5512675fde07d21e3c329eba",
+    "leads": "e4a323a056c6cd9aafd9d9dac71098f39c10a858b640a1135d3436a905b705c5",
+    "phase1_metrics": "fdad80602d8ab03d0b476ac90ea3d5d9bc286ee38c07931d1444390f1056214b",
+    "r2_segment": "f7adc3c695253ec39859fb83fb0ec7f2d3a29f2d5ab85850f7faf685dc70c6bd",
+    "seller": "d0fa0be4e7b7df1683bf40ed002123a24c078e721333c13b4cb58b0b0aee901a",
+    "shop": "7a7afe7456bf71b4a27f4f78abb14c6724ddb902f3eb6e06011b91a6b158604f",
+    "shop_behavior": "bfceb0466b9c6edd0fe021a21aa74ece75ee6045d01c4a508aeac028d67a13f7",
+    "shop_month": "1ddcd124506f6d7697d0c030805da17421e8ed751531f9ca18047b3b3461c951"
+  },
+  "aggregates": {
+    "fnd01_coverage": {
+      "signature": "11f2a6a92ed50324d73b4ff2c9593d52e715df804269085532e84eb566f4bac1",
+      "rows": 13,
+      "sha256": "71cadbf63ab53124937f79751fe364d3f5549a26e7aacc20d6e01bfd54b32100"
+    },
+    "fnd02_date_quality": {
+      "signature": "b91d04107b05d6aa1aa836fb418ca101ec69e8008d6b45b15ef588d274c963b4",
+      "rows": 5,
+      "sha256": "7d4b8236402f7b5a0b161ffcb2b39ab70c50a2e3cc6cb2c559bb9cf5651331dd"
+    },
+    "fnd02_monthly": {
+      "signature": "f2498ce532a03c8a86b7d78596e0f5f13aa9c7a71f59e47bdc575203acdc7f16",
+      "rows": 22,
+      "sha256": "cb5a27130890bcdab2191bcdf27f639cff79254fda335a7a913d8817e89df7eb"
+    },
+    "fnd03_uuid_multiplicity": {
+      "signature": "d780a42c206fcc60778db2536106adce31e6cf8f864aa81fed7aaa9f295a905a",
+      "rows": 3,
+      "sha256": "b98367b1c674530234fa2cfc767add5c3fd41b653ede7d4e21ef6b7fcc7590e5"
+    },
+    "fnd03_uuid_variation": {
+      "signature": "83552e0db0bde7ec0212e90dccb2605a03d383f50c8366aef441aa02617b0cf7",
+      "rows": 1,
+      "sha256": "34f2f754f1e48a8f8f9ef03bc9915878a50305fc06956002f031df2d2ca200a0"
+    },
+    "fnd03_weights": {
+      "signature": "9e3a0a483a799969f917546888685c7af2fee0bd6583a908effbabf6242b881e",
+      "rows": 21,
+      "sha256": "d757dfbaa9c0b37b7ac03691f72d024a214ff0f478221a5e6b87dd848baa37a7"
+    },
+    "fnd04_candidate_quality": {
+      "signature": "84e1097f1d73a4fb3d243024794b96a753c7ca1aa78b4fdf7313c98bc6955ecd",
+      "rows": 1,
+      "sha256": "4d9a73696330759b5a14ff1e0b3c2ffe17f5fd72f62f19363c8c8a5c266918e9"
+    },
+    "fnd04_conversion_channels": {
+      "signature": "290bca654938ffabfe72067f5e672412f9cddaa01d4a8a49259e69103e55e22b",
+      "rows": 3,
+      "sha256": "f72e5182a613800d059a58a664c8f17c5c577b17c12f42649582b53586390d31"
+    },
+    "fnd04_lag_bins": {
+      "signature": "6b1dc61af890cc876628f9910d9c127cf86d632af40b9c69c7cbe08bf6bfb75f",
+      "rows": 5,
+      "sha256": "3dadce4ca4121d30191801d0db9e4fff9c029ad282ad7b7f06951b94ac56d5c3"
+    },
+    "fnd04_lead_states": {
+      "signature": "f6b5912df5ad83a0bf9238e9467f1e0d6e6f7301c0abf0f6f4a38c4c112ce024",
+      "rows": 4,
+      "sha256": "28741d63473f4191d09d4753dcb5062d2d13b7cb1f84a74e35c76168da5c0a7e"
+    },
+    "fnd04_primary_summary": {
+      "signature": "0dcd92d48b472ce4304c9e0a12857489af86a6acc34dad91f15a3a1a6e1b37b0",
+      "rows": 1,
+      "sha256": "96e555ae0179c8c74f84df8f974c9306adce548d89c30aee2306117824f4219c"
+    },
+    "fnd05_contract_details": {
+      "signature": "27a7422df82efd34bded6008644e6fb0bd013888e092cfb719ede8999ac8f02a",
+      "rows": 100,
+      "sha256": "62a99c0d269174c61e9840bdf10163af5b7a9b2b761c9ad0fc2d4d444e4ea0e9"
+    },
+    "fnd05_crosswalk": {
+      "signature": "a9a937a679a6a63daf893497244e46cdcb50afcd379474c6b47a29f70671490f",
+      "rows": 5,
+      "sha256": "0c6454a6f7705aeba6262e0136a503810d4e1b6f80b40502f877df04b3dc0abf"
+    },
+    "fnd06_shop_behavior": {
+      "signature": "702247f544540819d0b28d88237e2c7245fe6616411b8a47b0d196d82c3ffbe7",
+      "rows": 2,
+      "sha256": "d710a15951b8de6e59da70c0070bff2825e831943dd128e31df96c1149eb44fe"
+    },
+    "fnd06_shop_month_by_shop": {
+      "signature": "beedc4e5865f259910ff99b999baf96c807c2604ed618e8e3c53053a5ba5a95d",
+      "rows": 32524,
+      "sha256": "b05820fa2dbc0d277129025993c3cedba7bb9d575300dd549db5cef981cbfbc9"
+    },
+    "fnd07_r2_segment_product_role": {
+      "signature": "2a3e9e6ce3eaf82eb3f6117643a2b7d8b10859dd4527bd662d08746afd87a05e",
+      "rows": 120,
+      "sha256": "999aee51e45df3f9bd40ff8e2e6cc90e51b277f9d54309eee9f1048be3a2866e"
+    },
+    "fnd08_employee_interval_states": {
+      "signature": "c0f13e8c21efc938b0bf0733c114f5879d6139b8611ccb5e7c20e21e709e859f",
+      "rows": 2,
+      "sha256": "09ecddc0a78986b9c2442ff4ba9ebd3fdc50630efd5c939b8c9b77847873262e"
+    },
+    "fnd09_dpd_availability": {
+      "signature": "908e40bfadb00aecc26a1cd2f87b576fc425b1293d3e2ea1d8f3198e7c3cdf08",
+      "rows": 7,
+      "sha256": "9e92c2a86466140669eac35084c709808046fbe691cb6bbe0cd58aa54320be15"
+    }
+  }
+}
