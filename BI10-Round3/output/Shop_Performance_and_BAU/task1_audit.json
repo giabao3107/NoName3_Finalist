@@ -1,0 +1,1359 @@
+{
+  "gate": {
+    "execution_status": "SUCCESS",
+    "fatal_failures": [],
+    "business_gates_pending": [
+      "round2_feature_timestamp_lineage_audited",
+      "lead_sample_weight_semantics_approved"
+    ],
+    "warnings": [
+      "Pending business gate: round2_feature_timestamp_lineage_audited",
+      "Pending business gate: lead_sample_weight_semantics_approved"
+    ]
+  },
+  "window": {
+    "history_start": "2025-01-01T00:00:00",
+    "latest_complete": "2026-09-01T00:00:00",
+    "lead_start": "2025-12-01T00:00:00",
+    "partial_lead": "2026-10-01T00:00:00",
+    "contract_max_date": "2026-09-30",
+    "lead_max_date": "2026-10-17",
+    "forecast_origin_month": "2026-09-01T00:00:00",
+    "horizons": [
+      1,
+      2,
+      3
+    ]
+  },
+  "phase1_optional_columns": {
+    "present": [
+      "active_headcount_proxy",
+      "assigned_employee_count_raw",
+      "distinct_lead_uuids",
+      "funded_contract_count"
+    ],
+    "derived_when_missing": [
+      "first_activity_month",
+      "last_activity_month",
+      "lifecycle_state"
+    ]
+  },
+  "observation_audit": [
+    {
+      "state": "MISSING_IN_LIFECYCLE",
+      "shop_month_rows": 80062,
+      "shop_ids": 16618,
+      "contract_rows": 0
+    },
+    {
+      "state": "OBSERVED_POSITIVE",
+      "shop_month_rows": 221984,
+      "shop_ids": 26655,
+      "contract_rows": 3775371
+    },
+    {
+      "state": "OBSERVED_ZERO",
+      "shop_month_rows": 75171,
+      "shop_ids": 17182,
+      "contract_rows": 0
+    },
+    {
+      "state": "OUTSIDE_LIFECYCLE",
+      "shop_month_rows": 305787,
+      "shop_ids": 25477,
+      "contract_rows": 0
+    }
+  ],
+  "in_lifecycle_zero_event_months": 80062,
+  "source_reconciliation": [
+    {
+      "check": "funded_rows_reconcile_to_contract_source",
+      "observed": 2715985.0,
+      "expected": 2715985.0,
+      "status": "PASS"
+    },
+    {
+      "check": "application_rows_reconcile_to_phase1_month_rows",
+      "observed": 3775371.0,
+      "expected": 3775371.0,
+      "status": "PASS"
+    },
+    {
+      "check": "one_row_per_shop_outcome_horizon",
+      "observed": 0,
+      "expected": 0,
+      "status": "PASS"
+    },
+    {
+      "check": "fnd02_monthly_columns_superset",
+      "observed": [
+        "contract_application_rows",
+        "lead_assignment_rows",
+        "month_start",
+        "shops_with_any_recorded_event"
+      ],
+      "expected": [
+        "month_start",
+        "contract_application_rows",
+        "lead_assignment_rows",
+        "shops_with_any_recorded_event"
+      ],
+      "status": "PASS"
+    },
+    {
+      "check": "three_month_total_equals_horizon_sum",
+      "observed": 0,
+      "expected": 0,
+      "status": "PASS"
+    },
+    {
+      "check": "origin_precedes_all_targets",
+      "observed": "2026-10-01",
+      "expected": "later than origin 2026-09-01",
+      "status": "PASS"
+    },
+    {
+      "check": "no_hand_typed_month_year_in_text",
+      "observed": false,
+      "expected": false,
+      "status": "PASS"
+    }
+  ],
+  "positive_only_sensitivity_primary_outcome": {
+    "tier_shift": {
+      "A": 1735,
+      "B": 7862,
+      "C": 6681,
+      "D": 6474
+    },
+    "shops_tier_changed": 11376,
+    "decision_status": {
+      "A_h1": "TRAILING_BASELINE_FALLBACK",
+      "A_h2": "TRAILING_BASELINE_FALLBACK",
+      "A_h3": "TRAILING_BASELINE_FALLBACK",
+      "B_h1": "SUPPORTED",
+      "B_h2": "SUPPORTED",
+      "B_h3": "SUPPORTED",
+      "C_h1": "SUPPORTED",
+      "C_h2": "SUPPORTED",
+      "C_h3": "SUPPORTED"
+    }
+  },
+  "holdout_subgroup_errors": [
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "horizon": 1,
+      "model": "recent_3m",
+      "n": 11280,
+      "wape": 0.27292109796308867,
+      "bias": 1.289598108747045
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "horizon": 2,
+      "model": "recent_3m",
+      "n": 11242,
+      "wape": 0.2693822626368194,
+      "bias": 1.3715531044298166
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "horizon": 3,
+      "model": "recent_3m",
+      "n": 11121,
+      "wape": 0.2195265524277279,
+      "bias": 1.219075023229326
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "horizon": 1,
+      "model": "blend_25",
+      "n": 23265,
+      "wape": 0.5159957006234813,
+      "bias": -0.08995312975473721
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "horizon": 2,
+      "model": "ewm",
+      "n": 23333,
+      "wape": 0.5252663517190864,
+      "bias": -0.10276637872783978
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "horizon": 3,
+      "model": "ewm",
+      "n": 22995,
+      "wape": 0.5006635831648253,
+      "bias": 0.004082177207215069
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "horizon": 1,
+      "model": "blend_75",
+      "n": 15931,
+      "wape": 0.5086215876031482,
+      "bias": 0.16939107674773252
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "horizon": 2,
+      "model": "blend_50",
+      "n": 18189,
+      "wape": 0.49542096610795977,
+      "bias": 0.12341218712357274
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "horizon": 3,
+      "model": "blend_50",
+      "n": 20878,
+      "wape": 0.47771792587675216,
+      "bias": 0.1459621572246878
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "horizon": 1,
+      "model": "recent_3m",
+      "n": 11280,
+      "wape": 0.2488309473549196,
+      "bias": 2.187854609929078
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "horizon": 2,
+      "model": "recent_3m",
+      "n": 11242,
+      "wape": 0.2494583591720874,
+      "bias": 2.5839411729822697
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "horizon": 3,
+      "model": "recent_3m",
+      "n": 11121,
+      "wape": 0.21008845741123516,
+      "bias": 2.407727122860654
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "horizon": 1,
+      "model": "blend_25",
+      "n": 23265,
+      "wape": 0.4785378087896649,
+      "bias": -0.13488497943147137
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "horizon": 2,
+      "model": "ewm",
+      "n": 23333,
+      "wape": 0.49424649920453556,
+      "bias": -0.18927025971672343
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "horizon": 3,
+      "model": "ewm",
+      "n": 22995,
+      "wape": 0.4795976234002496,
+      "bias": -0.05310061266484454
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "horizon": 1,
+      "model": "blend_75",
+      "n": 15931,
+      "wape": 0.4579616732719059,
+      "bias": 0.18398825004775085
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "horizon": 2,
+      "model": "blend_50",
+      "n": 18189,
+      "wape": 0.4468510198667527,
+      "bias": 0.1119878217966082
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "horizon": 3,
+      "model": "blend_75",
+      "n": 20878,
+      "wape": 0.44067322742315107,
+      "bias": 0.1894941217323182
+    }
+  ],
+  "missing_outcome_bounds": [
+    {
+      "outcome": "application",
+      "tier": "A",
+      "split": "holdout",
+      "horizon": 1,
+      "candidate_shops": 11319,
+      "observed_targets": 11280,
+      "missing_targets": 39,
+      "observed_share": 0.9965544659422211
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "split": "holdout",
+      "horizon": 2,
+      "candidate_shops": 11319,
+      "observed_targets": 11242,
+      "missing_targets": 77,
+      "observed_share": 0.9931972789115646
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "split": "holdout",
+      "horizon": 3,
+      "candidate_shops": 11319,
+      "observed_targets": 11121,
+      "missing_targets": 198,
+      "observed_share": 0.9825072886297376
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "split": "selection",
+      "horizon": 1,
+      "candidate_shops": 0,
+      "observed_targets": 0,
+      "missing_targets": 0,
+      "observed_share": null
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "split": "selection",
+      "horizon": 2,
+      "candidate_shops": 0,
+      "observed_targets": 0,
+      "missing_targets": 0,
+      "observed_share": null
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "split": "selection",
+      "horizon": 3,
+      "candidate_shops": 0,
+      "observed_targets": 0,
+      "missing_targets": 0,
+      "observed_share": null
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "split": "validation",
+      "horizon": 1,
+      "candidate_shops": 0,
+      "observed_targets": 0,
+      "missing_targets": 0,
+      "observed_share": null
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "split": "validation",
+      "horizon": 2,
+      "candidate_shops": 0,
+      "observed_targets": 0,
+      "missing_targets": 0,
+      "observed_share": null
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "split": "validation",
+      "horizon": 3,
+      "candidate_shops": 0,
+      "observed_targets": 0,
+      "missing_targets": 0,
+      "observed_share": null
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "split": "holdout",
+      "horizon": 1,
+      "candidate_shops": 25016,
+      "observed_targets": 23265,
+      "missing_targets": 1751,
+      "observed_share": 0.9300047969299648
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "split": "holdout",
+      "horizon": 2,
+      "candidate_shops": 25016,
+      "observed_targets": 23333,
+      "missing_targets": 1683,
+      "observed_share": 0.9327230572433642
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "split": "holdout",
+      "horizon": 3,
+      "candidate_shops": 25016,
+      "observed_targets": 22995,
+      "missing_targets": 2021,
+      "observed_share": 0.9192117045091142
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "split": "selection",
+      "horizon": 1,
+      "candidate_shops": 31427,
+      "observed_targets": 29994,
+      "missing_targets": 1433,
+      "observed_share": 0.9544022655678238
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "split": "selection",
+      "horizon": 2,
+      "candidate_shops": 31427,
+      "observed_targets": 30312,
+      "missing_targets": 1115,
+      "observed_share": 0.9645209533203933
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "split": "selection",
+      "horizon": 3,
+      "candidate_shops": 31427,
+      "observed_targets": 30079,
+      "missing_targets": 1348,
+      "observed_share": 0.9571069462564037
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "split": "validation",
+      "horizon": 1,
+      "candidate_shops": 26530,
+      "observed_targets": 25600,
+      "missing_targets": 930,
+      "observed_share": 0.9649453448925744
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "split": "validation",
+      "horizon": 2,
+      "candidate_shops": 26530,
+      "observed_targets": 25582,
+      "missing_targets": 948,
+      "observed_share": 0.9642668676969468
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "split": "validation",
+      "horizon": 3,
+      "candidate_shops": 26530,
+      "observed_targets": 25287,
+      "missing_targets": 1243,
+      "observed_share": 0.9531473803241614
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "split": "holdout",
+      "horizon": 1,
+      "candidate_shops": 25717,
+      "observed_targets": 19964,
+      "missing_targets": 5753,
+      "observed_share": 0.7762958354395925
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "split": "holdout",
+      "horizon": 2,
+      "candidate_shops": 25717,
+      "observed_targets": 20682,
+      "missing_targets": 5035,
+      "observed_share": 0.8042151106272116
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "split": "holdout",
+      "horizon": 3,
+      "candidate_shops": 25717,
+      "observed_targets": 20878,
+      "missing_targets": 4839,
+      "observed_share": 0.8118365283664503
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "split": "selection",
+      "horizon": 1,
+      "candidate_shops": 51029,
+      "observed_targets": 35109,
+      "missing_targets": 15920,
+      "observed_share": 0.6880205373415117
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "split": "selection",
+      "horizon": 2,
+      "candidate_shops": 51029,
+      "observed_targets": 36830,
+      "missing_targets": 14199,
+      "observed_share": 0.7217464578964903
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "split": "selection",
+      "horizon": 3,
+      "candidate_shops": 51029,
+      "observed_targets": 37391,
+      "missing_targets": 13638,
+      "observed_share": 0.7327402065492171
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "split": "validation",
+      "horizon": 1,
+      "candidate_shops": 28398,
+      "observed_targets": 23673,
+      "missing_targets": 4725,
+      "observed_share": 0.8336150433129094
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "split": "validation",
+      "horizon": 2,
+      "candidate_shops": 28398,
+      "observed_targets": 23755,
+      "missing_targets": 4643,
+      "observed_share": 0.8365025706035636
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "split": "validation",
+      "horizon": 3,
+      "candidate_shops": 28398,
+      "observed_targets": 23056,
+      "missing_targets": 5342,
+      "observed_share": 0.8118881611381084
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "split": "holdout",
+      "horizon": 1,
+      "candidate_shops": 11319,
+      "observed_targets": 11280,
+      "missing_targets": 39,
+      "observed_share": 0.9965544659422211
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "split": "holdout",
+      "horizon": 2,
+      "candidate_shops": 11319,
+      "observed_targets": 11242,
+      "missing_targets": 77,
+      "observed_share": 0.9931972789115646
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "split": "holdout",
+      "horizon": 3,
+      "candidate_shops": 11319,
+      "observed_targets": 11121,
+      "missing_targets": 198,
+      "observed_share": 0.9825072886297376
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "split": "selection",
+      "horizon": 1,
+      "candidate_shops": 0,
+      "observed_targets": 0,
+      "missing_targets": 0,
+      "observed_share": null
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "split": "selection",
+      "horizon": 2,
+      "candidate_shops": 0,
+      "observed_targets": 0,
+      "missing_targets": 0,
+      "observed_share": null
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "split": "selection",
+      "horizon": 3,
+      "candidate_shops": 0,
+      "observed_targets": 0,
+      "missing_targets": 0,
+      "observed_share": null
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "split": "validation",
+      "horizon": 1,
+      "candidate_shops": 0,
+      "observed_targets": 0,
+      "missing_targets": 0,
+      "observed_share": null
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "split": "validation",
+      "horizon": 2,
+      "candidate_shops": 0,
+      "observed_targets": 0,
+      "missing_targets": 0,
+      "observed_share": null
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "split": "validation",
+      "horizon": 3,
+      "candidate_shops": 0,
+      "observed_targets": 0,
+      "missing_targets": 0,
+      "observed_share": null
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "split": "holdout",
+      "horizon": 1,
+      "candidate_shops": 25016,
+      "observed_targets": 23265,
+      "missing_targets": 1751,
+      "observed_share": 0.9300047969299648
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "split": "holdout",
+      "horizon": 2,
+      "candidate_shops": 25016,
+      "observed_targets": 23333,
+      "missing_targets": 1683,
+      "observed_share": 0.9327230572433642
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "split": "holdout",
+      "horizon": 3,
+      "candidate_shops": 25016,
+      "observed_targets": 22995,
+      "missing_targets": 2021,
+      "observed_share": 0.9192117045091142
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "split": "selection",
+      "horizon": 1,
+      "candidate_shops": 31427,
+      "observed_targets": 29994,
+      "missing_targets": 1433,
+      "observed_share": 0.9544022655678238
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "split": "selection",
+      "horizon": 2,
+      "candidate_shops": 31427,
+      "observed_targets": 30312,
+      "missing_targets": 1115,
+      "observed_share": 0.9645209533203933
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "split": "selection",
+      "horizon": 3,
+      "candidate_shops": 31427,
+      "observed_targets": 30079,
+      "missing_targets": 1348,
+      "observed_share": 0.9571069462564037
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "split": "validation",
+      "horizon": 1,
+      "candidate_shops": 26530,
+      "observed_targets": 25600,
+      "missing_targets": 930,
+      "observed_share": 0.9649453448925744
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "split": "validation",
+      "horizon": 2,
+      "candidate_shops": 26530,
+      "observed_targets": 25582,
+      "missing_targets": 948,
+      "observed_share": 0.9642668676969468
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "split": "validation",
+      "horizon": 3,
+      "candidate_shops": 26530,
+      "observed_targets": 25287,
+      "missing_targets": 1243,
+      "observed_share": 0.9531473803241614
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "split": "holdout",
+      "horizon": 1,
+      "candidate_shops": 25717,
+      "observed_targets": 19964,
+      "missing_targets": 5753,
+      "observed_share": 0.7762958354395925
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "split": "holdout",
+      "horizon": 2,
+      "candidate_shops": 25717,
+      "observed_targets": 20682,
+      "missing_targets": 5035,
+      "observed_share": 0.8042151106272116
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "split": "holdout",
+      "horizon": 3,
+      "candidate_shops": 25717,
+      "observed_targets": 20878,
+      "missing_targets": 4839,
+      "observed_share": 0.8118365283664503
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "split": "selection",
+      "horizon": 1,
+      "candidate_shops": 51029,
+      "observed_targets": 35109,
+      "missing_targets": 15920,
+      "observed_share": 0.6880205373415117
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "split": "selection",
+      "horizon": 2,
+      "candidate_shops": 51029,
+      "observed_targets": 36830,
+      "missing_targets": 14199,
+      "observed_share": 0.7217464578964903
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "split": "selection",
+      "horizon": 3,
+      "candidate_shops": 51029,
+      "observed_targets": 37391,
+      "missing_targets": 13638,
+      "observed_share": 0.7327402065492171
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "split": "validation",
+      "horizon": 1,
+      "candidate_shops": 28398,
+      "observed_targets": 23673,
+      "missing_targets": 4725,
+      "observed_share": 0.8336150433129094
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "split": "validation",
+      "horizon": 2,
+      "candidate_shops": 28398,
+      "observed_targets": 23755,
+      "missing_targets": 4643,
+      "observed_share": 0.8365025706035636
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "split": "validation",
+      "horizon": 3,
+      "candidate_shops": 28398,
+      "observed_targets": 23056,
+      "missing_targets": 5342,
+      "observed_share": 0.8118881611381084
+    }
+  ],
+  "interval_calibration": [
+    {
+      "horizon": 1,
+      "coverage": 0.75
+    },
+    {
+      "horizon": 2,
+      "coverage": 0.75
+    },
+    {
+      "horizon": 3,
+      "coverage": 0.5
+    }
+  ],
+  "coverage": [
+    {
+      "observed_history_tier": "A",
+      "eligibility_status": "DORMANT_NO_RECENT_ACTIVITY",
+      "shop_ids": 21,
+      "market_matched": 1,
+      "median_3m_funded": null
+    },
+    {
+      "observed_history_tier": "A",
+      "eligibility_status": "ELIGIBLE_FOR_FORECAST",
+      "shop_ids": 5185,
+      "market_matched": 361,
+      "median_3m_funded": 10.0
+    },
+    {
+      "observed_history_tier": "B",
+      "eligibility_status": "DORMANT_NO_RECENT_ACTIVITY",
+      "shop_ids": 918,
+      "market_matched": 267,
+      "median_3m_funded": null
+    },
+    {
+      "observed_history_tier": "B",
+      "eligibility_status": "ELIGIBLE_FOR_FORECAST",
+      "shop_ids": 10283,
+      "market_matched": 3255,
+      "median_3m_funded": 1.0
+    },
+    {
+      "observed_history_tier": "C",
+      "eligibility_status": "DORMANT_NO_RECENT_ACTIVITY",
+      "shop_ids": 2651,
+      "market_matched": 1142,
+      "median_3m_funded": null
+    },
+    {
+      "observed_history_tier": "C",
+      "eligibility_status": "ELIGIBLE_FOR_FORECAST",
+      "shop_ids": 6952,
+      "market_matched": 4292,
+      "median_3m_funded": 1.0
+    },
+    {
+      "observed_history_tier": "D",
+      "eligibility_status": "DORMANT_NO_RECENT_ACTIVITY",
+      "shop_ids": 2343,
+      "market_matched": 1072,
+      "median_3m_funded": null
+    },
+    {
+      "observed_history_tier": "D",
+      "eligibility_status": "TIER_D_LT3_OBSERVED_MONTHS",
+      "shop_ids": 2099,
+      "market_matched": 1778,
+      "median_3m_funded": 1.0
+    }
+  ],
+  "forecasted_by_tier_outcome": [
+    {
+      "outcome": "application",
+      "tier": "A",
+      "forecasted_shops": 6647
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "forecasted_shops": 11045
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "forecasted_shops": 4728
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "forecasted_shops": 6647
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "forecasted_shops": 11045
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "forecasted_shops": 4728
+    }
+  ],
+  "pair": {
+    "status": "SUPPORTED",
+    "pair_id": "115096693::99546349",
+    "shop_ids": [
+      "115096693",
+      "99546349"
+    ],
+    "rule_used": "A05_SIMILAR_ACTUAL_10PCT",
+    "tolerance": 0.1,
+    "peer_group": "Small | Non-Aldi",
+    "peer_n": 4237,
+    "actual_3m_funded": {
+      "115096693": 13.0,
+      "99546349": 14.0
+    },
+    "bau_3m_total": {
+      "115096693": {
+        "point": 69.36090982070917,
+        "lo": 61.990324120553026,
+        "hi": 75.45347745148149
+      },
+      "99546349": {
+        "point": 10.144755587421837,
+        "lo": 2.774169887265696,
+        "hi": 16.23732321819416
+      }
+    },
+    "bau_ratio": {
+      "115096693": 5.335454601593013,
+      "99546349": 0.7246253991015598
+    },
+    "observed_contrasts": {
+      "115096693": {
+        "lead_rows_3m": 38.0,
+        "distinct_lead_uuids_3m": 38.0,
+        "assigned_headcount_proxy_3m": 20.0,
+        "lead_product_mix_3m": {
+          "CC": 0.15789473684210525,
+          "CD": 0.3157894736842105,
+          "CL": 0.5263157894736842,
+          "TW": 0.0
+        }
+      },
+      "99546349": {
+        "lead_rows_3m": 27.0,
+        "distinct_lead_uuids_3m": 27.0,
+        "assigned_headcount_proxy_3m": 21.333333333333332,
+        "lead_product_mix_3m": {
+          "CC": 0.18518518518518517,
+          "CD": 0.7037037037037037,
+          "CL": 0.1111111111111111,
+          "TW": 0.0
+        }
+      }
+    },
+    "note": "Observed contrasts are descriptive, not causal.",
+    "stability": {
+      "5pct": [
+        "111893539",
+        "115096693"
+      ],
+      "10pct": [
+        "115096693",
+        "99546349"
+      ],
+      "20pct": [
+        "103796122",
+        "115096693"
+      ]
+    }
+  },
+  "rank_stability": {
+    "spearman_rank_correlation": 0.955244259806483,
+    "pair_unchanged_when_outcome_switched": false,
+    "common_shop_count": 22420
+  },
+  "model_decisions": [
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "horizon": 1,
+      "model": "recent_3m",
+      "fallback": true,
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "reason": "INSUFFICIENT_VALIDATION",
+      "validation_n": 0,
+      "interval_offsets": [
+        -6.633333333333332,
+        3.9666666666666783
+      ],
+      "total_interval_offsets": [
+        -15.666666666666671,
+        5.333333333333336
+      ]
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "horizon": 2,
+      "model": "recent_3m",
+      "fallback": true,
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "reason": "INSUFFICIENT_VALIDATION",
+      "validation_n": 0,
+      "interval_offsets": [
+        -7.366666666666666,
+        3.666666666666668
+      ],
+      "total_interval_offsets": [
+        -15.666666666666671,
+        5.333333333333336
+      ]
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "horizon": 3,
+      "model": "recent_3m",
+      "fallback": true,
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "reason": "INSUFFICIENT_VALIDATION",
+      "validation_n": 0,
+      "interval_offsets": [
+        -5.5,
+        4.0
+      ],
+      "total_interval_offsets": [
+        -15.666666666666671,
+        5.333333333333336
+      ]
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "horizon": 1,
+      "model": "blend_25",
+      "fallback": false,
+      "status": "SUPPORTED",
+      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
+      "validation_n": 25600,
+      "interval_offsets": [
+        -3.7209529004311,
+        3.5659276574533663
+      ],
+      "total_interval_offsets": [
+        -7.370585700156141,
+        6.092567630772322
+      ]
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "horizon": 2,
+      "model": "ewm",
+      "fallback": false,
+      "status": "SUPPORTED",
+      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
+      "validation_n": 25582,
+      "interval_offsets": [
+        -4.437424252232678,
+        3.212864962193631
+      ],
+      "total_interval_offsets": [
+        -8.88680188697257,
+        5.044052199825217
+      ]
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "horizon": 3,
+      "model": "ewm",
+      "fallback": false,
+      "status": "SUPPORTED",
+      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
+      "validation_n": 25287,
+      "interval_offsets": [
+        -4.2557702082450515,
+        3.3208940532531623
+      ],
+      "total_interval_offsets": [
+        -8.88680188697257,
+        5.044052199825217
+      ]
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "horizon": 1,
+      "model": "blend_75",
+      "fallback": false,
+      "status": "SUPPORTED",
+      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
+      "validation_n": 23673,
+      "interval_offsets": [
+        -0.8889312910379492,
+        1.8235839934143425
+      ],
+      "total_interval_offsets": [
+        -1.2283315457149322,
+        4.1838569370167
+      ]
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "horizon": 2,
+      "model": "blend_50",
+      "fallback": false,
+      "status": "SUPPORTED",
+      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
+      "validation_n": 23755,
+      "interval_offsets": [
+        -1.0918797255935586,
+        1.6739975337056274
+      ],
+      "total_interval_offsets": [
+        -1.5947250713248486,
+        3.468520633658474
+      ]
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "horizon": 3,
+      "model": "blend_50",
+      "fallback": false,
+      "status": "SUPPORTED",
+      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
+      "validation_n": 23056,
+      "interval_offsets": [
+        -1.1084636678392008,
+        1.363893638672898
+      ],
+      "total_interval_offsets": [
+        -1.5947250713248486,
+        3.468520633658474
+      ]
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "horizon": 1,
+      "model": "recent_3m",
+      "fallback": true,
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "reason": "INSUFFICIENT_VALIDATION",
+      "validation_n": 0,
+      "interval_offsets": [
+        -7.0,
+        4.666666666666667
+      ],
+      "total_interval_offsets": [
+        -20.0,
+        6.666666666666664
+      ]
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "horizon": 2,
+      "model": "recent_3m",
+      "fallback": true,
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "reason": "INSUFFICIENT_VALIDATION",
+      "validation_n": 0,
+      "interval_offsets": [
+        -8.333333333333334,
+        4.333333333333334
+      ],
+      "total_interval_offsets": [
+        -20.0,
+        6.666666666666664
+      ]
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "horizon": 3,
+      "model": "recent_3m",
+      "fallback": true,
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "reason": "INSUFFICIENT_VALIDATION",
+      "validation_n": 0,
+      "interval_offsets": [
+        -7.333333333333334,
+        5.0
+      ],
+      "total_interval_offsets": [
+        -20.0,
+        6.666666666666664
+      ]
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "horizon": 1,
+      "model": "blend_25",
+      "fallback": false,
+      "status": "SUPPORTED",
+      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
+      "validation_n": 25600,
+      "interval_offsets": [
+        -4.299483748691796,
+        4.432328714705787
+      ],
+      "total_interval_offsets": [
+        -8.09036285140997,
+        7.22391121027702
+      ]
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "horizon": 2,
+      "model": "ewm",
+      "fallback": false,
+      "status": "SUPPORTED",
+      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
+      "validation_n": 25582,
+      "interval_offsets": [
+        -5.2518545520431115,
+        3.915657345196191
+      ],
+      "total_interval_offsets": [
+        -9.775018832269453,
+        5.829539168597032
+      ]
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "horizon": 3,
+      "model": "ewm",
+      "fallback": false,
+      "status": "SUPPORTED",
+      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
+      "validation_n": 25287,
+      "interval_offsets": [
+        -5.181966015838476,
+        3.6462759196922665
+      ],
+      "total_interval_offsets": [
+        -9.775018832269453,
+        5.829539168597032
+      ]
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "horizon": 1,
+      "model": "blend_75",
+      "fallback": false,
+      "status": "SUPPORTED",
+      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
+      "validation_n": 23673,
+      "interval_offsets": [
+        -1.1084029107230293,
+        1.9992539947307724
+      ],
+      "total_interval_offsets": [
+        -1.3000550689866839,
+        5.42929311560898
+      ]
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "horizon": 2,
+      "model": "blend_50",
+      "fallback": false,
+      "status": "SUPPORTED",
+      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
+      "validation_n": 23755,
+      "interval_offsets": [
+        -1.436623418138776,
+        1.8516936502836272
+      ],
+      "total_interval_offsets": [
+        -1.878400193216275,
+        4.986097698730051
+      ]
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "horizon": 3,
+      "model": "blend_75",
+      "fallback": false,
+      "status": "SUPPORTED",
+      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
+      "validation_n": 23056,
+      "interval_offsets": [
+        -1.1594325528787728,
+        1.9301397358695385
+      ],
+      "total_interval_offsets": [
+        -1.3000550689866839,
+        5.42929311560898
+      ]
+    }
+  ],
+  "warnings": [
+    "Pending business gate: round2_feature_timestamp_lineage_audited",
+    "Pending business gate: lead_sample_weight_semantics_approved"
+  ],
+  "failed_checks": []
+}
