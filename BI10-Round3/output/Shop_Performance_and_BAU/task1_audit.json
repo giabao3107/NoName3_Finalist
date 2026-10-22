@@ -1,1359 +1,1671 @@
 {
-  "gate": {
+  "status": "SUCCESS",
+  "phase1_gate": {
+    "schema_version": "1.0",
+    "phase": "Phase 1 — Data Processing / Foundation only",
     "execution_status": "SUCCESS",
+    "foundation_quality_gate": "CONDITIONAL",
     "fatal_failures": [],
     "business_gates_pending": [
       "round2_feature_timestamp_lineage_audited",
       "lead_sample_weight_semantics_approved"
     ],
-    "warnings": [
-      "Pending business gate: round2_feature_timestamp_lineage_audited",
-      "Pending business gate: lead_sample_weight_semantics_approved"
-    ]
+    "round2_cutoffs": {
+      "fhs": "2025-06-05",
+      "ces": "2025-06-05",
+      "fhs_validation_asof": "2024-10-01",
+      "ces_validation_asof": "2025-02-01",
+      "common_cutoff": "2025-06-05",
+      "cutoff_provenance_state": "PRODUCTION_SCORE_SNAPSHOT_DECLARED_IN_ROUND2_CONFIG; FEATURE-LEVEL TIMESTAMP AUDIT STILL REQUIRED"
+    },
+    "table_row_counts": {
+      "contract_fact": 3775371,
+      "leads_clean": 6130637,
+      "contract_product_bridge": 784902,
+      "shop_bridge": 14231,
+      "seller_master": 11639,
+      "employee_shop_bridge": 275856,
+      "lead_contract_candidates": 339529,
+      "shop_month_foundation": 715528,
+      "lead_shop_month_product": 349564,
+      "lead_conversion_shop_month": 140230,
+      "shop_behavior_profile": 30705,
+      "r2_customer_segment": 1000528
+    },
+    "raw_inventory": [
+      {
+        "dataset": "contract",
+        "file_name": "contract.csv",
+        "source_format": "csv",
+        "source_bytes": 573943563,
+        "source_rows": 3775371.0,
+        "source_columns": 21.0,
+        "ingestion_policy": "DuckDB VARCHAR-preserving CSV scan"
+      },
+      {
+        "dataset": "leads",
+        "file_name": "leads.csv",
+        "source_format": "csv",
+        "source_bytes": 1068338893,
+        "source_rows": 6130637.0,
+        "source_columns": 19.0,
+        "ingestion_policy": "DuckDB VARCHAR-preserving CSV scan"
+      },
+      {
+        "dataset": "contract_product",
+        "file_name": "contract_product.csv",
+        "source_format": "csv",
+        "source_bytes": 48520659,
+        "source_rows": 784902.0,
+        "source_columns": 5.0,
+        "ingestion_policy": "DuckDB VARCHAR-preserving CSV scan"
+      },
+      {
+        "dataset": "employee_assignment",
+        "file_name": "emp_2_salesroom.csv",
+        "source_format": "csv",
+        "source_bytes": 17895356,
+        "source_rows": 275856.0,
+        "source_columns": 6.0,
+        "ingestion_policy": "DuckDB VARCHAR-preserving CSV scan"
+      },
+      {
+        "dataset": "shop",
+        "file_name": "salesroom.xlsx",
+        "source_format": "xlsx",
+        "source_bytes": 1091472,
+        "source_rows": 14231.0,
+        "source_columns": 13.0,
+        "ingestion_policy": "pandas/openpyxl source values"
+      },
+      {
+        "dataset": "seller",
+        "file_name": "seller.xlsx",
+        "source_format": "xlsx",
+        "source_bytes": 535791,
+        "source_rows": 11639.0,
+        "source_columns": 8.0,
+        "ingestion_policy": "pandas/openpyxl source values"
+      },
+      {
+        "dataset": "lead_reason",
+        "file_name": "cl_lead_fin_reason.xlsx",
+        "source_format": "xlsx",
+        "source_bytes": 16924,
+        "source_rows": 12.0,
+        "source_columns": 9.0,
+        "ingestion_policy": "pandas/openpyxl source values"
+      },
+      {
+        "dataset": "schema_workbook",
+        "file_name": "StructureTable.xlsx",
+        "source_format": "xlsx",
+        "source_bytes": 28840,
+        "source_rows": null,
+        "source_columns": null,
+        "ingestion_policy": "Read-only schema metadata"
+      },
+      {
+        "dataset": "r2_fhs",
+        "file_name": "BI10-Round2/output/Task1/scores/fh_scores.parquet",
+        "source_format": "parquet",
+        "source_bytes": 51764752,
+        "source_rows": 1000528.0,
+        "source_columns": 47.0,
+        "ingestion_policy": "Read-only Round 2 score output; key uniqueness validated in score bridge"
+      },
+      {
+        "dataset": "r2_ces",
+        "file_name": "BI10-Round2/output/Task2/scores/eng_scores.parquet",
+        "source_format": "parquet",
+        "source_bytes": 19137691,
+        "source_rows": 1000528.0,
+        "source_columns": 30.0,
+        "ingestion_policy": "Read-only Round 2 score output; key uniqueness validated in score bridge"
+      }
+    ],
+    "coverage_summary": [
+      {
+        "coverage_area": "RAW_SOURCE",
+        "population": "contract",
+        "numerator": 3775371.0,
+        "denominator": 3775371.0,
+        "coverage_pct": 100.0,
+        "status": "INVENTORIED",
+        "details": "contract.csv; 21 columns; 573,943,563 bytes"
+      },
+      {
+        "coverage_area": "RAW_SOURCE",
+        "population": "leads",
+        "numerator": 6130637.0,
+        "denominator": 6130637.0,
+        "coverage_pct": 100.0,
+        "status": "INVENTORIED",
+        "details": "leads.csv; 19 columns; 1,068,338,893 bytes"
+      },
+      {
+        "coverage_area": "RAW_SOURCE",
+        "population": "contract_product",
+        "numerator": 784902.0,
+        "denominator": 784902.0,
+        "coverage_pct": 100.0,
+        "status": "INVENTORIED",
+        "details": "contract_product.csv; 5 columns; 48,520,659 bytes"
+      },
+      {
+        "coverage_area": "RAW_SOURCE",
+        "population": "employee_assignment",
+        "numerator": 275856.0,
+        "denominator": 275856.0,
+        "coverage_pct": 100.0,
+        "status": "INVENTORIED",
+        "details": "emp_2_salesroom.csv; 6 columns; 17,895,356 bytes"
+      },
+      {
+        "coverage_area": "RAW_SOURCE",
+        "population": "shop",
+        "numerator": 14231.0,
+        "denominator": 14231.0,
+        "coverage_pct": 100.0,
+        "status": "INVENTORIED",
+        "details": "salesroom.xlsx; 13 columns; 1,091,472 bytes"
+      },
+      {
+        "coverage_area": "RAW_SOURCE",
+        "population": "seller",
+        "numerator": 11639.0,
+        "denominator": 11639.0,
+        "coverage_pct": 100.0,
+        "status": "INVENTORIED",
+        "details": "seller.xlsx; 8 columns; 535,791 bytes"
+      },
+      {
+        "coverage_area": "RAW_SOURCE",
+        "population": "lead_reason",
+        "numerator": 12.0,
+        "denominator": 12.0,
+        "coverage_pct": 100.0,
+        "status": "INVENTORIED",
+        "details": "cl_lead_fin_reason.xlsx; 9 columns; 16,924 bytes"
+      },
+      {
+        "coverage_area": "RAW_SOURCE",
+        "population": "schema_workbook",
+        "numerator": null,
+        "denominator": null,
+        "coverage_pct": null,
+        "status": "INVENTORIED",
+        "details": "StructureTable.xlsx; None columns; 28,840 bytes"
+      },
+      {
+        "coverage_area": "RAW_SOURCE",
+        "population": "r2_fhs",
+        "numerator": 1000528.0,
+        "denominator": 1000528.0,
+        "coverage_pct": 100.0,
+        "status": "INVENTORIED",
+        "details": "BI10-Round2/output/Task1/scores/fh_scores.parquet; 47 columns; 51,764,752 bytes"
+      },
+      {
+        "coverage_area": "RAW_SOURCE",
+        "population": "r2_ces",
+        "numerator": 1000528.0,
+        "denominator": 1000528.0,
+        "coverage_pct": 100.0,
+        "status": "INVENTORIED",
+        "details": "BI10-Round2/output/Task2/scores/eng_scores.parquet; 30 columns; 19,137,691 bytes"
+      },
+      {
+        "coverage_area": "CURRENT_SHOP_MASTER",
+        "population": "CONTRACT_TO_CURRENT_SHOP",
+        "numerator": 621387.0,
+        "denominator": 3775371.0,
+        "coverage_pct": 16.459,
+        "status": "CURRENT_SNAPSHOT_ONLY",
+        "details": "26,654 distinct fact shop IDs; unmatched IDs preserved."
+      },
+      {
+        "coverage_area": "CURRENT_SHOP_MASTER",
+        "population": "LEAD_TO_CURRENT_SHOP",
+        "numerator": 385273.0,
+        "denominator": 6130637.0,
+        "coverage_pct": 6.2844,
+        "status": "CURRENT_SNAPSHOT_ONLY",
+        "details": "27,380 distinct fact shop IDs; unmatched IDs preserved."
+      },
+      {
+        "coverage_area": "PRODUCT_CROSSWALK",
+        "population": "LEAD_EVENT_ROWS",
+        "numerator": 6031418.0,
+        "denominator": 6130637.0,
+        "coverage_pct": 98.3816,
+        "status": "CONFIGURED",
+        "details": "0 event rows have literal candidate mappings; not approved by default."
+      },
+      {
+        "coverage_area": "LEAD_CONTRACT_CANDIDATES",
+        "population": "LEAD_CONTRACT_BRIDGE_ROWS",
+        "numerator": 339529.0,
+        "denominator": 339529.0,
+        "coverage_pct": 100.0,
+        "status": "CONDITIONAL_ON_APPROVED_PRODUCT_CROSSWALK",
+        "details": "{\"MATCHED\": 339529}"
+      },
+      {
+        "coverage_area": "ROUND2_LINKAGE",
+        "population": "R2_SCORE_FILES:ALL",
+        "numerator": 1000528.0,
+        "denominator": null,
+        "coverage_pct": null,
+        "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+        "details": "FHS 1,000,528 rows/1,000,528 clients; CES 1,000,528/1,000,528; 0 unpaired/ambiguous."
+      },
+      {
+        "coverage_area": "ROUND2_LINKAGE",
+        "population": "CONTRACT_APPLICATIONS:ALL",
+        "numerator": 349399.0,
+        "denominator": 2513153.0,
+        "coverage_pct": 13.9028,
+        "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+        "details": "Distinct clients are unweighted; duplicated lead UUID/version rows remain event rows."
+      },
+      {
+        "coverage_area": "ROUND2_LINKAGE",
+        "population": "CONTRACT_APPLICATIONS:STRICTLY_POST_COMMON_CUTOFF",
+        "numerator": 200892.0,
+        "denominator": 1974930.0,
+        "coverage_pct": 10.1721,
+        "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+        "details": "Distinct clients are unweighted; duplicated lead UUID/version rows remain event rows."
+      },
+      {
+        "coverage_area": "ROUND2_LINKAGE",
+        "population": "LEAD_ASSIGNMENTS:ALL",
+        "numerator": 228427.0,
+        "denominator": 3631389.0,
+        "coverage_pct": 6.2903,
+        "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+        "details": "Distinct clients are unweighted; duplicated lead UUID/version rows remain event rows."
+      },
+      {
+        "coverage_area": "ROUND2_LINKAGE",
+        "population": "LEAD_ASSIGNMENTS:STRICTLY_POST_COMMON_CUTOFF",
+        "numerator": 228427.0,
+        "denominator": 3631389.0,
+        "coverage_pct": 6.2903,
+        "status": "CUTOFF_PROVENANCE_REVIEW_REQUIRED",
+        "details": "Distinct clients are unweighted; duplicated lead UUID/version rows remain event rows."
+      },
+      {
+        "coverage_area": "LEAD_WEIGHT",
+        "population": "ALL_LEAD_SOURCE_ROWS",
+        "numerator": 6130637.0,
+        "denominator": 6130637.0,
+        "coverage_pct": 100.0,
+        "status": "UNAPPROVED_QA_ONLY",
+        "details": "Observed weight sum 43454845.0002234; missing 0; nonpositive 0. Not a lead count or population estimate."
+      }
+    ],
+    "checks": [
+      {
+        "check": "all_contract_source_rows_preserved",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "3775371",
+        "expected": "3775371",
+        "note": "Every contract source row remains in contract_event_version, including duplicates and conflicting case versions."
+      },
+      {
+        "check": "all_lead_source_rows_preserved",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "6130637",
+        "expected": "6130637",
+        "note": "Every lead source row remains in lead_event_version; repeated UUIDs are not deduplicated."
+      },
+      {
+        "check": "all_product_detail_rows_preserved",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "784902",
+        "expected": "784902",
+        "note": "Source-level detail rows remain in their bridge table."
+      },
+      {
+        "check": "all_employee_assignment_rows_preserved",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "275856",
+        "expected": "275856",
+        "note": "Source-level detail rows remain in their bridge table."
+      },
+      {
+        "check": "all_lead_reason_rows_preserved",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "12",
+        "expected": "12",
+        "note": "Source-level detail rows remain in their bridge table."
+      },
+      {
+        "check": "contract_fact_id_unique",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "0",
+        "expected": "0",
+        "note": "Canonical bridge key must not fan out downstream joins."
+      },
+      {
+        "check": "lead_row_id_unique",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "0",
+        "expected": "0",
+        "note": "Canonical bridge key must not fan out downstream joins."
+      },
+      {
+        "check": "shop_master_record_id_unique",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "0",
+        "expected": "0",
+        "note": "Canonical bridge key must not fan out downstream joins."
+      },
+      {
+        "check": "seller_master_record_id_unique",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "0",
+        "expected": "0",
+        "note": "Canonical bridge key must not fan out downstream joins."
+      },
+      {
+        "check": "r2_segment_client_key_unique",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "0",
+        "expected": "0",
+        "note": "Canonical bridge key must not fan out downstream joins."
+      },
+      {
+        "check": "lead_match_summary_one_row_per_lead",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "0",
+        "expected": "0",
+        "note": "Canonical bridge key must not fan out downstream joins."
+      },
+      {
+        "check": "shop_behavior_profile_one_row_per_shop",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "0",
+        "expected": "0",
+        "note": "Canonical bridge key must not fan out downstream joins."
+      },
+      {
+        "check": "contract_shop_bridge_no_row_inflation",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "3775371",
+        "expected": "3775371",
+        "note": "One-row-per-source-event bridge must preserve its source grain."
+      },
+      {
+        "check": "lead_shop_bridge_no_row_inflation",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "6130637",
+        "expected": "6130637",
+        "note": "One-row-per-source-event bridge must preserve its source grain."
+      },
+      {
+        "check": "contract_segment_bridge_no_row_inflation",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "3775371",
+        "expected": "3775371",
+        "note": "One-row-per-source-event bridge must preserve its source grain."
+      },
+      {
+        "check": "lead_segment_bridge_no_row_inflation",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "6130637",
+        "expected": "6130637",
+        "note": "One-row-per-source-event bridge must preserve its source grain."
+      },
+      {
+        "check": "lead_match_summary_no_row_loss",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "6130637",
+        "expected": "6130637",
+        "note": "One-row-per-source-event bridge must preserve its source grain."
+      },
+      {
+        "check": "contract_product_summary_one_row_per_case",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "0",
+        "expected": "0",
+        "note": "Product details are aggregated before joining to contract_fact."
+      },
+      {
+        "check": "contract_shop_month_grain_unique",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "0",
+        "expected": "0",
+        "note": "Declared aggregate grain is unique."
+      },
+      {
+        "check": "contract_shop_month_total_grain_unique",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "0",
+        "expected": "0",
+        "note": "Declared aggregate grain is unique."
+      },
+      {
+        "check": "lead_conversion_shop_month_grain_unique",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "0",
+        "expected": "0",
+        "note": "Declared aggregate grain is unique."
+      },
+      {
+        "check": "shop_month_foundation_grain_unique",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "0",
+        "expected": "0",
+        "note": "One row per shop identifier (including unknown) and month."
+      },
+      {
+        "check": "lead_product_month_event_rows_reconcile",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "6130637",
+        "expected": "6130637",
+        "note": "Product-month aggregates count raw lead events once; UUID/client counts remain separate."
+      },
+      {
+        "check": "lead_shop_month_event_rows_reconcile",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "6130637",
+        "expected": "6130637",
+        "note": "Shop-month lead event totals come directly from lead source events, not sums of product-level distinct counts."
+      },
+      {
+        "check": "contract_month_event_rows_reconcile",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "3775371",
+        "expected": "3775371",
+        "note": "Contract shop-month totals reconcile to date-valid canonical application events."
+      },
+      {
+        "check": "contract_foundation_event_rows_reconcile",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "3775371",
+        "expected": "3775371",
+        "note": "Shop-month foundation totals reconcile without dimension fanout."
+      },
+      {
+        "check": "raw_to_event_version_amount_reconcile",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "70604962581146.0",
+        "expected": "70604962581146.0",
+        "note": "Casting to numeric must preserve the sum of parseable source credit_amount values."
+      },
+      {
+        "check": "contract_shop_bridge_amount_no_inflation",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "70604962581146.0",
+        "expected": "70604962581146.0",
+        "note": "Left-joining current shop attributes must preserve canonical raw amounts."
+      },
+      {
+        "check": "contract_segment_bridge_amount_no_inflation",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "70604962581146.0",
+        "expected": "70604962581146.0",
+        "note": "Left-joining Round 2 segments must preserve canonical raw amounts."
+      },
+      {
+        "check": "dated_contract_month_amount_reconcile",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "70604962581146.0",
+        "expected": "70604962581146.0",
+        "note": "Raw amount sum in shop-month total must match date-valid canonical events; it is not labeled funded volume."
+      },
+      {
+        "check": "funded_month_counts_reconcile",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "2715985",
+        "expected": "2715985",
+        "note": "Selected funded flag counts reconcile over dated application months."
+      },
+      {
+        "check": "funded_month_amount_reconcile",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "48180834314366.0",
+        "expected": "48180834314366.0",
+        "note": "Selected funded credit amount reconciles over dated application months."
+      },
+      {
+        "check": "funded_foundation_counts_reconcile",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "2715985",
+        "expected": "2715985",
+        "note": "Foundation selected-funded count reconciles without fanout."
+      },
+      {
+        "check": "funded_foundation_amount_reconcile",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "48180834314366.0",
+        "expected": "48180834314366.0",
+        "note": "Foundation selected-funded amount reconciles without fanout."
+      },
+      {
+        "check": "conversion_month_primary_matches_reconcile",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "260674",
+        "expected": "260674",
+        "note": "Shop-month conversion table accounts for each primary confirmed match once."
+      },
+      {
+        "check": "sample_weight_raw_and_typed_columns_are_distinct",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "{\"sample_weight\": \"DOUBLE\", \"sample_weight_raw\": \"VARCHAR\"}",
+        "expected": "{\"sample_weight\": \"DOUBLE\", \"sample_weight_raw\": \"VARCHAR\"}",
+        "note": "Raw source representation and parsed QA-only sensitivity value must not collide or be mistaken for each other."
+      },
+      {
+        "check": "round2_production_score_cutoffs_read_from_source_config",
+        "status": "PASS",
+        "severity": "CONDITIONAL",
+        "observed": "\"2025-06-05\"",
+        "expected": "\"FHS and CES SNAPSHOT_DATE\"",
+        "note": "Production score snapshots are read from Round 2 config; feature-level timestamp lineage still requires review."
+      },
+      {
+        "check": "round2_feature_timestamp_lineage_audited",
+        "status": "FAIL",
+        "severity": "BUSINESS_GATE",
+        "observed": "\"REVIEW_REQUIRED\"",
+        "expected": "\"Every score feature timestamp verified\"",
+        "note": "Code snapshot dates are known, but this pipeline does not certify every feature's point-in-time lineage."
+      },
+      {
+        "check": "lead_product_crosswalk_approved",
+        "status": "PASS",
+        "severity": "BUSINESS_GATE",
+        "observed": "4",
+        "expected": "\">=1 configured team-assumption mappings\"",
+        "note": "Configured equality mappings are competition assumptions, not owner approvals."
+      },
+      {
+        "check": "contract_status_outcome_semantics_approved",
+        "status": "PASS",
+        "severity": "BUSINESS_GATE",
+        "observed": "7",
+        "expected": "\">=1 explicit status mappings\"",
+        "note": "Current/final statuses are retained raw; funded outcome remains undefined unless approved."
+      },
+      {
+        "check": "lead_sample_weight_semantics_approved",
+        "status": "FAIL",
+        "severity": "BUSINESS_GATE",
+        "observed": "\"UNAPPROVED_QA_ONLY\"",
+        "expected": "\"source-owner scope and estimator approval\"",
+        "note": "Weights are preserved and summarized for QA only; no weighted population claim is emitted."
+      },
+      {
+        "check": "employee_active_status_codes_approved",
+        "status": "PASS",
+        "severity": "BUSINESS_GATE",
+        "observed": "1",
+        "expected": "\">=1 approved active status\"",
+        "note": "Raw assignment intervals remain available; active headcount proxy is null by default."
+      },
+      {
+        "check": "primary_matches_at_most_one_per_contract",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "0",
+        "expected": "0",
+        "note": "At most one primary lead per contract."
+      },
+      {
+        "check": "primary_match_amount_not_above_all_contracts",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "5839719628947.0",
+        "expected": "70604962581146.0",
+        "note": "Primary-match amount cannot exceed canonical contract amount."
+      },
+      {
+        "check": "confirmed_pairs_minimum_expected",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "339529",
+        "expected": "\">=339000\"",
+        "note": "Expected approximately 339,529 criterion-qualified pairs."
+      },
+      {
+        "check": "existing_table_row_count_unchanged:contract_fact",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "3775371",
+        "expected": "3775371",
+        "note": "Existing published table count should remain stable."
+      },
+      {
+        "check": "existing_table_row_count_unchanged:leads_clean",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "6130637",
+        "expected": "6130637",
+        "note": "Existing published table count should remain stable."
+      },
+      {
+        "check": "existing_table_row_count_unchanged:contract_product_bridge",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "784902",
+        "expected": "784902",
+        "note": "Existing published table count should remain stable."
+      },
+      {
+        "check": "existing_table_row_count_unchanged:shop_bridge",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "14231",
+        "expected": "14231",
+        "note": "Existing published table count should remain stable."
+      },
+      {
+        "check": "existing_table_row_count_unchanged:seller_master",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "11639",
+        "expected": "11639",
+        "note": "Existing published table count should remain stable."
+      },
+      {
+        "check": "existing_table_row_count_unchanged:employee_shop_bridge",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "275856",
+        "expected": "275856",
+        "note": "Existing published table count should remain stable."
+      },
+      {
+        "check": "existing_table_row_count_unchanged:lead_contract_candidates",
+        "status": "PASS",
+        "severity": "WARNING",
+        "observed": "339529",
+        "expected": "339529",
+        "note": "Candidate count may change under strict client/product/known-date/time eligibility; all other legacy grains remain invariant."
+      },
+      {
+        "check": "existing_table_row_count_unchanged:shop_month_foundation",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "715528",
+        "expected": "715528",
+        "note": "Existing published table count should remain stable."
+      },
+      {
+        "check": "existing_table_row_count_unchanged:lead_shop_month_product",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "349564",
+        "expected": "349564",
+        "note": "Existing published table count should remain stable."
+      },
+      {
+        "check": "existing_table_row_count_unchanged:lead_conversion_shop_month",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "140230",
+        "expected": "140230",
+        "note": "Existing published table count should remain stable."
+      },
+      {
+        "check": "existing_table_row_count_unchanged:shop_behavior_profile",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "30705",
+        "expected": "30705",
+        "note": "Existing published table count should remain stable."
+      },
+      {
+        "check": "existing_table_row_count_unchanged:r2_customer_segment",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "1000528",
+        "expected": "1000528",
+        "note": "Existing published table count should remain stable."
+      },
+      {
+        "check": "existing_amount_sum_unchanged:contract_fact_amount_sum",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "70604962581146.0",
+        "expected": "70604962581146.0",
+        "note": "Existing canonical amount sum should remain stable."
+      },
+      {
+        "check": "existing_amount_sum_unchanged:contract_month_amount_sum",
+        "status": "PASS",
+        "severity": "FATAL",
+        "observed": "70604962581146.0",
+        "expected": "70604962581146.0",
+        "note": "Existing canonical amount sum should remain stable."
+      }
+    ],
+    "unresolved_business_definitions": [
+      "Contract status-to-outcome and funded amount definition",
+      "Lead-to-contract product crosswalk approval",
+      "Lead sample_weight scope, target population, estimator and normalization",
+      "Employee active-status code semantics and headcount proxy",
+      "Round 2 score feature-level cutoff provenance",
+      "Historical validity of current shop/seller attributes"
+    ],
+    "join_reconciliation": {
+      "contract_version_rows": 3775371,
+      "contract_fact_rows": 3775371,
+      "contract_version_amount_sum": 70604962581146.0,
+      "contract_fact_amount_sum": 70604962581146.0,
+      "contract_shop_bridge_amount_sum": 70604962581146.0,
+      "contract_segment_bridge_amount_sum": 70604962581146.0,
+      "dated_contract_fact_rows": 3775371,
+      "dated_contract_fact_amount_sum": 70604962581146.0,
+      "contract_month_event_rows": 3775371,
+      "contract_month_amount_sum": 70604962581146.0,
+      "lead_version_rows": 6130637,
+      "lead_shop_bridge_rows": 6130637,
+      "contract_shop_bridge_rows": 3775371,
+      "contract_product_detail_rows": 784902,
+      "contract_product_case_rows": 779941,
+      "dated_lead_event_rows": 6130637,
+      "lead_month_event_rows": 6130637,
+      "foundation_contract_event_rows": 3775371,
+      "foundation_lead_event_rows": 6130637,
+      "contract_raw_rows": 3775371,
+      "contract_raw_amount_sum": 70604962581146.0,
+      "lead_raw_rows": 6130637,
+      "raw_to_event_version_amount_delta": 0.0,
+      "shop_bridge_amount_delta": 0.0,
+      "segment_bridge_amount_delta": 0.0,
+      "dated_month_amount_delta": 0.0
+    },
+    "parquet_readback": [
+      {
+        "file": "contract_clean.parquet",
+        "rows": 3775371,
+        "columns": 48,
+        "file_bytes": 318952468,
+        "readable_by_pyarrow": true,
+        "expected_rows": 3775371,
+        "row_count_match": true
+      },
+      {
+        "file": "leads_clean.parquet",
+        "rows": 6130637,
+        "columns": 63,
+        "file_bytes": 689271615,
+        "readable_by_pyarrow": true,
+        "expected_rows": 6130637,
+        "row_count_match": true
+      },
+      {
+        "file": "contract_product_clean.parquet",
+        "rows": 784902,
+        "columns": 14,
+        "file_bytes": 38455738,
+        "readable_by_pyarrow": true,
+        "expected_rows": 784902,
+        "row_count_match": true
+      },
+      {
+        "file": "shop_clean.parquet",
+        "rows": 14231,
+        "columns": 32,
+        "file_bytes": 558699,
+        "readable_by_pyarrow": true,
+        "expected_rows": 14231,
+        "row_count_match": true
+      },
+      {
+        "file": "seller_clean.parquet",
+        "rows": 11639,
+        "columns": 16,
+        "file_bytes": 154459,
+        "readable_by_pyarrow": true,
+        "expected_rows": 11639,
+        "row_count_match": true
+      },
+      {
+        "file": "employee_shop_clean.parquet",
+        "rows": 275856,
+        "columns": 26,
+        "file_bytes": 15480329,
+        "readable_by_pyarrow": true,
+        "expected_rows": 275856,
+        "row_count_match": true
+      },
+      {
+        "file": "lead_contract_candidates.parquet",
+        "rows": 339529,
+        "columns": 30,
+        "file_bytes": 20276615,
+        "readable_by_pyarrow": true,
+        "expected_rows": 339529,
+        "row_count_match": true
+      },
+      {
+        "file": "shop_month_foundation.parquet",
+        "rows": 715528,
+        "columns": 29,
+        "file_bytes": 5484703,
+        "readable_by_pyarrow": true,
+        "expected_rows": 715528,
+        "row_count_match": true
+      },
+      {
+        "file": "lead_shop_month_product.parquet",
+        "rows": 349564,
+        "columns": 13,
+        "file_bytes": 2857356,
+        "readable_by_pyarrow": true,
+        "expected_rows": 349564,
+        "row_count_match": true
+      },
+      {
+        "file": "lead_conversion_shop_month.parquet",
+        "rows": 140230,
+        "columns": 11,
+        "file_bytes": 1147715,
+        "readable_by_pyarrow": true,
+        "expected_rows": 140230,
+        "row_count_match": true
+      },
+      {
+        "file": "shop_behavior_profile.parquet",
+        "rows": 30705,
+        "columns": 14,
+        "file_bytes": 654577,
+        "readable_by_pyarrow": true,
+        "expected_rows": 30705,
+        "row_count_match": true
+      },
+      {
+        "file": "R2/r2_customer_segment.parquet",
+        "rows": 1000528,
+        "columns": 24,
+        "file_bytes": 7926280,
+        "readable_by_pyarrow": true,
+        "expected_rows": 1000528,
+        "row_count_match": true
+      }
+    ],
+    "metrics_file": "metrics_phase1.json"
   },
   "window": {
     "history_start": "2025-01-01T00:00:00",
     "latest_complete": "2026-09-01T00:00:00",
-    "lead_start": "2025-12-01T00:00:00",
-    "partial_lead": "2026-10-01T00:00:00",
-    "contract_max_date": "2026-09-30",
-    "lead_max_date": "2026-10-17",
-    "forecast_origin_month": "2026-09-01T00:00:00",
-    "horizons": [
-      1,
-      2,
-      3
-    ]
+    "origin": "2026-09-01T00:00:00",
+    "contract_max_date": "2026-09-30T00:00:00"
   },
-  "phase1_optional_columns": {
-    "present": [
-      "active_headcount_proxy",
-      "assigned_employee_count_raw",
-      "distinct_lead_uuids",
-      "funded_contract_count"
-    ],
-    "derived_when_missing": [
-      "first_activity_month",
-      "last_activity_month",
-      "lifecycle_state"
-    ]
-  },
-  "observation_audit": [
-    {
-      "state": "MISSING_IN_LIFECYCLE",
-      "shop_month_rows": 80062,
-      "shop_ids": 16618,
-      "contract_rows": 0
-    },
-    {
-      "state": "OBSERVED_POSITIVE",
-      "shop_month_rows": 221984,
-      "shop_ids": 26655,
-      "contract_rows": 3775371
-    },
-    {
-      "state": "OBSERVED_ZERO",
-      "shop_month_rows": 75171,
-      "shop_ids": 17182,
-      "contract_rows": 0
-    },
-    {
-      "state": "OUTSIDE_LIFECYCLE",
-      "shop_month_rows": 305787,
-      "shop_ids": 25477,
-      "contract_rows": 0
-    }
-  ],
-  "in_lifecycle_zero_event_months": 80062,
-  "source_reconciliation": [
-    {
-      "check": "funded_rows_reconcile_to_contract_source",
-      "observed": 2715985.0,
-      "expected": 2715985.0,
-      "status": "PASS"
-    },
-    {
-      "check": "application_rows_reconcile_to_phase1_month_rows",
-      "observed": 3775371.0,
-      "expected": 3775371.0,
-      "status": "PASS"
-    },
-    {
-      "check": "one_row_per_shop_outcome_horizon",
-      "observed": 0,
-      "expected": 0,
-      "status": "PASS"
-    },
-    {
-      "check": "fnd02_monthly_columns_superset",
-      "observed": [
-        "contract_application_rows",
-        "lead_assignment_rows",
-        "month_start",
-        "shops_with_any_recorded_event"
+  "tier_validation_diagnostic": {
+    "funded": {
+      "tier_A_required_prior_observed_months": 18,
+      "validation_origin_indices": [
+        12,
+        13,
+        14,
+        15
       ],
-      "expected": [
-        "month_start",
-        "contract_application_rows",
-        "lead_assignment_rows",
-        "shops_with_any_recorded_event"
+      "validation_origin_months": [
+        "2025-12-01",
+        "2026-01-01",
+        "2026-02-01",
+        "2026-03-01"
       ],
-      "status": "PASS"
+      "maximum_prior_calendar_months": 15,
+      "reason": "Each origin assigns tiers using prior observed contract months only. This history ends validation before the 18-month Tier A threshold; missing shop months reduce per-shop history further. Threshold retained.",
+      "status": "INSUFFICIENT_VALIDATION"
     },
-    {
-      "check": "three_month_total_equals_horizon_sum",
-      "observed": 0,
-      "expected": 0,
-      "status": "PASS"
-    },
-    {
-      "check": "origin_precedes_all_targets",
-      "observed": "2026-10-01",
-      "expected": "later than origin 2026-09-01",
-      "status": "PASS"
-    },
-    {
-      "check": "no_hand_typed_month_year_in_text",
-      "observed": false,
-      "expected": false,
-      "status": "PASS"
-    }
-  ],
-  "positive_only_sensitivity_primary_outcome": {
-    "tier_shift": {
-      "A": 1735,
-      "B": 7862,
-      "C": 6681,
-      "D": 6474
-    },
-    "shops_tier_changed": 11376,
-    "decision_status": {
-      "A_h1": "TRAILING_BASELINE_FALLBACK",
-      "A_h2": "TRAILING_BASELINE_FALLBACK",
-      "A_h3": "TRAILING_BASELINE_FALLBACK",
-      "B_h1": "SUPPORTED",
-      "B_h2": "SUPPORTED",
-      "B_h3": "SUPPORTED",
-      "C_h1": "SUPPORTED",
-      "C_h2": "SUPPORTED",
-      "C_h3": "SUPPORTED"
+    "application": {
+      "tier_A_required_prior_observed_months": 18,
+      "validation_origin_indices": [
+        12,
+        13,
+        14,
+        15
+      ],
+      "validation_origin_months": [
+        "2025-12-01",
+        "2026-01-01",
+        "2026-02-01",
+        "2026-03-01"
+      ],
+      "maximum_prior_calendar_months": 15,
+      "reason": "Each origin assigns tiers using prior observed contract months only. This history ends validation before the 18-month Tier A threshold; missing shop months reduce per-shop history further. Threshold retained.",
+      "status": "INSUFFICIENT_VALIDATION"
     }
   },
-  "holdout_subgroup_errors": [
-    {
-      "outcome": "funded",
-      "tier": "A",
-      "horizon": 1,
-      "model": "recent_3m",
-      "n": 11280,
-      "wape": 0.27292109796308867,
-      "bias": 1.289598108747045
-    },
-    {
-      "outcome": "funded",
-      "tier": "A",
-      "horizon": 2,
-      "model": "recent_3m",
-      "n": 11242,
-      "wape": 0.2693822626368194,
-      "bias": 1.3715531044298166
-    },
-    {
-      "outcome": "funded",
-      "tier": "A",
-      "horizon": 3,
-      "model": "recent_3m",
-      "n": 11121,
-      "wape": 0.2195265524277279,
-      "bias": 1.219075023229326
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "horizon": 1,
-      "model": "blend_25",
-      "n": 23265,
-      "wape": 0.5159957006234813,
-      "bias": -0.08995312975473721
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "horizon": 2,
-      "model": "ewm",
-      "n": 23333,
-      "wape": 0.5252663517190864,
-      "bias": -0.10276637872783978
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "horizon": 3,
-      "model": "ewm",
-      "n": 22995,
-      "wape": 0.5006635831648253,
-      "bias": 0.004082177207215069
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "horizon": 1,
-      "model": "blend_75",
-      "n": 15931,
-      "wape": 0.5086215876031482,
-      "bias": 0.16939107674773252
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "horizon": 2,
-      "model": "blend_50",
-      "n": 18189,
-      "wape": 0.49542096610795977,
-      "bias": 0.12341218712357274
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "horizon": 3,
-      "model": "blend_50",
-      "n": 20878,
-      "wape": 0.47771792587675216,
-      "bias": 0.1459621572246878
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "horizon": 1,
-      "model": "recent_3m",
-      "n": 11280,
-      "wape": 0.2488309473549196,
-      "bias": 2.187854609929078
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "horizon": 2,
-      "model": "recent_3m",
-      "n": 11242,
-      "wape": 0.2494583591720874,
-      "bias": 2.5839411729822697
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "horizon": 3,
-      "model": "recent_3m",
-      "n": 11121,
-      "wape": 0.21008845741123516,
-      "bias": 2.407727122860654
-    },
-    {
-      "outcome": "application",
-      "tier": "B",
-      "horizon": 1,
-      "model": "blend_25",
-      "n": 23265,
-      "wape": 0.4785378087896649,
-      "bias": -0.13488497943147137
-    },
-    {
-      "outcome": "application",
-      "tier": "B",
-      "horizon": 2,
-      "model": "ewm",
-      "n": 23333,
-      "wape": 0.49424649920453556,
-      "bias": -0.18927025971672343
-    },
-    {
-      "outcome": "application",
-      "tier": "B",
-      "horizon": 3,
-      "model": "ewm",
-      "n": 22995,
-      "wape": 0.4795976234002496,
-      "bias": -0.05310061266484454
-    },
-    {
-      "outcome": "application",
-      "tier": "C",
-      "horizon": 1,
-      "model": "blend_75",
-      "n": 15931,
-      "wape": 0.4579616732719059,
-      "bias": 0.18398825004775085
-    },
-    {
-      "outcome": "application",
-      "tier": "C",
-      "horizon": 2,
-      "model": "blend_50",
-      "n": 18189,
-      "wape": 0.4468510198667527,
-      "bias": 0.1119878217966082
-    },
-    {
-      "outcome": "application",
-      "tier": "C",
-      "horizon": 3,
-      "model": "blend_75",
-      "n": 20878,
-      "wape": 0.44067322742315107,
-      "bias": 0.1894941217323182
-    }
-  ],
-  "missing_outcome_bounds": [
-    {
-      "outcome": "application",
-      "tier": "A",
-      "split": "holdout",
-      "horizon": 1,
-      "candidate_shops": 11319,
-      "observed_targets": 11280,
-      "missing_targets": 39,
-      "observed_share": 0.9965544659422211
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "split": "holdout",
-      "horizon": 2,
-      "candidate_shops": 11319,
-      "observed_targets": 11242,
-      "missing_targets": 77,
-      "observed_share": 0.9931972789115646
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "split": "holdout",
-      "horizon": 3,
-      "candidate_shops": 11319,
-      "observed_targets": 11121,
-      "missing_targets": 198,
-      "observed_share": 0.9825072886297376
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "split": "selection",
-      "horizon": 1,
-      "candidate_shops": 0,
-      "observed_targets": 0,
-      "missing_targets": 0,
-      "observed_share": null
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "split": "selection",
-      "horizon": 2,
-      "candidate_shops": 0,
-      "observed_targets": 0,
-      "missing_targets": 0,
-      "observed_share": null
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "split": "selection",
-      "horizon": 3,
-      "candidate_shops": 0,
-      "observed_targets": 0,
-      "missing_targets": 0,
-      "observed_share": null
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "split": "validation",
-      "horizon": 1,
-      "candidate_shops": 0,
-      "observed_targets": 0,
-      "missing_targets": 0,
-      "observed_share": null
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "split": "validation",
-      "horizon": 2,
-      "candidate_shops": 0,
-      "observed_targets": 0,
-      "missing_targets": 0,
-      "observed_share": null
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "split": "validation",
-      "horizon": 3,
-      "candidate_shops": 0,
-      "observed_targets": 0,
-      "missing_targets": 0,
-      "observed_share": null
-    },
-    {
-      "outcome": "application",
-      "tier": "B",
-      "split": "holdout",
-      "horizon": 1,
-      "candidate_shops": 25016,
-      "observed_targets": 23265,
-      "missing_targets": 1751,
-      "observed_share": 0.9300047969299648
-    },
-    {
-      "outcome": "application",
-      "tier": "B",
-      "split": "holdout",
-      "horizon": 2,
-      "candidate_shops": 25016,
-      "observed_targets": 23333,
-      "missing_targets": 1683,
-      "observed_share": 0.9327230572433642
-    },
-    {
-      "outcome": "application",
-      "tier": "B",
-      "split": "holdout",
-      "horizon": 3,
-      "candidate_shops": 25016,
-      "observed_targets": 22995,
-      "missing_targets": 2021,
-      "observed_share": 0.9192117045091142
-    },
-    {
-      "outcome": "application",
-      "tier": "B",
-      "split": "selection",
-      "horizon": 1,
-      "candidate_shops": 31427,
-      "observed_targets": 29994,
-      "missing_targets": 1433,
-      "observed_share": 0.9544022655678238
-    },
-    {
-      "outcome": "application",
-      "tier": "B",
-      "split": "selection",
-      "horizon": 2,
-      "candidate_shops": 31427,
-      "observed_targets": 30312,
-      "missing_targets": 1115,
-      "observed_share": 0.9645209533203933
-    },
-    {
-      "outcome": "application",
-      "tier": "B",
-      "split": "selection",
-      "horizon": 3,
-      "candidate_shops": 31427,
-      "observed_targets": 30079,
-      "missing_targets": 1348,
-      "observed_share": 0.9571069462564037
-    },
-    {
-      "outcome": "application",
-      "tier": "B",
-      "split": "validation",
-      "horizon": 1,
-      "candidate_shops": 26530,
-      "observed_targets": 25600,
-      "missing_targets": 930,
-      "observed_share": 0.9649453448925744
-    },
-    {
-      "outcome": "application",
-      "tier": "B",
-      "split": "validation",
-      "horizon": 2,
-      "candidate_shops": 26530,
-      "observed_targets": 25582,
-      "missing_targets": 948,
-      "observed_share": 0.9642668676969468
-    },
-    {
-      "outcome": "application",
-      "tier": "B",
-      "split": "validation",
-      "horizon": 3,
-      "candidate_shops": 26530,
-      "observed_targets": 25287,
-      "missing_targets": 1243,
-      "observed_share": 0.9531473803241614
-    },
-    {
-      "outcome": "application",
-      "tier": "C",
-      "split": "holdout",
-      "horizon": 1,
-      "candidate_shops": 25717,
-      "observed_targets": 19964,
-      "missing_targets": 5753,
-      "observed_share": 0.7762958354395925
-    },
-    {
-      "outcome": "application",
-      "tier": "C",
-      "split": "holdout",
-      "horizon": 2,
-      "candidate_shops": 25717,
-      "observed_targets": 20682,
-      "missing_targets": 5035,
-      "observed_share": 0.8042151106272116
-    },
-    {
-      "outcome": "application",
-      "tier": "C",
-      "split": "holdout",
-      "horizon": 3,
-      "candidate_shops": 25717,
-      "observed_targets": 20878,
-      "missing_targets": 4839,
-      "observed_share": 0.8118365283664503
-    },
-    {
-      "outcome": "application",
-      "tier": "C",
-      "split": "selection",
-      "horizon": 1,
-      "candidate_shops": 51029,
-      "observed_targets": 35109,
-      "missing_targets": 15920,
-      "observed_share": 0.6880205373415117
-    },
-    {
-      "outcome": "application",
-      "tier": "C",
-      "split": "selection",
-      "horizon": 2,
-      "candidate_shops": 51029,
-      "observed_targets": 36830,
-      "missing_targets": 14199,
-      "observed_share": 0.7217464578964903
-    },
-    {
-      "outcome": "application",
-      "tier": "C",
-      "split": "selection",
-      "horizon": 3,
-      "candidate_shops": 51029,
-      "observed_targets": 37391,
-      "missing_targets": 13638,
-      "observed_share": 0.7327402065492171
-    },
-    {
-      "outcome": "application",
-      "tier": "C",
-      "split": "validation",
-      "horizon": 1,
-      "candidate_shops": 28398,
-      "observed_targets": 23673,
-      "missing_targets": 4725,
-      "observed_share": 0.8336150433129094
-    },
-    {
-      "outcome": "application",
-      "tier": "C",
-      "split": "validation",
-      "horizon": 2,
-      "candidate_shops": 28398,
-      "observed_targets": 23755,
-      "missing_targets": 4643,
-      "observed_share": 0.8365025706035636
-    },
-    {
-      "outcome": "application",
-      "tier": "C",
-      "split": "validation",
-      "horizon": 3,
-      "candidate_shops": 28398,
-      "observed_targets": 23056,
-      "missing_targets": 5342,
-      "observed_share": 0.8118881611381084
-    },
-    {
-      "outcome": "funded",
-      "tier": "A",
-      "split": "holdout",
-      "horizon": 1,
-      "candidate_shops": 11319,
-      "observed_targets": 11280,
-      "missing_targets": 39,
-      "observed_share": 0.9965544659422211
-    },
-    {
-      "outcome": "funded",
-      "tier": "A",
-      "split": "holdout",
-      "horizon": 2,
-      "candidate_shops": 11319,
-      "observed_targets": 11242,
-      "missing_targets": 77,
-      "observed_share": 0.9931972789115646
-    },
-    {
-      "outcome": "funded",
-      "tier": "A",
-      "split": "holdout",
-      "horizon": 3,
-      "candidate_shops": 11319,
-      "observed_targets": 11121,
-      "missing_targets": 198,
-      "observed_share": 0.9825072886297376
-    },
-    {
-      "outcome": "funded",
-      "tier": "A",
-      "split": "selection",
-      "horizon": 1,
-      "candidate_shops": 0,
-      "observed_targets": 0,
-      "missing_targets": 0,
-      "observed_share": null
-    },
-    {
-      "outcome": "funded",
-      "tier": "A",
-      "split": "selection",
-      "horizon": 2,
-      "candidate_shops": 0,
-      "observed_targets": 0,
-      "missing_targets": 0,
-      "observed_share": null
-    },
-    {
-      "outcome": "funded",
-      "tier": "A",
-      "split": "selection",
-      "horizon": 3,
-      "candidate_shops": 0,
-      "observed_targets": 0,
-      "missing_targets": 0,
-      "observed_share": null
-    },
-    {
-      "outcome": "funded",
-      "tier": "A",
-      "split": "validation",
-      "horizon": 1,
-      "candidate_shops": 0,
-      "observed_targets": 0,
-      "missing_targets": 0,
-      "observed_share": null
-    },
-    {
-      "outcome": "funded",
-      "tier": "A",
-      "split": "validation",
-      "horizon": 2,
-      "candidate_shops": 0,
-      "observed_targets": 0,
-      "missing_targets": 0,
-      "observed_share": null
-    },
-    {
-      "outcome": "funded",
-      "tier": "A",
-      "split": "validation",
-      "horizon": 3,
-      "candidate_shops": 0,
-      "observed_targets": 0,
-      "missing_targets": 0,
-      "observed_share": null
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "split": "holdout",
-      "horizon": 1,
-      "candidate_shops": 25016,
-      "observed_targets": 23265,
-      "missing_targets": 1751,
-      "observed_share": 0.9300047969299648
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "split": "holdout",
-      "horizon": 2,
-      "candidate_shops": 25016,
-      "observed_targets": 23333,
-      "missing_targets": 1683,
-      "observed_share": 0.9327230572433642
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "split": "holdout",
-      "horizon": 3,
-      "candidate_shops": 25016,
-      "observed_targets": 22995,
-      "missing_targets": 2021,
-      "observed_share": 0.9192117045091142
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "split": "selection",
-      "horizon": 1,
-      "candidate_shops": 31427,
-      "observed_targets": 29994,
-      "missing_targets": 1433,
-      "observed_share": 0.9544022655678238
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "split": "selection",
-      "horizon": 2,
-      "candidate_shops": 31427,
-      "observed_targets": 30312,
-      "missing_targets": 1115,
-      "observed_share": 0.9645209533203933
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "split": "selection",
-      "horizon": 3,
-      "candidate_shops": 31427,
-      "observed_targets": 30079,
-      "missing_targets": 1348,
-      "observed_share": 0.9571069462564037
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "split": "validation",
-      "horizon": 1,
-      "candidate_shops": 26530,
-      "observed_targets": 25600,
-      "missing_targets": 930,
-      "observed_share": 0.9649453448925744
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "split": "validation",
-      "horizon": 2,
-      "candidate_shops": 26530,
-      "observed_targets": 25582,
-      "missing_targets": 948,
-      "observed_share": 0.9642668676969468
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "split": "validation",
-      "horizon": 3,
-      "candidate_shops": 26530,
-      "observed_targets": 25287,
-      "missing_targets": 1243,
-      "observed_share": 0.9531473803241614
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "split": "holdout",
-      "horizon": 1,
-      "candidate_shops": 25717,
-      "observed_targets": 19964,
-      "missing_targets": 5753,
-      "observed_share": 0.7762958354395925
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "split": "holdout",
-      "horizon": 2,
-      "candidate_shops": 25717,
-      "observed_targets": 20682,
-      "missing_targets": 5035,
-      "observed_share": 0.8042151106272116
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "split": "holdout",
-      "horizon": 3,
-      "candidate_shops": 25717,
-      "observed_targets": 20878,
-      "missing_targets": 4839,
-      "observed_share": 0.8118365283664503
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "split": "selection",
-      "horizon": 1,
-      "candidate_shops": 51029,
-      "observed_targets": 35109,
-      "missing_targets": 15920,
-      "observed_share": 0.6880205373415117
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "split": "selection",
-      "horizon": 2,
-      "candidate_shops": 51029,
-      "observed_targets": 36830,
-      "missing_targets": 14199,
-      "observed_share": 0.7217464578964903
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "split": "selection",
-      "horizon": 3,
-      "candidate_shops": 51029,
-      "observed_targets": 37391,
-      "missing_targets": 13638,
-      "observed_share": 0.7327402065492171
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "split": "validation",
-      "horizon": 1,
-      "candidate_shops": 28398,
-      "observed_targets": 23673,
-      "missing_targets": 4725,
-      "observed_share": 0.8336150433129094
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "split": "validation",
-      "horizon": 2,
-      "candidate_shops": 28398,
-      "observed_targets": 23755,
-      "missing_targets": 4643,
-      "observed_share": 0.8365025706035636
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "split": "validation",
-      "horizon": 3,
-      "candidate_shops": 28398,
-      "observed_targets": 23056,
-      "missing_targets": 5342,
-      "observed_share": 0.8118881611381084
-    }
-  ],
-  "interval_calibration": [
-    {
-      "horizon": 1,
-      "coverage": 0.75
-    },
-    {
-      "horizon": 2,
-      "coverage": 0.75
-    },
-    {
-      "horizon": 3,
-      "coverage": 0.5
-    }
-  ],
-  "coverage": [
-    {
-      "observed_history_tier": "A",
-      "eligibility_status": "DORMANT_NO_RECENT_ACTIVITY",
-      "shop_ids": 21,
-      "market_matched": 1,
-      "median_3m_funded": null
-    },
-    {
-      "observed_history_tier": "A",
-      "eligibility_status": "ELIGIBLE_FOR_FORECAST",
-      "shop_ids": 5185,
-      "market_matched": 361,
-      "median_3m_funded": 10.0
-    },
-    {
-      "observed_history_tier": "B",
-      "eligibility_status": "DORMANT_NO_RECENT_ACTIVITY",
-      "shop_ids": 918,
-      "market_matched": 267,
-      "median_3m_funded": null
-    },
-    {
-      "observed_history_tier": "B",
-      "eligibility_status": "ELIGIBLE_FOR_FORECAST",
-      "shop_ids": 10283,
-      "market_matched": 3255,
-      "median_3m_funded": 1.0
-    },
-    {
-      "observed_history_tier": "C",
-      "eligibility_status": "DORMANT_NO_RECENT_ACTIVITY",
-      "shop_ids": 2651,
-      "market_matched": 1142,
-      "median_3m_funded": null
-    },
-    {
-      "observed_history_tier": "C",
-      "eligibility_status": "ELIGIBLE_FOR_FORECAST",
-      "shop_ids": 6952,
-      "market_matched": 4292,
-      "median_3m_funded": 1.0
-    },
-    {
-      "observed_history_tier": "D",
-      "eligibility_status": "DORMANT_NO_RECENT_ACTIVITY",
-      "shop_ids": 2343,
-      "market_matched": 1072,
-      "median_3m_funded": null
-    },
-    {
-      "observed_history_tier": "D",
-      "eligibility_status": "TIER_D_LT3_OBSERVED_MONTHS",
-      "shop_ids": 2099,
-      "market_matched": 1778,
-      "median_3m_funded": 1.0
-    }
-  ],
-  "forecasted_by_tier_outcome": [
-    {
-      "outcome": "application",
-      "tier": "A",
-      "forecasted_shops": 6647
-    },
-    {
-      "outcome": "application",
-      "tier": "B",
-      "forecasted_shops": 11045
-    },
-    {
-      "outcome": "application",
-      "tier": "C",
-      "forecasted_shops": 4728
-    },
-    {
-      "outcome": "funded",
-      "tier": "A",
-      "forecasted_shops": 6647
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "forecasted_shops": 11045
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "forecasted_shops": 4728
-    }
-  ],
-  "pair": {
-    "status": "SUPPORTED",
-    "pair_id": "115096693::99546349",
-    "shop_ids": [
-      "115096693",
-      "99546349"
-    ],
-    "rule_used": "A05_SIMILAR_ACTUAL_10PCT",
-    "tolerance": 0.1,
-    "peer_group": "Small | Non-Aldi",
-    "peer_n": 4237,
-    "actual_3m_funded": {
-      "115096693": 13.0,
-      "99546349": 14.0
-    },
-    "bau_3m_total": {
-      "115096693": {
-        "point": 69.36090982070917,
-        "lo": 61.990324120553026,
-        "hi": 75.45347745148149
-      },
-      "99546349": {
-        "point": 10.144755587421837,
-        "lo": 2.774169887265696,
-        "hi": 16.23732321819416
-      }
-    },
-    "bau_ratio": {
-      "115096693": 5.335454601593013,
-      "99546349": 0.7246253991015598
-    },
-    "observed_contrasts": {
-      "115096693": {
-        "lead_rows_3m": 38.0,
-        "distinct_lead_uuids_3m": 38.0,
-        "assigned_headcount_proxy_3m": 20.0,
-        "lead_product_mix_3m": {
-          "CC": 0.15789473684210525,
-          "CD": 0.3157894736842105,
-          "CL": 0.5263157894736842,
-          "TW": 0.0
-        }
-      },
-      "99546349": {
-        "lead_rows_3m": 27.0,
-        "distinct_lead_uuids_3m": 27.0,
-        "assigned_headcount_proxy_3m": 21.333333333333332,
-        "lead_product_mix_3m": {
-          "CC": 0.18518518518518517,
-          "CD": 0.7037037037037037,
-          "CL": 0.1111111111111111,
-          "TW": 0.0
-        }
-      }
-    },
-    "note": "Observed contrasts are descriptive, not causal.",
-    "stability": {
-      "5pct": [
-        "111893539",
-        "115096693"
-      ],
-      "10pct": [
-        "115096693",
-        "99546349"
-      ],
-      "20pct": [
-        "103796122",
-        "115096693"
-      ]
-    }
-  },
-  "rank_stability": {
-    "spearman_rank_correlation": 0.955244259806483,
-    "pair_unchanged_when_outcome_switched": false,
-    "common_shop_count": 22420
-  },
+  "decision_policy": "Selection split chooses a model; validation confirms it against trailing_3m; holdout reports performance only and does not select models or interval bounds.",
   "model_decisions": [
     {
       "outcome": "funded",
       "tier": "A",
       "horizon": 1,
-      "model": "recent_3m",
-      "fallback": true,
-      "status": "TRAILING_BASELINE_FALLBACK",
-      "reason": "INSUFFICIENT_VALIDATION",
+      "model": "trailing_3m",
+      "status": "INSUFFICIENT_VALIDATION",
       "validation_n": 0,
-      "interval_offsets": [
-        -6.633333333333332,
-        3.9666666666666783
-      ],
-      "total_interval_offsets": [
-        -15.666666666666671,
-        5.333333333333336
-      ]
+      "selection_model": null,
+      "validation_wape": null,
+      "validation_baseline_wape": null,
+      "holdout_n": 2336,
+      "holdout_wape": 0.2582714420572546,
+      "validation_residuals": null,
+      "holdout_empirical_coverage": null,
+      "interval_status": "INSUFFICIENT_VALIDATION"
     },
     {
       "outcome": "funded",
       "tier": "A",
       "horizon": 2,
-      "model": "recent_3m",
-      "fallback": true,
-      "status": "TRAILING_BASELINE_FALLBACK",
-      "reason": "INSUFFICIENT_VALIDATION",
+      "model": "trailing_3m",
+      "status": "INSUFFICIENT_VALIDATION",
       "validation_n": 0,
-      "interval_offsets": [
-        -7.366666666666666,
-        3.666666666666668
-      ],
-      "total_interval_offsets": [
-        -15.666666666666671,
-        5.333333333333336
-      ]
+      "selection_model": null,
+      "validation_wape": null,
+      "validation_baseline_wape": null,
+      "holdout_n": 2315,
+      "holdout_wape": 0.2856458022014239,
+      "validation_residuals": null,
+      "holdout_empirical_coverage": null,
+      "interval_status": "INSUFFICIENT_VALIDATION"
     },
     {
       "outcome": "funded",
       "tier": "A",
       "horizon": 3,
-      "model": "recent_3m",
-      "fallback": true,
-      "status": "TRAILING_BASELINE_FALLBACK",
-      "reason": "INSUFFICIENT_VALIDATION",
+      "model": "trailing_3m",
+      "status": "INSUFFICIENT_VALIDATION",
       "validation_n": 0,
-      "interval_offsets": [
-        -5.5,
-        4.0
-      ],
-      "total_interval_offsets": [
-        -15.666666666666671,
-        5.333333333333336
-      ]
+      "selection_model": null,
+      "validation_wape": null,
+      "validation_baseline_wape": null,
+      "holdout_n": 2269,
+      "holdout_wape": 0.30008945380777535,
+      "validation_residuals": null,
+      "holdout_empirical_coverage": null,
+      "interval_status": "INSUFFICIENT_VALIDATION"
     },
     {
       "outcome": "funded",
       "tier": "B",
       "horizon": 1,
-      "model": "blend_25",
-      "fallback": false,
-      "status": "SUPPORTED",
-      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
-      "validation_n": 25600,
-      "interval_offsets": [
-        -3.7209529004311,
-        3.5659276574533663
-      ],
-      "total_interval_offsets": [
-        -7.370585700156141,
-        6.092567630772322
-      ]
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "horizon": 2,
-      "model": "ewm",
-      "fallback": false,
-      "status": "SUPPORTED",
-      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
-      "validation_n": 25582,
-      "interval_offsets": [
-        -4.437424252232678,
-        3.212864962193631
-      ],
-      "total_interval_offsets": [
-        -8.88680188697257,
-        5.044052199825217
-      ]
-    },
-    {
-      "outcome": "funded",
-      "tier": "B",
-      "horizon": 3,
-      "model": "ewm",
-      "fallback": false,
-      "status": "SUPPORTED",
-      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
-      "validation_n": 25287,
-      "interval_offsets": [
-        -4.2557702082450515,
-        3.3208940532531623
-      ],
-      "total_interval_offsets": [
-        -8.88680188697257,
-        5.044052199825217
-      ]
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "horizon": 1,
-      "model": "blend_75",
-      "fallback": false,
-      "status": "SUPPORTED",
-      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
-      "validation_n": 23673,
-      "interval_offsets": [
-        -0.8889312910379492,
-        1.8235839934143425
-      ],
-      "total_interval_offsets": [
-        -1.2283315457149322,
-        4.1838569370167
-      ]
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "horizon": 2,
-      "model": "blend_50",
-      "fallback": false,
-      "status": "SUPPORTED",
-      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
-      "validation_n": 23755,
-      "interval_offsets": [
-        -1.0918797255935586,
-        1.6739975337056274
-      ],
-      "total_interval_offsets": [
-        -1.5947250713248486,
-        3.468520633658474
-      ]
-    },
-    {
-      "outcome": "funded",
-      "tier": "C",
-      "horizon": 3,
-      "model": "blend_50",
-      "fallback": false,
-      "status": "SUPPORTED",
-      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
-      "validation_n": 23056,
-      "interval_offsets": [
-        -1.1084636678392008,
-        1.363893638672898
-      ],
-      "total_interval_offsets": [
-        -1.5947250713248486,
-        3.468520633658474
-      ]
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "horizon": 1,
-      "model": "recent_3m",
-      "fallback": true,
+      "model": "trailing_3m",
       "status": "TRAILING_BASELINE_FALLBACK",
-      "reason": "INSUFFICIENT_VALIDATION",
-      "validation_n": 0,
-      "interval_offsets": [
-        -7.0,
-        4.666666666666667
-      ],
-      "total_interval_offsets": [
-        -20.0,
-        6.666666666666664
-      ]
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "horizon": 2,
-      "model": "recent_3m",
-      "fallback": true,
-      "status": "TRAILING_BASELINE_FALLBACK",
-      "reason": "INSUFFICIENT_VALIDATION",
-      "validation_n": 0,
-      "interval_offsets": [
-        -8.333333333333334,
-        4.333333333333334
-      ],
-      "total_interval_offsets": [
-        -20.0,
-        6.666666666666664
-      ]
-    },
-    {
-      "outcome": "application",
-      "tier": "A",
-      "horizon": 3,
-      "model": "recent_3m",
-      "fallback": true,
-      "status": "TRAILING_BASELINE_FALLBACK",
-      "reason": "INSUFFICIENT_VALIDATION",
-      "validation_n": 0,
-      "interval_offsets": [
-        -7.333333333333334,
+      "validation_n": 5983,
+      "selection_model": "linear_trend",
+      "validation_wape": 0.2990714837038897,
+      "validation_baseline_wape": 0.2819023632308348,
+      "holdout_n": 16601,
+      "holdout_wape": 0.2583717909103897,
+      "validation_residuals": [
+        -6.666666666666666,
         5.0
       ],
-      "total_interval_offsets": [
-        -20.0,
-        6.666666666666664
-      ]
+      "holdout_empirical_coverage": 0.8715740015661707,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "horizon": 2,
+      "model": "trailing_3m",
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "validation_n": 5786,
+      "selection_model": "trailing_3m",
+      "validation_wape": 0.44829158070537395,
+      "validation_baseline_wape": 0.44829158070537395,
+      "holdout_n": 16140,
+      "holdout_wape": 0.37479715907025324,
+      "validation_residuals": [
+        -7.666666666666666,
+        4.333333333333334
+      ],
+      "holdout_empirical_coverage": 0.8512391573729864,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "horizon": 3,
+      "model": "trailing_3m",
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "validation_n": 5517,
+      "selection_model": "linear_trend",
+      "validation_wape": 0.6024514692600123,
+      "validation_baseline_wape": 0.3610190420484825,
+      "holdout_n": 15864,
+      "holdout_wape": 0.39816068715151287,
+      "validation_residuals": [
+        -8.333333333333334,
+        4.0
+      ],
+      "holdout_empirical_coverage": 0.8363590519415027,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "horizon": 1,
+      "model": "trailing_3m",
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "validation_n": 3846,
+      "selection_model": "trailing_3m",
+      "validation_wape": 0.5207122590744546,
+      "validation_baseline_wape": 0.5207122590744546,
+      "holdout_n": 9363,
+      "holdout_wape": 0.49625352306317455,
+      "validation_residuals": [
+        -3.0,
+        3.666666666666666
+      ],
+      "holdout_empirical_coverage": 0.8090355655238706,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "horizon": 2,
+      "model": "trailing_3m",
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "validation_n": 3524,
+      "selection_model": "trailing_3m",
+      "validation_wape": 0.6413791629259117,
+      "validation_baseline_wape": 0.6413791629259117,
+      "holdout_n": 9294,
+      "holdout_wape": 0.5484442448287048,
+      "validation_residuals": [
+        -3.333333333333334,
+        3.666666666666667
+      ],
+      "holdout_empirical_coverage": 0.8162255218420487,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "horizon": 3,
+      "model": "trailing_3m",
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "validation_n": 3537,
+      "selection_model": "trailing_3m",
+      "validation_wape": 0.5693202867037127,
+      "validation_baseline_wape": 0.5693202867037127,
+      "holdout_n": 9210,
+      "holdout_wape": 0.5642576132886493,
+      "validation_residuals": [
+        -3.666666666666666,
+        3.666666666666667
+      ],
+      "holdout_empirical_coverage": 0.8086862106406081,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "horizon": 1,
+      "model": "trailing_3m",
+      "status": "INSUFFICIENT_VALIDATION",
+      "validation_n": 0,
+      "selection_model": null,
+      "validation_wape": null,
+      "validation_baseline_wape": null,
+      "holdout_n": 2336,
+      "holdout_wape": 0.23298994676428345,
+      "validation_residuals": null,
+      "holdout_empirical_coverage": null,
+      "interval_status": "INSUFFICIENT_VALIDATION"
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "horizon": 2,
+      "model": "trailing_3m",
+      "status": "INSUFFICIENT_VALIDATION",
+      "validation_n": 0,
+      "selection_model": null,
+      "validation_wape": null,
+      "validation_baseline_wape": null,
+      "holdout_n": 2315,
+      "holdout_wape": 0.2821156802707905,
+      "validation_residuals": null,
+      "holdout_empirical_coverage": null,
+      "interval_status": "INSUFFICIENT_VALIDATION"
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "horizon": 3,
+      "model": "trailing_3m",
+      "status": "INSUFFICIENT_VALIDATION",
+      "validation_n": 0,
+      "selection_model": null,
+      "validation_wape": null,
+      "validation_baseline_wape": null,
+      "holdout_n": 2269,
+      "holdout_wape": 0.2986348166897594,
+      "validation_residuals": null,
+      "holdout_empirical_coverage": null,
+      "interval_status": "INSUFFICIENT_VALIDATION"
     },
     {
       "outcome": "application",
       "tier": "B",
       "horizon": 1,
-      "model": "blend_25",
-      "fallback": false,
-      "status": "SUPPORTED",
-      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
-      "validation_n": 25600,
-      "interval_offsets": [
-        -4.299483748691796,
-        4.432328714705787
+      "model": "trailing_3m",
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "validation_n": 5983,
+      "selection_model": "linear_trend",
+      "validation_wape": 0.27415741853542547,
+      "validation_baseline_wape": 0.2476956618049969,
+      "holdout_n": 16601,
+      "holdout_wape": 0.2417260542346284,
+      "validation_residuals": [
+        -8.0,
+        5.666666666666666
       ],
-      "total_interval_offsets": [
-        -8.09036285140997,
-        7.22391121027702
-      ]
+      "holdout_empirical_coverage": 0.8645262333594361,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
     },
     {
       "outcome": "application",
       "tier": "B",
       "horizon": 2,
-      "model": "ewm",
-      "fallback": false,
-      "status": "SUPPORTED",
-      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
-      "validation_n": 25582,
-      "interval_offsets": [
-        -5.2518545520431115,
-        3.915657345196191
+      "model": "trailing_3m",
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "validation_n": 5786,
+      "selection_model": "trailing_3m",
+      "validation_wape": 0.46904659346970584,
+      "validation_baseline_wape": 0.46904659346970584,
+      "holdout_n": 16140,
+      "holdout_wape": 0.3502083789272544,
+      "validation_residuals": [
+        -9.333333333333332,
+        5.333333333333333
       ],
-      "total_interval_offsets": [
-        -9.775018832269453,
-        5.829539168597032
-      ]
+      "holdout_empirical_coverage": 0.8504337050805453,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
     },
     {
       "outcome": "application",
       "tier": "B",
       "horizon": 3,
-      "model": "ewm",
-      "fallback": false,
-      "status": "SUPPORTED",
-      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
-      "validation_n": 25287,
-      "interval_offsets": [
-        -5.181966015838476,
-        3.6462759196922665
+      "model": "trailing_3m",
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "validation_n": 5517,
+      "selection_model": "trailing_3m",
+      "validation_wape": 0.33230889825927123,
+      "validation_baseline_wape": 0.33230889825927123,
+      "holdout_n": 15864,
+      "holdout_wape": 0.3754891265817284,
+      "validation_residuals": [
+        -10.0,
+        5.0
       ],
-      "total_interval_offsets": [
-        -9.775018832269453,
-        5.829539168597032
-      ]
+      "holdout_empirical_coverage": 0.8391326273323247,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
     },
     {
       "outcome": "application",
       "tier": "C",
       "horizon": 1,
-      "model": "blend_75",
-      "fallback": false,
-      "status": "SUPPORTED",
-      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
-      "validation_n": 23673,
-      "interval_offsets": [
-        -1.1084029107230293,
-        1.9992539947307724
+      "model": "trailing_3m",
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "validation_n": 3846,
+      "selection_model": "trailing_3m",
+      "validation_wape": 0.4680364352942798,
+      "validation_baseline_wape": 0.4680364352942798,
+      "holdout_n": 9363,
+      "holdout_wape": 0.4541990843018602,
+      "validation_residuals": [
+        -4.333333333333333,
+        4.333333333333334
       ],
-      "total_interval_offsets": [
-        -1.3000550689866839,
-        5.42929311560898
-      ]
+      "holdout_empirical_coverage": 0.8167254085229093,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
     },
     {
       "outcome": "application",
       "tier": "C",
       "horizon": 2,
-      "model": "blend_50",
-      "fallback": false,
-      "status": "SUPPORTED",
-      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
-      "validation_n": 23755,
-      "interval_offsets": [
-        -1.436623418138776,
-        1.8516936502836272
+      "model": "trailing_3m",
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "validation_n": 3524,
+      "selection_model": "trailing_3m",
+      "validation_wape": 0.6020327655822156,
+      "validation_baseline_wape": 0.6020327655822156,
+      "holdout_n": 9294,
+      "holdout_wape": 0.49903044913788586,
+      "validation_residuals": [
+        -4.666666666666667,
+        4.666666666666667
       ],
-      "total_interval_offsets": [
-        -1.878400193216275,
-        4.986097698730051
-      ]
+      "holdout_empirical_coverage": 0.8126748439853669,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
     },
     {
       "outcome": "application",
       "tier": "C",
       "horizon": 3,
-      "model": "blend_75",
-      "fallback": false,
-      "status": "SUPPORTED",
-      "reason": "VALIDATED_BEATS_TRAILING_BASELINE",
-      "validation_n": 23056,
-      "interval_offsets": [
-        -1.1594325528787728,
-        1.9301397358695385
+      "model": "trailing_3m",
+      "status": "TRAILING_BASELINE_FALLBACK",
+      "validation_n": 3537,
+      "selection_model": "trailing_3m",
+      "validation_wape": 0.5253891852044578,
+      "validation_baseline_wape": 0.5253891852044578,
+      "holdout_n": 9210,
+      "holdout_wape": 0.5225549526989427,
+      "validation_residuals": [
+        -4.666666666666667,
+        4.666666666666667
       ],
-      "total_interval_offsets": [
-        -1.3000550689866839,
-        5.42929311560898
-      ]
+      "holdout_empirical_coverage": 0.8062975027144408,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
     }
   ],
-  "warnings": [
-    "Pending business gate: round2_feature_timestamp_lineage_audited",
-    "Pending business gate: lead_sample_weight_semantics_approved"
+  "interval_calibration": [
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "horizon": 1,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": null,
+      "holdout_n": 2336,
+      "interval_status": "INSUFFICIENT_VALIDATION"
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "horizon": 2,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": null,
+      "holdout_n": 2315,
+      "interval_status": "INSUFFICIENT_VALIDATION"
+    },
+    {
+      "outcome": "funded",
+      "tier": "A",
+      "horizon": 3,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": null,
+      "holdout_n": 2269,
+      "interval_status": "INSUFFICIENT_VALIDATION"
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "horizon": 1,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": 0.8715740015661707,
+      "holdout_n": 16601,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "horizon": 2,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": 0.8512391573729864,
+      "holdout_n": 16140,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "funded",
+      "tier": "B",
+      "horizon": 3,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": 0.8363590519415027,
+      "holdout_n": 15864,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "horizon": 1,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": 0.8090355655238706,
+      "holdout_n": 9363,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "horizon": 2,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": 0.8162255218420487,
+      "holdout_n": 9294,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "funded",
+      "tier": "C",
+      "horizon": 3,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": 0.8086862106406081,
+      "holdout_n": 9210,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "horizon": 1,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": null,
+      "holdout_n": 2336,
+      "interval_status": "INSUFFICIENT_VALIDATION"
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "horizon": 2,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": null,
+      "holdout_n": 2315,
+      "interval_status": "INSUFFICIENT_VALIDATION"
+    },
+    {
+      "outcome": "application",
+      "tier": "A",
+      "horizon": 3,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": null,
+      "holdout_n": 2269,
+      "interval_status": "INSUFFICIENT_VALIDATION"
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "horizon": 1,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": 0.8645262333594361,
+      "holdout_n": 16601,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "horizon": 2,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": 0.8504337050805453,
+      "holdout_n": 16140,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "application",
+      "tier": "B",
+      "horizon": 3,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": 0.8391326273323247,
+      "holdout_n": 15864,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "horizon": 1,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": 0.8167254085229093,
+      "holdout_n": 9363,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "horizon": 2,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": 0.8126748439853669,
+      "holdout_n": 9294,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    },
+    {
+      "outcome": "application",
+      "tier": "C",
+      "horizon": 3,
+      "model": "trailing_3m",
+      "nominal_coverage": 0.8,
+      "empirical_holdout_coverage": 0.8062975027144408,
+      "holdout_n": 9210,
+      "interval_status": "EMPIRICAL_COVERAGE_NEAR_NOMINAL"
+    }
   ],
-  "failed_checks": []
+  "pair": {
+    "status": "ILLUSTRATIVE_ONLY",
+    "pair_ids": [
+      "99180387",
+      "99363629"
+    ],
+    "selection_rule": "closest adjacent complete actuals within 10%, same available category/model, peer n>=30; lead-match contrast breaks ties",
+    "peer_group": "Small|Non-Aldi",
+    "peer_support": 5593,
+    "actual_delta_pct": 0.0,
+    "current_actual_3m_funded": {
+      "99180387": 2.0,
+      "99363629": 2.0
+    },
+    "bau_3m_total": {
+      "99180387": {
+        "point": 2.0,
+        "lo": 0.0,
+        "hi": 15.333333333333336
+      },
+      "99363629": {
+        "point": 2.0,
+        "lo": 0.0,
+        "hi": 13.0
+      }
+    },
+    "reliability_diagnostics": {
+      "99180387": {
+        "actual_observed_months_of_3": 3,
+        "observation_quality_state": "COMPLETE_3M_OBSERVED",
+        "last_recorded_activity": "2026-09-01T00:00:00",
+        "recent_observations": [
+          {
+            "month": "2026-04-01T00:00:00",
+            "observed": true,
+            "funded": 4.0,
+            "applications": 4.0
+          },
+          {
+            "month": "2026-05-01T00:00:00",
+            "observed": true,
+            "funded": 1.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-06-01T00:00:00",
+            "observed": true,
+            "funded": 1.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-07-01T00:00:00",
+            "observed": true,
+            "funded": 0.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-08-01T00:00:00",
+            "observed": true,
+            "funded": 1.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-09-01T00:00:00",
+            "observed": true,
+            "funded": 1.0,
+            "applications": 2.0
+          }
+        ],
+        "partial_3m_observed_funded_sum": 2.0,
+        "recent_lead_rows": 11.0,
+        "recent_lead_uuids": 11.0,
+        "lead_match_rate": 0.0,
+        "forecast_path": []
+      },
+      "99363629": {
+        "actual_observed_months_of_3": 3,
+        "observation_quality_state": "COMPLETE_3M_OBSERVED",
+        "last_recorded_activity": "2026-09-01T00:00:00",
+        "recent_observations": [
+          {
+            "month": "2026-04-01T00:00:00",
+            "observed": false,
+            "funded": null,
+            "applications": null
+          },
+          {
+            "month": "2026-05-01T00:00:00",
+            "observed": true,
+            "funded": 0.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-06-01T00:00:00",
+            "observed": false,
+            "funded": null,
+            "applications": null
+          },
+          {
+            "month": "2026-07-01T00:00:00",
+            "observed": true,
+            "funded": 1.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-08-01T00:00:00",
+            "observed": true,
+            "funded": 1.0,
+            "applications": 1.0
+          },
+          {
+            "month": "2026-09-01T00:00:00",
+            "observed": true,
+            "funded": 0.0,
+            "applications": 1.0
+          }
+        ],
+        "partial_3m_observed_funded_sum": 2.0,
+        "recent_lead_rows": 3.0,
+        "recent_lead_uuids": 3.0,
+        "lead_match_rate": 1.0,
+        "forecast_path": []
+      }
+    },
+    "reliability_reasons": [
+      "99180387:DESCRIPTIVE_ONLY_BAU",
+      "99363629:DESCRIPTIVE_ONLY_BAU"
+    ],
+    "causal_claim": false
+  },
+  "checks": [
+    {
+      "check": "phase1_revision2_gate",
+      "observed": "SUCCESS",
+      "expected": "SUCCESS",
+      "status": "PASS"
+    },
+    {
+      "check": "application_rows_reconcile",
+      "observed": 3775371.0,
+      "expected": 3775371,
+      "status": "PASS"
+    },
+    {
+      "check": "forecast_keys_unique",
+      "observed": 0,
+      "expected": 0,
+      "status": "PASS"
+    },
+    {
+      "check": "targets_after_origin",
+      "observed": true,
+      "expected": true,
+      "status": "PASS"
+    },
+    {
+      "check": "missing_contract_observations_not_zero",
+      "observed": 0,
+      "expected": 0,
+      "status": "PASS"
+    },
+    {
+      "check": "3M_TOTAL_reconciles_horizons",
+      "observed": 0,
+      "expected": 0,
+      "status": "PASS"
+    },
+    {
+      "check": "reliability_fields_present",
+      "observed": true,
+      "expected": true,
+      "status": "PASS"
+    },
+    {
+      "check": "pair_actual_coverage_status",
+      "observed": "ILLUSTRATIVE_ONLY",
+      "expected": "downgraded if actual incomplete",
+      "status": "PASS"
+    }
+  ],
+  "assumptions": {
+    "current_actual": "Only complete three-month contract-observed windows; incomplete windows are null.",
+    "BAU": "Trailing mean of up to three prior observed months or linear trend over six prior observations; no seasonal or causal claim.",
+    "intervals": "Validation residual ranges checked on holdout; descriptive only, never claimed calibrated at 80%.",
+    "pair": "A05: closest adjacent complete actuals within ±10%, same available category/model, minimum peer n=30; observed lead-match contrast breaks ties; unmatched-master shops do not form one pseudo-peer group."
+  },
+  "task2_usage": "Quantitative potential gaps may use only EVIDENCE_QUALIFIED_BAU; DESCRIPTIVE_ONLY forecasts are excluded."
 }

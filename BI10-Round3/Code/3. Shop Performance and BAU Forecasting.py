@@ -1,1811 +1,580 @@
-"""Task 1: shop performance, comparable peers, and Business-as-Usual forecasting."""
-
+"""Task 1: clear shop actuals, a transparent BAU baseline, and a matched-shop case."""
 from __future__ import annotations
 
 import json
 import math
-import re
-from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
 import duckdb
 import matplotlib
-
 matplotlib.use("Agg")
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
 import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR = ROOT / "Data_clean"
-OUTPUT_DIR = ROOT / "output" / "Shop_Performance_and_BAU"
-PHASE1_METRICS = DATA_DIR / "metrics_phase1.json"
-PHASE1_VALIDATION = ROOT / "output" / "Data processing" / "validation_report.json"
-PHASE2_MONTHLY = ROOT / "output" / "EDA" / "cache" / "fnd02_monthly.parquet"
-SHOP_MONTH_SOURCE = DATA_DIR / "shop_month_foundation.parquet"
-LEAD_PRODUCT_SOURCE = DATA_DIR / "lead_shop_month_product.parquet"
-CONTRACT_SOURCE = DATA_DIR / "contract_clean.parquet"
-LEAD_SOURCE = DATA_DIR / "leads_clean.parquet"
-
-OUTCOMES = {
-    "funded": "funded_contract_count",
-    "application": "contract_application_event_rows",
-}
-PRIMARY_OUTCOME = "funded"
+DATA = ROOT / "Data_clean"
+OUT = ROOT / "output" / "Shop_Performance_and_BAU"
+GATE = ROOT / "output" / "Data processing" / "validation_report.json"
+DPI = 200
+OUTCOMES = {"funded": "funded_contract_count", "application": "contract_application_event_rows"}
 HORIZONS = (1, 2, 3)
-TOTAL_HORIZON = "3M_TOTAL"
-TIER_MINIMUMS = ((18, "A"), (9, "B"), (3, "C"))
-MIN_PEER_SIZE = 30
-MIN_TIER_EVAL = 15
-MIN_RIDGE_TRAIN_ROWS = 120
-RIDGE_ALPHA = 8.0
-BLEND_WEIGHTS = (0.25, 0.50, 0.75)
-INTERVAL_QUANTILES = (0.10, 0.90)
-FORECAST_DPI = 200
-NOMINAL_INTERVAL = INTERVAL_QUANTILES[1] - INTERVAL_QUANTILES[0]
-MIN_PAIR_ACTUAL = 10
-
-COLORS = {
-    "primary": "#004AAD",
-    "secondary": "#4472C4",
-    "mid": "#8FAAD1",
-    "risk": "#C51E1E",
-    "muted": "#6B7280",
-    "grid": "#E4E8ED",
-    "white": "#FFFFFF",
-}
-plt.rcParams.update(
-    {
-        "font.family": "Arial",
-        "font.size": 8.5,
-        "figure.facecolor": COLORS["white"],
-        "axes.facecolor": COLORS["white"],
-        "savefig.facecolor": COLORS["white"],
-        "text.color": "#16324F",
-        "axes.labelcolor": COLORS["muted"],
-        "xtick.color": COLORS["muted"],
-        "ytick.color": COLORS["muted"],
-        "axes.spines.top": False,
-        "axes.spines.right": False,
-        "axes.spines.left": False,
-        "axes.grid": True,
-        "grid.color": COLORS["grid"],
-        "grid.linewidth": 0.5,
-        "axes.axisbelow": True,
-    }
-)
-
-
-def read_json(path: Path) -> dict[str, Any]:
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+TOTAL = "3M_TOTAL"
+TIERS = ((18, "A"), (9, "B"), (3, "C"))
+MIN_EVAL = 15
+MIN_INTERVAL_EVAL = 30
+NOMINAL = .80
+COLORS = {"blue": "#004AAD", "navy": "#14213d", "mid": "#8FAAD1", "red": "#C51E1E", "gray": "#6B7280", "grid": "#E4E8ED"}
+plt.rcParams.update({"font.family": "Arial", "font.size": 8, "figure.facecolor": "white", "axes.facecolor": "white", "savefig.facecolor": "white", "axes.spines.top": False, "axes.spines.right": False, "axes.grid": True, "grid.color": COLORS["grid"], "axes.axisbelow": True})
 
 
 def json_safe(value: Any) -> Any:
-    if isinstance(value, pd.DataFrame):
-        return json_safe(value.to_dict("records"))
-    if isinstance(value, pd.Series):
-        return json_safe(value.to_dict())
-    if isinstance(value, dict):
-        return {str(key): json_safe(item) for key, item in value.items()}
-    if isinstance(value, (list, tuple)):
-        return [json_safe(item) for item in value]
-    if isinstance(value, (float, np.floating)):
-        return float(value) if math.isfinite(float(value)) else None
-    if isinstance(value, np.integer):
-        return int(value)
-    if isinstance(value, np.bool_):
-        return bool(value)
-    if isinstance(value, (pd.Timestamp, datetime, date)):
-        return value.isoformat()
-    try:
-        return None if pd.isna(value) else value
-    except (TypeError, ValueError):
-        return str(value)
+    if isinstance(value, pd.DataFrame): return json_safe(value.to_dict("records"))
+    if isinstance(value, pd.Series): return json_safe(value.to_dict())
+    if isinstance(value, dict): return {str(k): json_safe(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)): return [json_safe(v) for v in value]
+    if isinstance(value, (pd.Timestamp,)): return value.isoformat()
+    if isinstance(value, (np.integer,)): return int(value)
+    if isinstance(value, (np.bool_,)): return bool(value)
+    if isinstance(value, (float, np.floating)): return float(value) if math.isfinite(float(value)) else None
+    if pd.isna(value): return None
+    return value
 
 
 def write_json(path: Path, payload: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(json_safe(payload), ensure_ascii=False, indent=2, allow_nan=False)
-        + "\n",
-        encoding="utf-8",
-    )
+    path.write_text(json.dumps(json_safe(payload), ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
 
 
-def sql_path(path: Path) -> str:
-    return "'" + path.resolve().as_posix().replace("'", "''") + "'"
+def canonical_shop_key(values: pd.Series) -> pd.Series:
+    text = values.astype("Int64").astype("string")
+    return text.fillna("__UNKNOWN_SHOP__")
 
 
-def month_start(value: Any) -> pd.Timestamp:
-    return pd.Timestamp(value).to_period("M").to_timestamp()
+def horizon_total_mismatches(parts: pd.DataFrame, totals: pd.DataFrame) -> int:
+    keys = ["shop_key", "outcome"]
+    grouped = parts.groupby(keys, as_index=False).point.agg(["sum", "count"]).reset_index()
+    checked = totals[keys + ["point"]].merge(grouped, on=keys, how="left", validate="one_to_one")
+    has_total = checked.point.notna()
+    invalid = has_total & ((checked["count"] != len(HORIZONS)) | checked["sum"].isna()
+                           | ((checked.point - checked["sum"]).abs() > 1e-8))
+    return int(invalid.sum())
 
 
-def save_figure(fig: plt.Figure, figure_id: str) -> Path:
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    path = OUTPUT_DIR / f"{figure_id}.png"
-    fig.savefig(
-        path,
-        format="png",
-        dpi=FORECAST_DPI,
-        facecolor=COLORS["white"],
-        edgecolor=COLORS["white"],
-        transparent=False,
-    )
-    plt.close(fig)
-    return path
-
-
-def compact_axis(ax: plt.Axes, axis: str = "y") -> None:
-    formatter = mtick.FuncFormatter(lambda value, _: f"{value:,.3g}")
-    (ax.yaxis if axis == "y" else ax.xaxis).set_major_formatter(formatter)
+def complete_window_sum(values, observed) -> tuple[float | None, int]:
+    values, observed = np.asarray(values, dtype=float), np.asarray(observed, dtype=bool)
+    valid = observed & np.isfinite(values)
+    count = int(valid.sum())
+    return (float(values[valid].sum()), count) if count == len(values) else (None, count)
 
 
 def tier_for_counts(counts: np.ndarray) -> np.ndarray:
-    return np.select(
-        [counts >= minimum for minimum, _ in TIER_MINIMUMS],
-        [tier for _, tier in TIER_MINIMUMS],
-        default="D",
-    )
+    counts = np.asarray(counts, dtype=int)
+    return np.select([counts >= n for n, _ in TIERS], [tier for _, tier in TIERS], default="D")
 
 
-# ---------------------------------------------------------------- inputs
-
-
-def load_window() -> dict[str, Any]:
-    gate = read_json(PHASE1_VALIDATION)
-    if gate.get("execution_status") != "SUCCESS" or gate.get("fatal_failures"):
-        raise RuntimeError(
-            "Phase 1 validation status is not SUCCESS; Task 1 will not proceed."
-        )
-    warnings = [
-        f"Pending business gate: {name}"
-        for name in gate.get("business_gates_pending", [])
-    ]
-    metrics = read_json(PHASE1_METRICS)
-    con = duckdb.connect(database=":memory:")
-    try:
-        names = [
-            row[0]
-            for row in con.execute(
-                f"DESCRIBE SELECT * FROM read_parquet({sql_path(SHOP_MONTH_SOURCE)})"
-            ).fetchall()
-        ]
-        optional = {
-            "funded_contract_count": "NULL::BIGINT AS funded_contract_count",
-            "active_headcount_proxy": "NULL::BIGINT AS active_headcount_proxy",
-            "lifecycle_state": "NULL::VARCHAR AS lifecycle_state",
-            "first_activity_month": "NULL::DATE AS first_activity_month",
-            "last_activity_month": "NULL::DATE AS last_activity_month",
-            "assigned_employee_count_raw": "NULL::BIGINT AS assigned_employee_count_raw",
-            "distinct_lead_uuids": "NULL::BIGINT AS distinct_lead_uuids",
-        }
-        present = {name for name in optional if name in names}
-        projection = [
-            "CAST(skp_salesroom_id AS VARCHAR) AS shop_id",
-            "CAST(month_start AS DATE) AS month_start",
-            "salesroom_category",
-            "salesroom_model",
-            "salesroom_status",
-            "shop_master_state",
-            "event_coverage_state",
-            "contract_application_event_rows",
-            "lead_event_rows",
-            "headcount_proxy_state",
-        ]
-        for name, fallback in optional.items():
-            projection.append(name if name in present else fallback)
-        panel = con.execute(
-            "SELECT " + ", ".join(projection) + f" FROM read_parquet({sql_path(SHOP_MONTH_SOURCE)})"
-        ).df()
-        contract_min, contract_max = con.execute(
-            f"SELECT min(date_apply_ts)::DATE, max(date_apply_ts)::DATE FROM read_parquet({sql_path(CONTRACT_SOURCE)}) "
-            "WHERE date_apply_ts IS NOT NULL"
-        ).fetchone()
-        lead_min, lead_max = con.execute(
-            f"SELECT min(date_assigned_ts)::DATE, max(date_assigned_ts)::DATE FROM read_parquet({sql_path(LEAD_SOURCE)}) "
-            "WHERE date_assigned_ts IS NOT NULL"
-        ).fetchone()
-        funded_by_month = con.execute(
-            f"SELECT date_trunc('month', date_apply_ts)::DATE AS m, count(*) FILTER (WHERE is_funded) AS funded, "
-            f"count(*) AS applications FROM read_parquet({sql_path(CONTRACT_SOURCE)}) "
-            "WHERE date_apply_ts IS NOT NULL GROUP BY 1"
-        ).df()
-    finally:
-        con.close()
-    history_start = month_start(contract_min)
-    latest_candidate = month_start(contract_max)
-    month_end = latest_candidate + pd.offsets.MonthEnd(0)
-    latest_complete = (
-        latest_candidate
-        if pd.Timestamp(contract_max) == month_end
-        else latest_candidate - pd.offsets.MonthBegin(1)
-    )
-    lead_start = month_start(lead_min)
-    lead_month = month_start(lead_max)
-    partial_lead = (
-        lead_month
-        if pd.Timestamp(lead_max) < lead_month + pd.offsets.MonthEnd(0)
-        else None
-    )
-    return {
-        "panel": panel,
-        "metrics": metrics,
-        "gate": gate,
-        "warnings": warnings,
-        "history_start": history_start,
-        "latest_complete": latest_complete,
-        "lead_start": lead_start,
-        "partial_lead": partial_lead,
-        "optional_missing": sorted(set(optional) - present),
-        "optional_present": sorted(present),
-        "funded_by_month": funded_by_month,
-        "contract_max": contract_max,
-        "lead_max": lead_max,
-    }
-
-
-def prepare_panel(
-    raw: pd.DataFrame, context: dict[str, Any]
-) -> tuple[pd.DataFrame, pd.DatetimeIndex]:
-    panel = raw.copy()
-    panel["month_start"] = pd.to_datetime(panel.month_start)
-    panel["shop_key"] = panel.shop_id.fillna("UNKNOWN_SHOP_ID").astype(str)
-    for column in (
-        "contract_application_event_rows",
-        "funded_contract_count",
-        "lead_event_rows",
-        "active_headcount_proxy",
-        "assigned_employee_count_raw",
-        "distinct_lead_uuids",
-    ):
-        panel[column] = pd.to_numeric(panel[column], errors="coerce")
-    panel["contract_observed"] = panel.event_coverage_state.eq(
-        "OBSERVED_EVENT_ROWS"
-    ) & panel.month_start.le(context["latest_complete"])
-    for outcome, column in OUTCOMES.items():
-        values = panel[column].astype(float)
-        panel[f"{outcome}_observed_value"] = values.where(panel.contract_observed)
-    panel = panel.drop(
-        columns=[column for column in ("first_activity_month", "last_activity_month", "lifecycle_state")
-                 if column in panel.columns]
-    )
-    observed = (
-        panel[panel.contract_observed]
-        .groupby("shop_key")
-        .month_start.agg(["min", "max", "count"])
-    )
-    observed.columns = [
-        "first_activity_month",
-        "last_activity_month",
-        "observed_months",
-    ]
-    panel = panel.merge(observed, on="shop_key", how="left", validate="many_to_one")
-    panel["lifecycle_state"] = np.select(
-        [
-            panel.first_activity_month.isna(),
-            panel.month_start.lt(panel.first_activity_month),
-            panel.month_start.gt(panel.last_activity_month),
-        ],
-        ["NO_OBSERVED_ACTIVITY", "PRE_LIFECYCLE", "POST_LIFECYCLE"],
-        default="IN_LIFECYCLE",
-    )
-    panel["dormant_flag"] = panel.last_activity_month.notna() & (
-        panel.last_activity_month < context["latest_complete"] - pd.DateOffset(months=2)
-    )
-    months = pd.date_range(
-        context["history_start"], context["latest_complete"], freq="MS"
-    )
-    panel["in_window"] = panel.month_start.between(
-        context["history_start"], context["latest_complete"]
-    )
-    return panel.loc[panel.in_window].copy(), months
-
-
-def lead_product_features() -> pd.DataFrame:
-    con = duckdb.connect(database=":memory:")
-    try:
-        frame = con.execute(f"""
-            SELECT CAST(lead_origin_shop_id AS VARCHAR) AS shop_key,
-                   CAST(month_start AS DATE) AS month_start,
-                   COALESCE(CAST(lead_product_code AS VARCHAR), 'Unspecified') AS product_code,
-                   SUM(lead_event_rows)::BIGINT AS lead_rows
-            FROM read_parquet({sql_path(LEAD_PRODUCT_SOURCE)})
-            GROUP BY 1, 2, 3
-        """).df()
-    finally:
-        con.close()
-    frame["month_start"] = pd.to_datetime(frame.month_start)
-    return frame
-
-
-def build_summary(
-    panel: pd.DataFrame,
-    context: dict[str, Any],
-    months: pd.DatetimeIndex,
-    lead_product: pd.DataFrame,
-) -> pd.DataFrame:
-    latest = context["latest_complete"]
-    recent = [latest - pd.offsets.MonthBegin(offset) for offset in (2, 1, 0)]
-    window = panel[panel.lifecycle_state.eq("IN_LIFECYCLE")].copy()
-    grouped = window.groupby("shop_key")
-    summary = grouped.agg(
-        shop_id=("shop_id", "first"),
-        salesroom_category=("salesroom_category", "first"),
-        salesroom_model=("salesroom_model", "first"),
-        salesroom_status=("salesroom_status", "first"),
-        shop_master_state=("shop_master_state", "first"),
-        lifecycle_state=("lifecycle_state", "first"),
-        first_activity_month=("first_activity_month", "first"),
-        last_activity_month=("last_activity_month", "first"),
-        dormant_flag=("dormant_flag", "first"),
-        observed_months=("contract_observed", "sum"),
-        in_lifecycle_months=("month_start", "nunique"),
-    ).reset_index()
-    summary["in_lifecycle_zero_event_months"] = (
-        summary.in_lifecycle_months - summary.observed_months
-    ).clip(lower=0).astype(int)
-    for outcome in OUTCOMES:
-        value = window[f"{outcome}_observed_value"]
-        one_month = (
-            window[window.month_start.eq(latest)]
-            .groupby("shop_key")[f"{outcome}_observed_value"]
-            .sum(min_count=1)
-        )
-        three_month = (
-            window[window.month_start.isin(recent)]
-            .groupby("shop_key")[f"{outcome}_observed_value"]
-            .sum(min_count=1)
-        )
-        summary[f"current_actual_1m_{outcome}"] = summary.shop_key.map(one_month)
-        summary[f"current_actual_3m_{outcome}"] = summary.shop_key.map(three_month)
-        del value
-    recent_rows = window[window.month_start.isin(recent)]
-    summary["lead_rows_3m"] = summary.shop_key.map(
-        recent_rows.groupby("shop_key").lead_event_rows.sum(min_count=1)
-    )
-    summary["lead_uuids_3m"] = summary.shop_key.map(
-        recent_rows.groupby("shop_key").distinct_lead_uuids.sum(min_count=1)
-    )
-    summary["assigned_headcount_proxy_3m"] = summary.shop_key.map(
-        recent_rows.groupby("shop_key").active_headcount_proxy.mean()
-    )
-    summary["observed_history_tier"] = tier_for_counts(
-        summary.observed_months.to_numpy(dtype=int)
-    )
-    summary["identified_shop_id"] = summary.shop_id.notna()
-    summary["peer_group"] = pd.Series(
-        summary.salesroom_category.astype(str)
-        + " | "
-        + summary.salesroom_model.astype(str),
-        index=summary.index,
-    ).where(summary.salesroom_category.notna() & summary.salesroom_model.notna())
-    peer_stats = (
-        summary[
-            summary.peer_group.notna()
-            & summary[f"current_actual_3m_{PRIMARY_OUTCOME}"].notna()
-        ]
-        .groupby("peer_group")[f"current_actual_3m_{PRIMARY_OUTCOME}"]
-        .agg(
-            peer_n="count",
-            peer_median="median",
-            peer_q1=lambda values: values.quantile(0.25),
-            peer_q3=lambda values: values.quantile(0.75),
-        )
-        .reset_index()
-    )
-    summary = summary.merge(peer_stats, on="peer_group", how="left")
-    summary["peer_supported"] = summary.peer_n.ge(MIN_PEER_SIZE)
-    eligible = (
-        summary.identified_shop_id
-        & summary.lifecycle_state.eq("IN_LIFECYCLE")
-        & ~summary.dormant_flag
-        & summary.observed_months.ge(3)
-    )
-    summary["forecast_eligible"] = eligible
-    summary["eligibility_status"] = np.select(
-        [
-            ~summary.identified_shop_id,
-            summary.dormant_flag,
-            summary.observed_months.lt(3),
-            eligible,
-        ],
-        [
-            "UNKNOWN_SHOP_ID_AGGREGATE",
-            "DORMANT_NO_RECENT_ACTIVITY",
-            "TIER_D_LT3_OBSERVED_MONTHS",
-            "ELIGIBLE_FOR_FORECAST",
-        ],
-        default="NOT_ELIGIBLE",
-    )
-    latest_product = lead_product[lead_product.month_start.isin(recent)]
-    mix = (
-        latest_product.groupby(["shop_key", "product_code"])
-        .lead_rows.sum()
-        .unstack(fill_value=0)
-    )
-    mix = mix.div(mix.sum(axis=1).replace(0, np.nan), axis=0)
-    mix_map = {
-        str(key): {str(code): float(value) for code, value in row.dropna().items()}
-        for key, row in mix.iterrows()
-    }
-    summary["lead_product_mix_3m"] = (
-        summary.shop_key.map(mix_map)
-        .apply(lambda value: value if isinstance(value, dict) else {})
-    )
-    return summary
-
-
-# ---------------------------------------------------------------- model features
-
-
-def history_features(
-    y: np.ndarray, observed: np.ndarray, target_index: int, months: pd.DatetimeIndex
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, dict[str, np.ndarray]]:
-    hist = y[:, :target_index]
-    mask = observed[:, :target_index]
-    counts = mask.sum(axis=1).astype(int)
-    tiers = tier_for_counts(counts)
-    calendar = np.broadcast_to(np.arange(target_index), mask.shape)
-    observed_index = np.where(mask, calendar, -1)
-    last_index = observed_index.max(axis=1)
-    safe = np.nan_to_num(hist, nan=0.0)
-    rows = np.arange(len(y))
-    last_value = safe[rows, np.maximum(last_index, 0)]
-    last_three = np.sort(observed_index, axis=1)[:, -3:]
-    valid_three = last_three >= 0
-    values_three = np.take_along_axis(safe, np.maximum(last_three, 0), axis=1)
-    recent_mean = (values_three * valid_three).sum(axis=1) / np.maximum(
-        valid_three.sum(axis=1), 1
-    )
-    ages = np.maximum(target_index - 1 - last_three, 0)
-    weights = np.exp(-0.30 * ages) * valid_three
-    ewm = (values_three * weights).sum(axis=1) / np.maximum(weights.sum(axis=1), 1e-12)
-    seasonal = recent_mean.copy()
-    if target_index >= 12:
-        seasonal_index = target_index - 12
-        valid = mask[:, seasonal_index]
-        seasonal[valid] = hist[valid, seasonal_index]
-    gap = np.where(last_index >= 0, target_index - 1 - last_index, 36)
-    target_month = months[target_index] if target_index < len(months) else months[-1]
-    angle = 2 * math.pi * int(target_month.month) / 12
-    features = np.column_stack(
-        [
-            np.log1p(np.maximum(last_value, 0)),
-            np.log1p(np.maximum(recent_mean, 0)),
-            np.log1p(np.maximum(ewm, 0)),
-            np.log1p(np.maximum(seasonal, 0)),
-            np.minimum(gap, 36),
-            np.log1p(counts),
-            np.full(len(y), math.sin(angle)),
-            np.full(len(y), math.cos(angle)),
-        ]
-    )
-    return (
-        counts,
-        tiers,
-        features,
-        {"recent_3m": recent_mean, "ewm": ewm, "naive": seasonal},
-    )
-
-
-def fit_ridge(
-    y: np.ndarray, observed: np.ndarray, origin: int, months: pd.DatetimeIndex
-):
-    designs, targets, shops = [], [], []
-    for target_index in range(len(TIER_MINIMUMS) + 3, origin):
-        counts, tiers, features, _ = history_features(y, observed, target_index, months)
-        keep = (tiers != "D") & (counts >= 3) & observed[:, target_index]
-        if not keep.any():
-            continue
-        designs.append(add_tier_indicators(features[keep], tiers[keep]))
-        targets.append(np.log1p(np.maximum(y[keep, target_index], 0)))
-        shops.append(keep)
-    if not targets:
+def trend_forecast(y: np.ndarray, observed: np.ndarray, month_indices: np.ndarray, origin: int,
+                   horizon: int, min_history: int = 3) -> np.ndarray | None:
+    y, observed = np.asarray(y, float), np.asarray(observed, bool)
+    indices = np.asarray(month_indices, float)
+    use = observed & np.isfinite(y) & np.isfinite(indices) & (indices < origin)
+    selected = np.flatnonzero(use)[-6:]
+    if len(selected) < min_history:
         return None
-    design = np.vstack(designs)
-    target = np.concatenate(targets)
-    if (
-        len(target) < MIN_RIDGE_TRAIN_ROWS
-        or sum(int(mask.sum()) for mask in shops) < MIN_PEER_SIZE
-    ):
+    slope, intercept = np.polyfit(indices[selected], y[selected], 1)
+    return np.maximum(0.0, intercept + slope * np.arange(origin, origin + horizon))
+
+
+def trailing_forecast(y: np.ndarray, observed: np.ndarray, origin: int, horizon: int, window: int = 3) -> np.ndarray | None:
+    y, observed = np.asarray(y, float), np.asarray(observed, bool)
+    selected = np.flatnonzero(observed[:origin] & np.isfinite(y[:origin]))[-window:]
+    if len(selected) < 3:
         return None
-    mean, scale = design.mean(axis=0), design.std(axis=0)
-    scale[scale == 0] = 1.0
-    normalized = np.column_stack([np.ones(len(design)), (design - mean) / scale])
-    penalty = np.eye(normalized.shape[1]) * RIDGE_ALPHA
-    penalty[0, 0] = 0.0
-    coefficients = np.linalg.solve(
-        normalized.T @ normalized + penalty, normalized.T @ target
-    )
-    return mean, scale, coefficients
-
-
-def add_tier_indicators(features: np.ndarray, tiers: np.ndarray) -> np.ndarray:
-    indicators = np.column_stack(
-        [(tiers == tier).astype(float) for _, tier in TIER_MINIMUMS]
-    )
-    return np.column_stack([features, indicators])
-
-
-def ridge_predict(features: np.ndarray, model) -> np.ndarray:
-    mean, scale, coefficients = model
-    design = np.column_stack([np.ones(len(features)), (features - mean) / scale])
-    return np.maximum(0.0, np.expm1(np.clip(design @ coefficients, -20, 20)))
-
-
-MODEL_NAMES = ["naive", "recent_3m", "ewm", "tier_peer_median", "ridge"] + [
-    f"blend_{int(weight * 100)}" for weight in BLEND_WEIGHTS
-]
-
-
-def step_predictions(
-    y: np.ndarray,
-    observed: np.ndarray,
-    target_index: int,
-    months: pd.DatetimeIndex,
-    ridge_model,
-) -> tuple[np.ndarray, dict[str, np.ndarray]]:
-    counts, tiers, features, stats = history_features(y, observed, target_index, months)
-    predictions = {
-        "naive": stats["naive"],
-        "recent_3m": stats["recent_3m"],
-        "ewm": stats["ewm"],
-        "tier_peer_median": np.full(len(y), np.nan),
-        "ridge": np.full(len(y), np.nan),
-    }
-    for _, tier in TIER_MINIMUMS:
-        peers = (tiers == tier) & (counts >= 3)
-        if peers.sum() >= MIN_PEER_SIZE:
-            predictions["tier_peer_median"][peers] = float(
-                np.median(stats["recent_3m"][peers])
-            )
-    if ridge_model is not None:
-        eligible = (tiers != "D") & (counts >= 3)
-        predictions["ridge"][eligible] = ridge_predict(
-            add_tier_indicators(features[eligible], tiers[eligible]), ridge_model
-        )
-    for weight in BLEND_WEIGHTS:
-        key = f"blend_{int(weight * 100)}"
-        valid = np.isfinite(predictions["ridge"]) & np.isfinite(predictions["ewm"])
-        predictions[key] = np.full(len(y), np.nan)
-        predictions[key][valid] = (
-            weight * predictions["ridge"][valid]
-            + (1 - weight) * predictions["ewm"][valid]
-        )
-    return tiers, predictions
-
-
-def simulate_paths(
-    y: np.ndarray,
-    observed: np.ndarray,
-    origin: int,
-    months: pd.DatetimeIndex,
-    ridge_model,
-    steps: int,
-) -> tuple[np.ndarray, np.ndarray]:
-    history, mask = y, observed
-    paths = []
-    for step in range(steps):
-        tiers, predictions = step_predictions(
-            history, mask, origin + step, months, ridge_model
-        )
-        step_matrix = np.column_stack([predictions[name] for name in MODEL_NAMES])
-        paths.append(step_matrix)
-        for name_index, name in enumerate(MODEL_NAMES):
-            history = np.concatenate([history, predictions[name][:, None]], axis=1)
-            mask = np.concatenate([mask, np.ones((len(y), 1), dtype=bool)], axis=1)
-    return np.stack(paths, axis=1), tiers
-
-
-# ---------------------------------------------------------------- backtest
+    return np.repeat(float(y[selected].mean()), horizon)
 
 
 def split_origins(origin_min: int, origin_max: int) -> dict[str, list[int]]:
     origins = list(range(origin_min, origin_max + 1))
     if len(origins) < 3:
-        return {"selection": origins, "validation": origins, "holdout": origins}
-    selection_end = max(1, int(round(len(origins) * 0.55)))
-    validation_end = max(selection_end + 1, int(round(len(origins) * 0.80)))
-    return {
-        "selection": origins[:selection_end],
-        "validation": origins[selection_end:validation_end],
-        "holdout": origins[validation_end:],
-    }
+        return {"selection": origins[:1], "validation": origins[1:2], "holdout": origins[2:]}
+    a = max(1, round(len(origins) * .55))
+    b = max(a + 1, round(len(origins) * .80))
+    return {"selection": origins[:a], "validation": origins[a:b], "holdout": origins[b:]}
 
 
-def run_backtest(
-    y: np.ndarray, observed: np.ndarray, months: pd.DatetimeIndex, outcome: str
-) -> dict[str, Any]:
-    origin_min = len(TIER_MINIMUMS) + 3
-    origin_max = len(months) - max(HORIZONS)
+def peer_potential(values, minimum: int = 30) -> dict[str, Any]:
+    v = np.asarray(values, float)
+    v = v[np.isfinite(v)]
+    if len(v) < minimum:
+        return {"status": "INSUFFICIENT_PEER_SUPPORT", "n": int(len(v)), "p50": None, "p75": None, "p90": None}
+    return {"status": "SUPPORTED_PEER_BENCHMARK", "n": int(len(v)),
+            "p50": float(np.quantile(v, .5)), "p75": float(np.quantile(v, .75)), "p90": float(np.quantile(v, .9))}
+
+
+def select_similar_pair(frame: pd.DataFrame, tolerance: float = .10) -> dict[str, Any] | None:
+    candidates = frame[frame.current_actual_3m.notna() & frame.peer_group.notna()
+                      & frame.peer_group.ne("UNMAPPED_MASTER")
+                      & pd.to_numeric(frame.peer_n, errors="coerce").ge(30)].copy()
+    best = None
+    # The closest pair in each peer group must be adjacent after sorting by actual.
+    # This keeps pair selection O(n log n), even for the large unmapped population.
+    for _, group in candidates.groupby("peer_group"):
+        rows = group.sort_values(["current_actual_3m", "shop_key"]).to_dict("records")
+        for left, right in zip(rows, rows[1:]):
+            scale = max(abs(float(left["current_actual_3m"])), abs(float(right["current_actual_3m"])), 1.0)
+            gap = abs(float(left["current_actual_3m"]) - float(right["current_actual_3m"])) / scale
+            if gap > tolerance:
+                continue
+            a, b = left.get("lead_match_rate"), right.get("lead_match_rate")
+            contrast = abs(float(a) - float(b)) if pd.notna(a) and pd.notna(b) else 0.0
+            score = (-gap, contrast, str(left["shop_key"]), str(right["shop_key"]))
+            if best is None or score > best[0]:
+                best = (score, left, right, gap)
+    if best is None:
+        return None
+    _, left, right, gap = best
+    return {"pair_ids": [str(left["shop_key"]), str(right["shop_key"])], "actual_delta_pct": float(gap),
+            "constraint_contrast": "lead_match_rate" if pd.notna(left.get("lead_match_rate")) and pd.notna(right.get("lead_match_rate")) else "lead_volume",
+            "peer_group": left["peer_group"], "peer_support": int(min(left.get("peer_n", 0), right.get("peer_n", 0))),
+            "left": left, "right": right}
+
+
+def _query(path: Path, sql: str, params=None) -> pd.DataFrame:
+    con = duckdb.connect()
+    try:
+        return con.execute(sql, params or []).df()
+    finally:
+        con.close()
+
+
+def load_inputs() -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
+    gate = json.loads((ROOT / "output" / "Data processing" / "validation_report.json").read_text(encoding="utf-8"))
+    if gate.get("execution_status") != "SUCCESS" or gate.get("fatal_failures"):
+        raise RuntimeError("Phase 1 Revision 2 validation gate failed; Task 1 stopped.")
+    metrics = json.loads((DATA / "metrics_phase1.json").read_text(encoding="utf-8"))
+    month_path = (DATA / "shop_month_foundation.parquet").as_posix()
+    contract_path = (DATA / "contract_clean.parquet").as_posix()
+    lead_path = (DATA / "leads_clean.parquet").as_posix()
+    candidate_path = (DATA / "lead_contract_candidates.parquet").as_posix()
+    c = duckdb.connect()
+    try:
+        panel = c.execute(f"SELECT * FROM read_parquet('{month_path}')").df()
+        panel["shop_key"] = canonical_shop_key(panel.skp_salesroom_id)
+        bounds = c.execute(f"SELECT min(date_apply_ts)::DATE, max(date_apply_ts)::DATE FROM read_parquet('{contract_path}') WHERE date_apply_ts IS NOT NULL").fetchone()
+        lead_bounds = c.execute(f"SELECT min(date_assigned_ts)::DATE,max(date_assigned_ts)::DATE FROM read_parquet('{lead_path}') WHERE date_assigned_ts IS NOT NULL").fetchone()
+        lead_match = c.execute(f"""
+          WITH cohort AS (
+            SELECT CASE WHEN skp_salesroom_id IS NULL THEN '__UNKNOWN_SHOP__' ELSE CAST(skp_salesroom_id AS VARCHAR) END shop_key, date_trunc('month',date_assigned_ts)::DATE month_start,
+                   count(*) lead_rows, count(DISTINCT lead_uuid) lead_uuids
+            FROM read_parquet('{lead_path}') WHERE date_assigned_ts IS NOT NULL GROUP BY 1,2
+          ), converted AS (
+            SELECT CASE WHEN lead_origin_shop_id IS NULL THEN '__UNKNOWN_SHOP__' ELSE CAST(lead_origin_shop_id AS VARCHAR) END shop_key,date_trunc('month',date_assigned_ts)::DATE month_start,
+                   count(DISTINCT lead_uuid) FILTER(WHERE is_primary_match) matched_uuids
+            FROM read_parquet('{candidate_path}')
+            WHERE is_confirmed_match AND is_primary_match AND date_assigned_ts IS NOT NULL AND contract_apply_ts IS NOT NULL
+            GROUP BY 1,2
+          )
+          SELECT c.*,coalesce(m.matched_uuids,0) matched_uuids
+          FROM cohort c LEFT JOIN converted m USING(shop_key,month_start)
+        """).df()
+        monthly_metrics = c.execute("SELECT * FROM read_parquet(?)", [(ROOT / "output" / "EDA" / "cache" / "fnd02_monthly.parquet").as_posix()]).df() if (ROOT / "output" / "EDA" / "cache" / "fnd02_monthly.parquet").exists() else pd.DataFrame()
+    finally:
+        c.close()
+    max_date = pd.Timestamp(bounds[1])
+    candidate = max_date.to_period("M").to_timestamp()
+    latest = candidate if max_date.normalize() == (candidate + pd.offsets.MonthEnd(0)).normalize() else candidate - pd.offsets.MonthBegin(1)
+    months = pd.date_range(pd.Timestamp(bounds[0]).to_period("M").to_timestamp(), latest, freq="MS")
+    return panel, lead_match, {"gate": gate, "metrics": metrics, "months": months, "latest": latest,
+                               "contract_max": max_date, "lead_min": lead_bounds[0], "lead_max": lead_bounds[1],
+                               "monthly_metrics": monthly_metrics}
+
+
+def rolling_backtest(y: np.ndarray, observed: np.ndarray, months: pd.DatetimeIndex, outcome: str) -> dict[str, Any]:
+    origin_min, origin_max = 3, len(months) - max(HORIZONS)
     splits = split_origins(origin_min, origin_max)
-    accumulation: dict[tuple, dict[str, float]] = {}
-    residuals: dict[tuple, list[np.ndarray]] = {}
-    totals: dict[tuple, list[np.ndarray]] = {}
-    coverage_rows = []
+    records, coverage, residuals = [], [], {}
+    indices = np.arange(len(months))
     for split, origins in splits.items():
         for origin in origins:
-            ridge_model = fit_ridge(y, observed, origin, months)
-            paths, tiers = simulate_paths(
-                y, observed, origin, months, ridge_model, max(HORIZONS)
-            )
-            for tier in [tier for _, tier in TIER_MINIMUMS]:
+            prior_counts = observed[:, :origin].sum(axis=1)
+            tiers = tier_for_counts(prior_counts)
+            for tier in ("A", "B", "C"):
                 shops = tiers == tier
-                for horizon in HORIZONS:
-                    target_index = origin + horizon - 1
-                    target = y[:, target_index]
-                    valid = shops & observed[:, target_index] & np.isfinite(target)
-                    coverage_rows.append(
-                        {
-                            "outcome": outcome,
-                            "tier": tier,
-                            "split": split,
-                            "origin_month": months[origin - 1],
-                            "horizon": horizon,
-                            "candidate_shops": int(shops.sum()),
-                            "observed_targets": int(valid.sum()),
-                            "target_coverage": float(valid.sum() / max(shops.sum(), 1)),
-                        }
-                    )
-                    for name_index, name in enumerate(MODEL_NAMES):
-                        prediction = paths[:, horizon - 1, name_index]
-                        usable = valid & np.isfinite(prediction)
-                        if not usable.any():
-                            continue
-                        actual = target[usable]
-                        forecast = prediction[usable]
-                        key = (tier, split, horizon, name)
-                        record = accumulation.setdefault(
-                            key, {"n": 0, "actual": 0.0, "abs": 0.0, "bias": 0.0}
-                        )
-                        record["n"] += int(usable.sum())
-                        record["actual"] += float(actual.sum())
-                        record["abs"] += float(np.abs(actual - forecast).sum())
-                        record["bias"] += float((actual - forecast).sum())
-                        if split in {"validation", "holdout"}:
-                            residuals.setdefault(key, []).append(
-                                (actual - forecast)[::25]
-                            )
-                    if origin + 2 < len(months):
-                        total_actual = y[:, origin : origin + 3].sum(axis=1)
-                        for name_index, name in enumerate(MODEL_NAMES):
-                            total_pred = paths[:, :3, name_index].sum(axis=1)
-                            usable = (
-                                shops
-                                & np.isfinite(total_actual)
-                                & np.isfinite(total_pred)
-                            )
-                            if usable.any():
-                                totals.setdefault((tier, split, name), []).append(
-                                    (total_actual[usable] - total_pred[usable])[::25]
-                                )
-    metric_rows = []
-    for tier in [tier for _, tier in TIER_MINIMUMS]:
-        for split in ("selection", "validation", "holdout"):
-            for horizon in HORIZONS:
-                for name in MODEL_NAMES:
-                    record = accumulation.get((tier, split, horizon, name))
-                    if record is None:
-                        continue
-                    metric_rows.append(
-                        {
-                            "outcome": outcome,
-                            "tier": tier,
-                            "split": split,
-                            "horizon": horizon,
-                            "model": name,
-                            "n": record["n"],
-                            "total_actual_rows": record["actual"],
-                            "mae_rows": record["abs"] / record["n"]
-                            if record["n"]
-                            else np.nan,
-                            "wape": record["abs"] / record["actual"]
-                            if record["actual"] > 0
-                            else np.nan,
-                            "bias_actual_minus_forecast": record["bias"] / record["n"]
-                            if record["n"]
-                            else np.nan,
-                        }
-                    )
-    metrics = pd.DataFrame(metric_rows)
-    coverage = pd.DataFrame(coverage_rows)
-    metrics = metrics.merge(
-        coverage.groupby(["outcome", "tier", "split", "horizon"], as_index=False).mean(
-            numeric_only=True
-        ),
-        on=["outcome", "tier", "split", "horizon"],
-        how="left",
-    )
-    interval_quantiles = {
-        key: np.quantile(np.concatenate(values), INTERVAL_QUANTILES).tolist()
-        for key, values in residuals.items()
-        if values
-    }
-    total_quantiles = {
-        key: np.quantile(np.concatenate(values), INTERVAL_QUANTILES).tolist()
-        for key, values in totals.items()
-        if values
-    }
-    return {
-        "metrics": metrics,
-        "coverage": coverage,
-        "interval_quantiles": interval_quantiles,
-        "total_quantiles": total_quantiles,
-        "splits": splits,
-        "min_origin": origin_min,
-        "max_origin": origin_max,
-    }
+                for h in HORIZONS:
+                    target_idx = origin + h - 1
+                    valid = shops & observed[:, target_idx] & np.isfinite(y[:, target_idx])
+                    coverage.append({"outcome": outcome, "tier": tier, "split": split, "origin": int(origin),
+                                     "origin_month": months[origin-1], "horizon": h,
+                                     "candidate_shops": int(shops.sum()), "observed_targets": int(valid.sum())})
+                    predictions = {"trailing_3m": [], "linear_trend": []}
+                    actuals = []
+                    for i in np.flatnonzero(valid):
+                        trailing = trailing_forecast(y[i], observed[i], origin, h)
+                        trend = trend_forecast(y[i], observed[i], indices, origin, h)
+                        if trailing is not None: predictions["trailing_3m"].append((int(i), float(trailing[h-1])))
+                        if trend is not None: predictions["linear_trend"].append((int(i), float(trend[h-1])))
+                        actuals.append((int(i), float(y[i,target_idx])))
+                    actual_map = dict(actuals)
+                    for model, pairs in predictions.items():
+                        usable = [(actual_map[i], pred) for i,pred in pairs if i in actual_map]
+                        if not usable: continue
+                        actual=np.array([a for a,_ in usable]); pred=np.array([p for _,p in usable])
+                        residual=actual-pred
+                        records.append({"outcome":outcome,"tier":tier,"split":split,"origin":months[origin-1],
+                                        "horizon":h,"model":model,"n":len(actual),"wape":float(np.abs(residual).sum()/actual.sum()) if actual.sum()>0 else None,
+                                        "mae":float(np.abs(residual).mean()),"bias_actual_minus_forecast":float(residual.mean())})
+                        if split in ("validation","holdout"):
+                            residuals.setdefault((tier,split,h,model),[]).append(residual)
+    return {"metrics":pd.DataFrame(records),"coverage":pd.DataFrame(coverage),"residuals":residuals,
+            "splits":splits,"min_origin":origin_min,"max_origin":origin_max}
 
 
-def choose_decisions(
-    backtest: dict[str, Any], outcome: str
-) -> dict[tuple[str, int], dict[str, Any]]:
-    metrics = backtest["metrics"]
-    decisions: dict[tuple[str, int], dict[str, Any]] = {}
-    for tier in [tier for _, tier in TIER_MINIMUMS]:
-        for horizon in HORIZONS:
-            validation = metrics[
-                (metrics.tier == tier)
-                & (metrics.split == "validation")
-                & (metrics.horizon == horizon)
-            ]
-            holdout = metrics[
-                (metrics.tier == tier)
-                & (metrics.split == "holdout")
-                & (metrics.horizon == horizon)
-            ]
-            baseline_validation = validation[validation.model == "recent_3m"]
-            baseline_holdout = holdout[holdout.model == "recent_3m"]
-            validation_n = int(validation.n.max()) if not validation.empty else 0
-            fallback, model, reason = False, "recent_3m", "INSUFFICIENT_VALIDATION"
-            if (
-                validation_n >= MIN_TIER_EVAL
-                and not validation.dropna(subset=["wape"]).empty
-            ):
-                best = validation.loc[validation.wape.idxmin()]
-                selected_holdout = holdout[holdout.model == best.model]
-                beats_baseline = (
-                    not baseline_holdout.empty
-                    and not selected_holdout.empty
-                    and float(selected_holdout.wape.iloc[0])
-                    <= float(baseline_holdout.wape.iloc[0])
-                )
-                if beats_baseline:
-                    model, reason = str(best.model), "VALIDATED_BEATS_TRAILING_BASELINE"
+def choose_simple_model(backtest: dict[str, Any], outcome: str) -> dict[tuple[str,int],dict[str,Any]]:
+    metrics=backtest["metrics"]
+    result={}
+    for _,tier in TIERS:
+        for h in HORIZONS:
+            get=lambda split: metrics[(metrics.tier==tier)&(metrics.split==split)&(metrics.horizon==h)]
+            selection,validation,holdout=get("selection"),get("validation"),get("holdout")
+            baseline_val=validation[validation.model=="trailing_3m"]
+            n=int(baseline_val.n.max()) if not baseline_val.empty else 0
+            candidate=None; val_wape=None; base_wape=float(baseline_val.wape.iloc[0]) if not baseline_val.empty and pd.notna(baseline_val.wape.iloc[0]) else None
+            status="INSUFFICIENT_VALIDATION"; model="trailing_3m"
+            if n>=MIN_EVAL and not selection.dropna(subset=["wape"]).empty:
+                candidate=str(selection.loc[selection.wape.idxmin()].model)
+                candidate_val=validation[validation.model==candidate]
+                val_wape=float(candidate_val.wape.iloc[0]) if not candidate_val.empty and pd.notna(candidate_val.wape.iloc[0]) else None
+                if candidate!="trailing_3m" and val_wape is not None and base_wape is not None and val_wape<=base_wape:
+                    model=candidate; status="VALIDATED_MODEL"
                 else:
-                    fallback, reason = True, "FALLBACK_TRAILING_BASELINE"
-            else:
-                fallback = True
-            key = (tier, horizon)
-            quantile_key = (tier, "validation", horizon, model)
-            quantiles = backtest["interval_quantiles"].get(quantile_key)
-            if quantiles is None:
-                quantiles = backtest["interval_quantiles"].get(
-                    (tier, "holdout", horizon, model)
-                )
-            total_key = (tier, "validation", model)
-            total_quantiles = backtest["total_quantiles"].get(total_key) or backtest[
-                "total_quantiles"
-            ].get((tier, "holdout", model))
-            decisions[key] = {
-                "outcome": outcome,
-                "tier": tier,
-                "horizon": horizon,
-                "model": model,
-                "fallback": fallback,
-                "status": "SUPPORTED" if not fallback else "TRAILING_BASELINE_FALLBACK",
-                "reason": reason,
-                "validation_n": validation_n,
-                "interval_offsets": quantiles or None,
-                "total_interval_offsets": total_quantiles or None,
-            }
-    return decisions
+                    status="TRAILING_BASELINE_FALLBACK"
+            hold=holdout[holdout.model==model]
+            result[(tier,h)]={"outcome":outcome,"tier":tier,"horizon":h,"model":model,"status":status,
+                              "validation_n":n,"selection_model":candidate,"validation_wape":val_wape,
+                              "validation_baseline_wape":base_wape,
+                              "holdout_n":int(hold.n.iloc[0]) if not hold.empty else 0,
+                              "holdout_wape":float(hold.wape.iloc[0]) if not hold.empty and pd.notna(hold.wape.iloc[0]) else None}
+    return result
 
 
-# ---------------------------------------------------------------- forecasting
+def forecast_current(y: np.ndarray, observed: np.ndarray, months: pd.DatetimeIndex,
+                     summary: pd.DataFrame, outcome: str, decisions: dict) -> pd.DataFrame:
+    indices=np.arange(len(months)); rows=[]; origin=len(months)
+    for i,shop in summary.iterrows():
+        count=int(observed[i].sum()); tier=str(tier_for_counts(np.array([count]))[0])
+        if tier=="D" or not bool(shop.get("forecast_eligible",False)): continue
+        points=[]; horizon_rows=[]
+        for h in HORIZONS:
+            d=decisions[(tier,h)]; model=d["model"]
+            prediction=(trend_forecast(y[i],observed[i],indices,origin,h) if model=="linear_trend" else trailing_forecast(y[i],observed[i],origin,h))
+            point=None if prediction is None else float(prediction[h-1]); points.append(point)
+            residuals=d.get("validation_residuals")
+            bounds=None
+            if residuals is not None and point is not None:
+                offsets=np.quantile(residuals,[.1,.9]); bounds=(max(0.,point+float(offsets[0])),max(0.,point+float(offsets[1])))
+            status=d["status"]
+            rows.append({"shop_key":shop.shop_key,"shop_id":shop.shop_id,"outcome":outcome,"origin_month":months[-1],"horizon":h,
+                         "target_month":months[-1]+pd.offsets.MonthBegin(h),"point":point,
+                         "lo":None if bounds is None else bounds[0],"hi":None if bounds is None else bounds[1],
+                         "model":model,"tier":tier,"status":status,"forecast_reliability":status,
+                         "eligibility_status":shop.eligibility_status,"interval_status":"DESCRIPTIVE_RESIDUAL_RANGE" if bounds else "INSUFFICIENT_VALIDATION",
+                         "observation_quality_state":shop.observation_quality_state,
+                         "downstream_usage_recommendation":"DESCRIPTIVE_ONLY"})
+            horizon_rows.append(rows[-1])
+        total_point=None if any(v is None for v in points) else float(sum(points))
+        rows.append({"shop_key":shop.shop_key,"shop_id":shop.shop_id,"outcome":outcome,"origin_month":months[-1],"horizon":TOTAL,
+                     "target_month":months[-1]+pd.offsets.MonthBegin(3),"point":total_point,
+                     "lo":None if any(r["lo"] is None for r in horizon_rows) else float(sum(r["lo"] for r in horizon_rows)),
+                     "hi":None if any(r["hi"] is None for r in horizon_rows) else float(sum(r["hi"] for r in horizon_rows)),
+                     "model":"SUM_OF_HORIZONS","tier":tier,"status":decisions[(tier,1)]["status"],
+                     "forecast_reliability":decisions[(tier,1)]["status"],"eligibility_status":shop.eligibility_status,
+                     "interval_status":"DESCRIPTIVE_SUM_OF_HORIZON_RANGES" if all(r["lo"] is not None for r in horizon_rows) else "INSUFFICIENT_VALIDATION",
+                     "observation_quality_state":shop.observation_quality_state,"downstream_usage_recommendation":"DESCRIPTIVE_ONLY"})
+    return pd.DataFrame(rows)
 
 
-def build_forecasts(
-    outcome: str,
-    y: np.ndarray,
-    observed: np.ndarray,
-    months: pd.DatetimeIndex,
-    summary: pd.DataFrame,
-    decisions: dict[tuple[str, int], dict[str, Any]],
-    ridge_model,
-    origin: int,
-) -> pd.DataFrame:
-    paths, tiers = simulate_paths(
-        y, observed, origin, months, ridge_model, max(HORIZONS)
-    )
-    rows = []
-    for index, shop_key in enumerate(summary.shop_key.to_numpy()):
-        tier = str(tiers[index])
-        if tier == "D":
+def _lead_stats(lead_month: pd.DataFrame, latest: pd.Timestamp) -> pd.DataFrame:
+    recent=lead_month[lead_month.month_start.isin(pd.date_range(latest-pd.DateOffset(months=2),latest,freq="MS"))]
+    return recent.groupby("shop_key",as_index=False).agg(lead_rows_3m=("lead_rows","sum"),lead_uuids_3m=("lead_uuids","sum"),matched_uuids_3m=("matched_uuids","sum"))
+
+
+def _attach_constraints(summary: pd.DataFrame, lead_month: pd.DataFrame, latest: pd.Timestamp) -> pd.DataFrame:
+    stats=_lead_stats(lead_month,latest)
+    out=summary.merge(stats,on="shop_key",how="left",validate="one_to_one")
+    out["lead_match_rate"]=out.matched_uuids_3m/out.lead_uuids_3m.replace(0,np.nan)
+    out["lead_match_rate"]=out.lead_match_rate.clip(0,1)
+    out["peer_group"]=np.where(out.category.notna() & out.model.notna(),out.category.astype(str)+"|"+out.model.astype(str),"UNMAPPED_MASTER")
+    out["peer_n"]=out.groupby("peer_group").shop_key.transform("count")
+    return out
+
+
+
+def _metric_row(metrics: pd.DataFrame, tier: str, split: str, horizon: int, model: str):
+    row = metrics[(metrics.tier == tier) & (metrics.split == split) & (metrics.horizon == horizon) & (metrics.model == model)]
+    return None if row.empty else row.iloc[0]
+
+
+def _choose_intervals(backtest: dict[str, Any], decisions: dict[tuple[str, int], dict[str, Any]]) -> None:
+    for (tier, horizon), decision in decisions.items():
+        model = decision["model"]
+        val_parts = backtest["residuals"].get((tier, "validation", horizon, model), [])
+        hold_parts = backtest["residuals"].get((tier, "holdout", horizon, model), [])
+        val = np.concatenate(val_parts) if val_parts else None
+        hold = np.concatenate(hold_parts) if hold_parts else None
+        decision["validation_residuals"] = None if val is None else np.quantile(val, [.1, .9]).tolist()
+        decision["holdout_empirical_coverage"] = None
+        decision["holdout_n"] = 0 if hold is None else int(len(hold))
+        if val is None or hold is None:
+            decision["interval_status"] = "INSUFFICIENT_VALIDATION"
+        else:
+            lo, hi = np.quantile(val, [.1, .9])
+            coverage = float(np.mean((hold >= lo) & (hold <= hi)))
+            decision["holdout_empirical_coverage"] = coverage
+            decision["interval_status"] = "UNCALIBRATED" if len(hold) >= MIN_INTERVAL_EVAL and coverage < NOMINAL - .10 else ("INSUFFICIENT_HOLDOUT" if len(hold) < MIN_INTERVAL_EVAL else "EMPIRICAL_COVERAGE_NEAR_NOMINAL")
+
+
+def forecast_current(y: np.ndarray, observed: np.ndarray, months: pd.DatetimeIndex,
+                     summary: pd.DataFrame, outcome: str, decisions: dict[tuple[str,int],dict[str,Any]]) -> pd.DataFrame:
+    month_indices = np.arange(len(months)); origin = len(months); records = []
+    for i, shop in summary.iterrows():
+        tier = str(tier_for_counts(np.array([int(observed[i].sum())]))[0])
+        if tier == "D" or not bool(shop["forecast_eligible"]):
             continue
-        points = []
+        component_points = []
+        component_rows = []
         for horizon in HORIZONS:
             decision = decisions[(tier, horizon)]
             model = decision["model"]
-            model_index = MODEL_NAMES.index(model)
-            point = float(paths[index, horizon - 1, model_index])
-            offsets = decision["interval_offsets"] or [-0.5 * point, 0.5 * point]
-            points.append(point)
-            rows.append(
-                {
-                    "shop_key": shop_key,
-                    "shop_id": summary.shop_id.iloc[index],
-                    "outcome": outcome,
-                    "origin_month": months[origin - 1],
-                    "horizon": horizon,
-                    "point": point,
-                    "lo": max(0.0, point + float(offsets[0])),
-                    "hi": max(0.0, point + float(offsets[1])),
-                    "model": "TRAILING_BASELINE" if decision["fallback"] else model,
-                    "model_is_baseline": bool(decision["fallback"]),
-                    "tier": tier,
-                    "status": decision["status"],
-                    "reliability": "MODEL_BASED"
-                    if not decision["fallback"]
-                    else "TRAILING_BASELINE",
-                    "eligibility": "FORECAST_ELIGIBLE",
-                    "interval_status": "VALIDATION_RESIDUAL_QUANTILES",
-                }
-            )
-        decision_one = decisions[(tier, 1)]
-        offsets = decision_one["total_interval_offsets"] or [
-            -0.5 * sum(points),
-            0.5 * sum(points),
-        ]
-        rows.append(
-            {
-                "shop_key": shop_key,
-                "shop_id": summary.shop_id.iloc[index],
-                "outcome": outcome,
-                "origin_month": months[origin - 1],
-                "horizon": TOTAL_HORIZON,
-                "point": float(sum(points)),
-                "lo": max(0.0, sum(points) + float(offsets[0])),
-                "hi": max(0.0, sum(points) + float(offsets[1])),
-                "model": "SUM_OF_HORIZONS"
-                if not decision_one["fallback"]
-                else "TRAILING_BASELINE_SUM",
-                "model_is_baseline": bool(decision_one["fallback"]),
-                "tier": tier,
-                "status": decision_one["status"],
-                "reliability": "MODEL_BASED"
-                if not decision_one["fallback"]
-                else "TRAILING_BASELINE",
-                "eligibility": "FORECAST_ELIGIBLE",
-                "interval_status": "VALIDATION_RESIDUAL_QUANTILES",
-            }
-        )
-    return pd.DataFrame(rows)
+            prediction = trend_forecast(y[i], observed[i], month_indices, origin, horizon) if model == "linear_trend" else trailing_forecast(y[i], observed[i], origin, horizon)
+            point = None if prediction is None else float(prediction[horizon-1])
+            offsets = decision.get("validation_residuals")
+            lo = None if point is None or offsets is None else max(0., point + float(offsets[0]))
+            hi = None if point is None or offsets is None else max(0., point + float(offsets[1]))
+            complete_recent = shop["observation_quality_state"] == "COMPLETE_3M_OBSERVED"
+            qualified = decision["status"] == "VALIDATED_MODEL" and decision["interval_status"] == "EMPIRICAL_COVERAGE_NEAR_NOMINAL" and complete_recent
+            recommendation = "EVIDENCE_QUALIFIED_BAU" if qualified else "DESCRIPTIVE_ONLY"
+            record = {"shop_key":shop.shop_key,"shop_id":shop.shop_id,"outcome":outcome,"origin_month":months[-1],
+                      "horizon":str(horizon),"target_month":months[-1]+pd.offsets.MonthBegin(horizon),"point":point,"lo":lo,"hi":hi,
+                      "model":model,"tier":tier,"status":decision["status"],"forecast_reliability":decision["status"],
+                      "eligibility_status":shop["eligibility_status"],"interval_status":decision["interval_status"],
+                      "interval_empirical_coverage":decision.get("holdout_empirical_coverage"),"interval_holdout_n":decision["holdout_n"],
+                      "observation_quality_state":shop["observation_quality_state"],"downstream_usage_recommendation":recommendation,
+                      "selection_wape":decision.get("selection_wape"),"validation_wape":decision.get("validation_wape"),"holdout_wape":decision.get("holdout_wape")}
+            records.append(record); component_rows.append(record); component_points.append(point)
+        total_point = None if any(p is None for p in component_points) else float(sum(component_points))
+        total_bounds = None if any(r["lo"] is None or r["hi"] is None for r in component_rows) else (sum(r["lo"] for r in component_rows), sum(r["hi"] for r in component_rows))
+        decision = decisions[(tier, 1)]
+        records.append({"shop_key":shop.shop_key,"shop_id":shop.shop_id,"outcome":outcome,"origin_month":months[-1],"horizon":str(TOTAL),
+                        "target_month":months[-1]+pd.offsets.MonthBegin(3),"point":total_point,
+                        "lo":None if total_bounds is None else total_bounds[0],"hi":None if total_bounds is None else total_bounds[1],
+                        "model":"SUM_OF_HORIZONS","tier":tier,"status":decision["status"],"forecast_reliability":decision["status"],
+                        "eligibility_status":shop["eligibility_status"],"interval_status":"DESCRIPTIVE_SUM_OF_HORIZON_RANGES" if total_bounds else "INSUFFICIENT_VALIDATION",
+                        "interval_empirical_coverage":None,"interval_holdout_n":0,"observation_quality_state":shop["observation_quality_state"],
+                        "downstream_usage_recommendation":"EVIDENCE_QUALIFIED_BAU" if all(r["downstream_usage_recommendation"]=="EVIDENCE_QUALIFIED_BAU" for r in component_rows) else "DESCRIPTIVE_ONLY",
+                        "selection_wape":decision.get("selection_wape"),"validation_wape":decision.get("validation_wape"),"holdout_wape":decision.get("holdout_wape")})
+    return pd.DataFrame(records)
 
 
-# ---------------------------------------------------------------- pair spine
+def _figures(summary: pd.DataFrame, forecasts: pd.DataFrame, backtest: pd.DataFrame,
+             calibration: pd.DataFrame, panel: pd.DataFrame, pair: dict[str,Any], latest: pd.Timestamp) -> list[dict[str,Any]]:
+    items=[]
+    def finish(fig, fid, insight, evidence, limitation, status="SUPPORTED"):
+        path=OUT/f"{fid}.png"; fig.savefig(path,dpi=DPI,facecolor="white",bbox_inches="tight");plt.close(fig)
+        items.append({"figure_id":fid,"status":status,"insight":insight,"evidence":evidence,"limitation":limitation})
+    fig,ax=plt.subplots(figsize=(7,4),dpi=DPI); vals=[summary.loc[summary.tier==t,"current_actual_3m_funded"].dropna() for t in ("A","B","C","D")];ax.boxplot(vals,tick_labels=["A","B","C","D"],showfliers=False);ax.set_ylabel("Complete 3-month funded-origin contracts");ax.set_title("Current actual by observed-history tier");finish(fig,"T1_01_Current_Actual_Baseline","Current actual varies by prior observed history.",f"Only complete three-month windows are reported through {latest:%b %Y}.","Incomplete windows remain missing; funded-origin is a configured proxy.")
+    monthly=panel[panel.contract_observed].groupby("month_start",as_index=False).agg(funded=("funded_contract_count","sum"),applications=("contract_application_event_rows","sum"));fig,ax=plt.subplots(figsize=(8,4),dpi=DPI);ax.plot(monthly.month_start,monthly.funded,label="Funded-origin");ax.plot(monthly.month_start,monthly.applications,label="Applications");ax.legend(frameon=False);ax.set_ylabel("Recorded contract rows");ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %y"));finish(fig,"T1_02_Monthly_Shop_Trends","The two outcome measures move on different scales.",f"Window {monthly.month_start.min():%b %Y} to {latest:%b %Y}.","Only observed contract months are plotted.")
+    cohorts=summary[summary.shop_id.notna()].groupby(summary.first_recorded_activity.dt.to_period("M").astype(str),dropna=True).shop_key.nunique();fig,ax=plt.subplots(figsize=(8,4),dpi=DPI);ax.bar(cohorts.index.astype(str),cohorts.values,color=COLORS["blue"]);ax.tick_params(axis="x",rotation=60);ax.set_ylabel("Shop IDs first recorded");ax.set_xlabel("First recorded contract activity month, not opening date");finish(fig,"T1_03_Shop_Lifecycle_Cohorts","First recorded activity dates show unequal history lengths.",f"{len(cohorts)} recorded-activity cohorts.","Extract activity is not a verified shop opening date.")
+    peer=summary[summary.peer_n.ge(30)].groupby("peer_group").current_actual_3m_funded.agg(["median",lambda x:x.quantile(.25),lambda x:x.quantile(.75)]).dropna().head(12);fig,ax=plt.subplots(figsize=(8,4.5),dpi=DPI);ax.barh(np.arange(len(peer)),peer["median"],color=COLORS["blue"]);ax.set_yticks(np.arange(len(peer)),peer.index.astype(str));ax.set_xlabel("Peer median complete 3-month funded-origin contracts");finish(fig,"T1_04_Comparable_Shop_Benchmark","Comparable shops provide a descriptive range.",f"{len(peer)} peer groups with n≥30.","Peer performance is not guaranteed attainable potential.")
+    model=backtest[(backtest.outcome=="funded")&(backtest.split=="validation")];cols=[(t,h) for t in ("A","B","C") for h in HORIZONS];body=[];valid_cells=0
+    for name in ("trailing_3m","linear_trend"):
+        row=[name]
+        for t,h in cols:
+            v=model[(model.tier==t)&(model.horizon==h)&(model.model==name)]
+            if v.empty or pd.isna(v.wape.iloc[0]):row.append("N/A — insufficient validation")
+            else:valid_cells+=1;row.append(f"{v.wape.iloc[0]:.3f} (n={int(v.n.iloc[0])})")
+        body.append(row)
+    fig,ax=plt.subplots(figsize=(10,2.6),dpi=DPI);ax.axis("off");tbl=ax.table(cellText=body,colLabels=["Model"]+[f"{t} h{h}" for t,h in cols],loc="center",cellLoc="center");tbl.auto_set_font_size(False);tbl.set_fontsize(7);tbl.scale(1,1.5);ax.set_title("Validation WAPE; N/A means insufficient validation",loc="left");finish(fig,"T1_05_Forecast_Model_Ladder","A simple linear trend is tested against trailing average.",f"{valid_cells} model-tier-horizon validation cells available.","Tier A has no valid validation origins; holdout is not used to choose models.")
+    chosen=backtest[(backtest.outcome=="funded")]; rows=[]
+    for t in ("A","B","C"):
+        for h in HORIZONS:
+            dec=STATE_DECISIONS.get(("funded",t,h),{}) if "STATE_DECISIONS" in globals() else {}
+            mod=dec.get("model","trailing_3m")
+            vals=[]
+            for split in ("validation","holdout"):
+                current=chosen[(chosen.tier==t)&(chosen.horizon==h)&(chosen.split==split)]
+                a=current[current.model==mod]; b=current[current.model=="trailing_3m"]
+                vals.extend(["N/A" if a.empty or pd.isna(a.wape.iloc[0]) else f"{a.wape.iloc[0]:.3f}",
+                             "N/A" if b.empty or pd.isna(b.wape.iloc[0]) else f"{b.wape.iloc[0]:.3f}"])
+            rows.append([f"{t} h{h}",mod,*vals])
+    fig,ax=plt.subplots(figsize=(8,3.4),dpi=DPI);ax.axis("off")
+    tbl=ax.table(cellText=rows,colLabels=["Tier/h","Selected by validation","Validation WAPE","Baseline WAPE","Holdout WAPE","Baseline WAPE"],loc="center",cellLoc="center")
+    tbl.auto_set_font_size(False);tbl.set_fontsize(7);tbl.scale(1,1.4);ax.set_title("Holdout evaluates; selection never uses holdout",loc="left")
+    finish(fig,"T1_06_Rolling_Origin_Backtest","Validation-selected model and holdout results are separate.","WAPE shown separately; N/A where no support.","Few time origins and overlapping shop observations limit inference.")
+    cal=calibration[(calibration.outcome=="funded")];fig,ax=plt.subplots(figsize=(9,3.6),dpi=DPI);ax.axhline(NOMINAL,color=COLORS["gray"],linestyle="--",label="Nominal 80%");x=np.arange(len(cal));coverage=pd.to_numeric(cal.empirical_holdout_coverage,errors="coerce");ax.scatter(x,coverage,c=[COLORS["red"] if s=="UNCALIBRATED" else COLORS["blue"] for s in cal.interval_status]);ax.set_xticks(x,[f"{r.tier} h{r.horizon}" for r in cal.itertuples()],rotation=60);ax.set_ylim(0,1);ax.legend(frameon=False);ax.set_ylabel("Empirical holdout coverage");finish(fig,"T1_07_Forecast_Interval_Calibration","Intervals are empirical descriptive ranges, not guaranteed 80% intervals.",f"{int((cal.interval_status=='UNCALIBRATED').sum())} undercoverage flags across funded cells.","Tier A intervals unavailable; holdout sample is not independent by shop.")
+    pair_ids=pair.get("pair_ids",[])
+    for i in range(2):
+        sid=pair_ids[i] if i<len(pair_ids) else None
+        fig,ax=plt.subplots(figsize=(7,3.6),dpi=DPI)
+        if sid is None:
+            ax.text(.5,.5,"No pair met A05 with at least 30 comparable shops",ha="center",va="center",transform=ax.transAxes)
+            ax.set_axis_off();status="UNSUPPORTED";limitation="No pair plotted because the required matching/support rule did not pass."
+            evidence="Current actuals must be complete and within 10%; same category/model and peer n≥30."
+        else:
+            hist=panel[(panel.shop_key==sid)&panel.contract_observed].sort_values("month_start")
+            ax.plot(hist.month_start,hist.funded_contract_count,marker="o",label="Observed funded-origin rows")
+            fr=forecasts[(forecasts.shop_key==sid)&(forecasts.outcome=="funded")&forecasts.horizon.astype(str).isin([str(h) for h in HORIZONS])].sort_values("horizon")
+            ax.plot(fr.target_month,fr.point,marker="s",label="BAU")
+            bound=fr.dropna(subset=["lo","hi"])
+            if not bound.empty:ax.fill_between(bound.target_month,bound.lo,bound.hi,alpha=.2,color=COLORS["mid"],label="Descriptive interval")
+            ax.set_xlim(panel.month_start.min(),latest+pd.DateOffset(months=3));ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %y"))
+            actual=summary.loc[summary.shop_key==sid,"current_actual_3m_funded"].iloc[0]
+            observed_n=int(summary.loc[summary.shop_key==sid,"current_actual_3m_observed_months"].iloc[0])
+            bau_row=forecasts[(forecasts.shop_key==sid)&(forecasts.outcome=="funded")&(forecasts.horizon==TOTAL)]
+            bau=None if bau_row.empty else bau_row.iloc[0].point
+            ax.set_title(f"A05 pair {i+1}: shop {sid} | actual {actual} | BAU {bau}")
+            ax.set_ylabel("Funded-origin contracts");ax.legend(frameon=False,fontsize=7)
+            evidence=f"Complete 3-month actual observed: {observed_n}/3; BAU reliability: {bau_row.iloc[0].forecast_reliability if not bau_row.empty else 'unavailable'}."
+            limitation="Pair comparison is descriptive, not causal; BAU is not attainable uplift."
+            status=pair.get("status","UNSUPPORTED")
+        fid="T1_08A_Shop_Actual_vs_BAU" if i==0 else "T1_08B_Shop_Actual_vs_BAU"
+        finish(fig,fid,"Similar-current shops are compared under the declared A05 rule.",evidence,limitation,status)
+    return items
 
 
-def best_pair(frame: pd.DataFrame, tolerance: float, key: str = "peer_group"):
-    best = None
-    for _, group in frame.groupby(key, dropna=True):
-        group = group.sort_values("actual")
-        actual = group.actual.to_numpy(dtype=float)
-        ratio = group.bau_ratio.to_numpy(dtype=float)
-        keys = group.shop_key.to_numpy()
-        peer_n = group.peer_n.fillna(0).to_numpy(dtype=float)
-        left = 0
-        for right in range(len(group)):
-            while actual[right] - actual[left] > tolerance * max(actual[right], 1.0):
-                left += 1
-            window = ratio[left:right]
-            if not len(window):
-                continue
-            for candidate in (
-                int(np.argmin(window)) + left,
-                int(np.argmax(window)) + left,
-            ):
-                if candidate == right:
-                    continue
-                difference = abs(ratio[right] - ratio[candidate])
-                signature = tuple(sorted((str(keys[right]), str(keys[candidate]))))
-                record = (
-                    difference,
-                    float(peer_n[right] + peer_n[candidate]),
-                    signature,
-                )
-                if (
-                    best is None
-                    or record[:2] > best[:2]
-                    or (record[:2] == best[:2] and record[2] < best[2])
-                ):
-                    best = record
-    return best
+def attach_constraints(summary: pd.DataFrame, lead_month: pd.DataFrame, raw: pd.DataFrame,
+                       months: pd.DatetimeIndex, latest: pd.Timestamp) -> pd.DataFrame:
+    recent=lead_month[lead_month.month_start.isin(months[-3:])]
+    lead_stats=recent.groupby("shop_key").agg(lead_rows_3m=("lead_rows","sum"),lead_uuids_3m=("lead_uuids","sum"),matched_uuids_3m=("matched_uuids","sum"))
+    out=summary.join(lead_stats,on="shop_key")
+    out["lead_match_rate"]=out.matched_uuids_3m/out.lead_uuids_3m.replace(0,np.nan)
+    out["lead_match_rate"]=out.lead_match_rate.clip(0,1)
+    return out
 
 
-def select_pair(summary: pd.DataFrame, forecasts: pd.DataFrame) -> dict[str, Any]:
-    outcome = str(forecasts["outcome"].iloc[0])
-    total = forecasts[forecasts.horizon == TOTAL_HORIZON]
-    frame = summary[summary.forecast_eligible].copy()
-    frame = frame.merge(
-        total[["shop_key", "point", "lo", "hi"]], on="shop_key", how="inner"
-    )
-    frame = frame.rename(columns={f"current_actual_3m_{outcome}": "actual", "point": "bau_total"})
-    frame = frame[
-        (frame.actual >= MIN_PAIR_ACTUAL) & (frame.bau_total >= MIN_PAIR_ACTUAL)
-        & frame.peer_supported & frame.peer_group.notna()
-    ]
-    frame["bau_ratio"] = frame.bau_total / frame.actual
-    rules = [
-        (0.10, "A05_SIMILAR_ACTUAL_10PCT", "peer_group"),
-        (0.20, "A05_RELAXED_20PCT", "peer_group"),
-        (0.20, "A05_CATEGORY_ONLY", "salesroom_category"),
-    ]
-    selected, rule_used, tolerance_used = None, None, 0.10
-    for tolerance, rule, key in rules:
-        selected = best_pair(frame, tolerance, key)
-        if selected is not None:
-            rule_used, tolerance_used = rule, tolerance
-            break
-    stability = {}
-    for tolerance, label in ((0.05, "5pct"), (0.10, "10pct"), (0.20, "20pct")):
-        found = best_pair(
-            frame,
-            tolerance,
-            "peer_group" if tolerance >= 0.10 else "salesroom_category",
-        )
-        stability[label] = list(found[2]) if found else None
-    if selected is None:
-        return {
-            "status": "UNSUPPORTED",
-            "reason": "No similar-current pair met the candidate rules.",
-            "stability": stability,
-        }
-    shop_a, shop_b = selected[2]
-    record = frame[frame.shop_key.isin((shop_a, shop_b))].set_index("shop_key")
-    pair = {
-        "status": "SUPPORTED",
-        "pair_id": f"{shop_a}::{shop_b}",
-        "shop_ids": [shop_a, shop_b],
-        "rule_used": rule_used,
-        "tolerance": tolerance_used,
-        "peer_group": record.loc[shop_a, "peer_group"],
-        "peer_n": int(record.loc[shop_a, "peer_n"]),
-        "actual_3m_funded": {
-            key: float(record.loc[key, "actual"]) for key in (shop_a, shop_b)
-        },
-        "bau_3m_total": {
-            key: {
-                "point": float(record.loc[key, "bau_total"]),
-                "lo": float(record.loc[key, "lo"]),
-                "hi": float(record.loc[key, "hi"]),
-            }
-            for key in (shop_a, shop_b)
-        },
-        "bau_ratio": {
-            key: float(record.loc[key, "bau_ratio"]) for key in (shop_a, shop_b)
-        },
-        "observed_contrasts": {
-            key: {
-                "lead_rows_3m": float(record.loc[key, "lead_rows_3m"])
-                if pd.notna(record.loc[key, "lead_rows_3m"])
-                else None,
-                "distinct_lead_uuids_3m": float(record.loc[key, "lead_uuids_3m"])
-                if pd.notna(record.loc[key, "lead_uuids_3m"])
-                else None,
-                "assigned_headcount_proxy_3m": float(
-                    record.loc[key, "assigned_headcount_proxy_3m"]
-                )
-                if pd.notna(record.loc[key, "assigned_headcount_proxy_3m"])
-                else None,
-                "lead_product_mix_3m": record.loc[key, "lead_product_mix_3m"],
-            }
-            for key in (shop_a, shop_b)
-        },
-        "note": "Observed contrasts are descriptive, not causal.",
-        "stability": stability,
-    }
-    return pair
-
-
-def pair_stability_share(pair: dict[str, Any], alternative: dict[str, Any]) -> bool:
-    if pair.get("status") != "SUPPORTED" or alternative.get("status") != "SUPPORTED":
-        return False
-    return set(pair["shop_ids"]) == set(alternative["shop_ids"])
-
-
-# ---------------------------------------------------------------- figures
-
-
-def figure_state(state: dict[str, Any]) -> list[dict[str, Any]]:
-    figures = []
-    summary = state["summary"]
-    primary = summary[
-        summary.identified_shop_id
-        & summary[f"current_actual_3m_{PRIMARY_OUTCOME}"].notna()
-    ]
-
-    fig, ax = plt.subplots(
-        figsize=(8.0, 4.2), dpi=FORECAST_DPI, facecolor=COLORS["white"]
-    )
-    tier_order = ["A", "B", "C", "D"]
-    values = [
-        primary.loc[
-            primary.observed_history_tier.eq(tier),
-            f"current_actual_3m_{PRIMARY_OUTCOME}",
-        ].dropna()
-        for tier in tier_order
-    ]
-    ax.boxplot(
-        values,
-        tick_labels=tier_order,
-        showfliers=False,
-        patch_artist=True,
-        boxprops={"facecolor": COLORS["mid"], "edgecolor": COLORS["primary"]},
-        medianprops={"color": COLORS["primary"], "linewidth": 1.6},
-    )
-    ax.set_ylabel(
-        f"Funded-origin contracts, 3 months to {state['latest_complete']:%B %Y}"
-    )
-    ax.set_xlabel("Observed-history tier")
-    ax.tick_params(length=0)
-    figures.append(
-        {
-            "figure_id": "T1_01_Current_Actual_Baseline",
-            "figure": fig,
-            "status": "SUPPORTED",
-            "insight": "Current observed activity differs strongly across history tiers.",
-            "evidence": f"Median 3-month funded-origin actual for tier A is "
-            f"{primary.loc[primary.observed_history_tier.eq('A'), f'current_actual_3m_{PRIMARY_OUTCOME}'].median():,.0f} "
-            f"contracts; tier D median is "
-            f"{primary.loc[primary.observed_history_tier.eq('D'), f'current_actual_3m_{PRIMARY_OUTCOME}'].median():,.0f}.",
-            "implication": "Forecast capability must be reported by tier rather than as one network number.",
-            "limitation": "Funded-origin is the contest assumption A01; raw application volume is a separate outcome.",
-        }
-    )
-
-    monthly = state["monthly"].copy()
-    fig, ax = plt.subplots(
-        figsize=(8.0, 4.0), dpi=FORECAST_DPI, facecolor=COLORS["white"]
-    )
-    ax.plot(
-        monthly.month_start,
-        monthly.funded_contract_rows,
-        color=COLORS["primary"],
-        linewidth=1.8,
-        label="Funded-origin contracts",
-    )
-    ax.plot(
-        monthly.month_start,
-        monthly.contract_application_rows,
-        color=COLORS["secondary"],
-        linewidth=1.4,
-        label="Contract applications",
-    )
-    ax.xaxis.set_major_locator(mdates.AutoDateLocator(minticks=4, maxticks=8))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %y"))
-    compact_axis(ax)
-    ax.set_ylabel("Recorded event rows")
-    ax.legend(frameon=False, fontsize=8)
-    figures.append(
-        {
-            "figure_id": "T1_02_Monthly_Shop_Trends",
-            "figure": fig,
-            "status": "SUPPORTED",
-            "insight": "Monthly activity moved through a clear expansion and later slowdown.",
-            "evidence": f"Window covers {state['history_start']:%B %Y} to {state['latest_complete']:%B %Y}; "
-            f"last complete month has {int(monthly.funded_contract_rows.iloc[-1]):,} funded-origin contracts "
-            f"and {int(monthly.contract_application_rows.iloc[-1]):,} applications.",
-            "implication": "Forecast origins must respect the difference between record volume and funded-origin volume.",
-            "limitation": "Monthly sums include recorded rows only; missing shop-months are not zero.",
-        }
-    )
-
-    cohort = (
-        summary[summary.identified_shop_id]
-        .assign(cohort=summary.first_activity_month.dt.to_period("M").astype(str))
-        .groupby("cohort", as_index=False)
-        .agg(
-            shop_ids=("shop_key", "nunique"),
-            median_months=("observed_months", "median"),
-        )
-    )
-    fig, ax = plt.subplots(
-        figsize=(8.0, 4.0), dpi=FORECAST_DPI, facecolor=COLORS["white"]
-    )
-    ax.bar(cohort.cohort, cohort.shop_ids, color=COLORS["primary"])
-    ax.set_ylabel("Shop IDs first observed")
-    ax.set_xlabel("First observed contract month")
-    ax.tick_params(axis="x", rotation=45, length=0)
-    figures.append(
-        {
-            "figure_id": "T1_03_Shop_Lifecycle_Cohorts",
-            "figure": fig,
-            "status": "SUPPORTED",
-            "insight": "Most shops enter the observed window early, with a smaller later cohort.",
-            "evidence": f"Largest cohort is {cohort.sort_values('shop_ids', ascending=False).iloc[0].cohort} with "
-            f"{int(cohort.sort_values('shop_ids', ascending=False).iloc[0].shop_ids):,} shops.",
-            "implication": "History-based tiers are required because lifecycle length is highly uneven.",
-            "limitation": "First observed month is an extract artefact, not a verified opening date.",
-        }
-    )
-
-    peers = (
-        summary[summary.peer_supported]
-        .groupby("peer_group")
-        .agg(
-            shops=("shop_key", "nunique"),
-            median=("current_actual_3m_funded", "median"),
-            q1=("current_actual_3m_funded", lambda values: values.quantile(0.25)),
-            q3=("current_actual_3m_funded", lambda values: values.quantile(0.75)),
-        )
-        .reset_index()
-    )
-    peers = peers.sort_values("shops", ascending=False).head(10).sort_values("median")
-    fig, ax = plt.subplots(
-        figsize=(8.0, 4.4), dpi=FORECAST_DPI, facecolor=COLORS["white"]
-    )
-    y = np.arange(len(peers))
-    ax.errorbar(
-        peers["median"],
-        y,
-        xerr=[peers["median"] - peers.q1, peers.q3 - peers["median"]],
-        fmt="o",
-        color=COLORS["primary"],
-        ecolor=COLORS["mid"],
-        capsize=3,
-    )
-    ax.set_yticks(y, peers.peer_group.str.slice(0, 36))
-    ax.set_xlabel("3-month funded-origin contracts (median and interquartile range)")
-    figures.append(
-        {
-            "figure_id": "T1_04_Comparable_Shop_Benchmark",
-            "figure": fig,
-            "status": "SUPPORTED",
-            "insight": "Peer groups differ in both level and dispersion of current activity.",
-            "evidence": f"{len(peers):,} supported peer groups shown; top group contains "
-            f"{int(peers.shops.max()):,} shops.",
-            "implication": "Comparisons should stay within a supported category-model peer group.",
-            "limitation": "Peer definitions use current snapshot attributes and observed-tier membership.",
-        }
-    )
-
-    ladder = state["backtest"][
-        (state["backtest"].split == "validation")
-        & (state["backtest"].outcome == PRIMARY_OUTCOME)
-    ]
-    ladder = ladder[ladder.horizon == 1]
-    best_tier = (
-        state["decisions"][(PRIMARY_OUTCOME, "A", 1)]["model"]
-        if (PRIMARY_OUTCOME, "A", 1) in state["decisions"]
-        else "recent_3m"
-    )
-    ladder = ladder[ladder.tier == "A"].sort_values("wape")
-    fig, ax = plt.subplots(
-        figsize=(8.0, 4.2), dpi=FORECAST_DPI, facecolor=COLORS["white"]
-    )
-    ax.barh(
-        ladder.model,
-        ladder.wape,
-        color=[
-            COLORS["primary"] if model == best_tier else COLORS["mid"]
-            for model in ladder.model
-        ],
-    )
-    ax.set_xlabel("Validation WAPE (lower is better)")
-    figures.append(
-        {
-            "figure_id": "T1_05_Forecast_Model_Ladder",
-            "figure": fig,
-            "status": "SUPPORTED",
-            "insight": "Transparent baselines are competitive; the selected model is tier-specific.",
-            "evidence": f"Tier A horizon 1 selects {best_tier}; best validation WAPE is "
-            f"{float(ladder.wape.min()):.3f}.",
-            "implication": "Model choice is justified by out-of-sample error, not complexity.",
-            "limitation": "Validation evidence is short-history and tier-specific.",
-        }
-    )
-
-    holdout = state["backtest"][
-        (state["backtest"].split == "holdout")
-        & (state["backtest"].outcome == PRIMARY_OUTCOME)
-    ]
-    selected_rows = []
-    for tier in ("A", "B", "C"):
-        for horizon in HORIZONS:
-            model = state["decisions"][(PRIMARY_OUTCOME, tier, horizon)]["model"]
-            row = holdout[
-                (holdout.tier == tier)
-                & (holdout.horizon == horizon)
-                & (holdout.model == model)
-            ]
-            baseline = holdout[
-                (holdout.tier == tier)
-                & (holdout.horizon == horizon)
-                & (holdout.model == "recent_3m")
-            ]
-            if not row.empty:
-                selected_rows.append(
-                    {
-                        "label": f"{tier} · h{horizon}",
-                        "selected": float(row.wape.iloc[0]),
-                        "baseline": float(baseline.wape.iloc[0])
-                        if not baseline.empty
-                        else np.nan,
-                    }
-                )
-    comparison = pd.DataFrame(selected_rows)
-    fig, ax = plt.subplots(
-        figsize=(8.0, 4.2), dpi=FORECAST_DPI, facecolor=COLORS["white"]
-    )
-    positions = np.arange(len(comparison))
-    ax.bar(
-        positions - 0.19,
-        comparison.selected,
-        width=0.38,
-        color=COLORS["primary"],
-        label="Selected model",
-    )
-    ax.bar(
-        positions + 0.19,
-        comparison.baseline,
-        width=0.38,
-        color=COLORS["mid"],
-        label="Trailing 3-month baseline",
-    )
-    ax.set_xticks(positions, comparison.label, rotation=45, ha="right")
-    ax.set_ylabel("Holdout WAPE")
-    ax.legend(frameon=False, fontsize=8)
-    figures.append(
-        {
-            "figure_id": "T1_06_Rolling_Origin_Backtest",
-            "figure": fig,
-            "status": "SUPPORTED",
-            "insight": "Model advantage over the trailing baseline exists in some tier-horizon cells only.",
-            "evidence": f"Selected model beats the trailing baseline in "
-            f"{int((comparison.selected <= comparison.baseline).sum()):,} of {len(comparison):,} tier-horizon cells.",
-            "implication": "Where the baseline wins, BAU should be reported as a trailing reference.",
-            "limitation": "Holdout origins are few; WAPE differences are noisy.",
-        }
-    )
-
-    calibration = state["coverage_summary"]
-    if calibration.empty:
-        figures.append({"figure_id": "T1_07_Forecast_Interval_Calibration", "figure": None, "status": "UNSUPPORTED",
-                        "insight": "Interval coverage could not be evaluated.", "evidence": "No holdout residuals were available.",
-                        "implication": "Report intervals as uncalibrated.", "limitation": "No holdout evidence."})
-        return figures
-    fig, ax = plt.subplots(
-        figsize=(8.0, 3.8), dpi=FORECAST_DPI, facecolor=COLORS["white"]
-    )
-    ax.bar(
-        calibration.horizon.astype(str), calibration.coverage, color=COLORS["primary"]
-    )
-    ax.axhline(
-        NOMINAL_INTERVAL,
-        color=COLORS["risk"],
-        linestyle="--",
-        linewidth=1.1,
-        label="Nominal 80%",
-    )
-    ax.set_ylim(0, 1)
-    ax.set_xlabel("Forecast horizon")
-    ax.set_ylabel("Holdout interval coverage")
-    ax.legend(frameon=False, fontsize=8)
-    figures.append(
-        {
-            "figure_id": "T1_07_Forecast_Interval_Calibration",
-            "figure": fig,
-            "status": "SUPPORTED",
-            "insight": "Intervals are built from validation residuals and checked on later origins.",
-            "evidence": f"Holdout coverage ranges from {calibration.coverage.min():.2f} to {calibration.coverage.max():.2f}.",
-            "implication": "Wide intervals should accompany fallback and short-history tiers.",
-            "limitation": "Residual quantiles are tier-level, not shop-specific.",
-        }
-    )
-
-    pair = state["pair"]
-    ymax = 0.0
-    pair_series = {}
-    for shop_key in pair.get("shop_ids", []):
-        history = state["panel"][state["panel"].shop_key.eq(shop_key)].sort_values(
-            "month_start"
-        )
-        history = history[history.contract_observed]
-        pair_series[shop_key] = history[
-            ["month_start", f"{PRIMARY_OUTCOME}_observed_value"]
-        ].dropna()
-        if not pair_series[shop_key].empty:
-            ymax = max(
-                ymax,
-                float(pair_series[shop_key][f"{PRIMARY_OUTCOME}_observed_value"].max()),
-            )
-    bau = state["forecasts"][(state["forecasts"].outcome == PRIMARY_OUTCOME)]
-    for shop_key in pair.get("shop_ids", []):
-        rows = bau[bau.shop_key.eq(shop_key) & bau.horizon.ne(TOTAL_HORIZON)]
-        ymax = max(ymax, float(rows.hi.max()) if not rows.empty else 0.0)
-    ymax = max(ymax, 1.0)
-    for position, shop_key in enumerate(pair.get("shop_ids", [])):
-        fig, ax = plt.subplots(
-            figsize=(8.0, 4.0), dpi=FORECAST_DPI, facecolor=COLORS["white"]
-        )
-        series = pair_series.get(shop_key, pd.DataFrame())
-        if not series.empty:
-            ax.plot(
-                series.month_start,
-                series[f"{PRIMARY_OUTCOME}_observed_value"],
-                color=COLORS["primary"],
-                marker="o",
-                markersize=3,
-                linewidth=1.4,
-                label="Observed funded-origin contracts",
-            )
-        rows = bau[
-            bau.shop_key.eq(shop_key) & bau.horizon.ne(TOTAL_HORIZON)
-        ].sort_values("horizon")
-        if not rows.empty:
-            ax.plot(
-                rows.target_month,
-                rows.point,
-                color=COLORS["secondary"],
-                marker="s",
-                markersize=4,
-                linewidth=1.5,
-                label="BAU path",
-            )
-            ax.fill_between(
-                rows.target_month,
-                rows.lo,
-                rows.hi,
-                color=COLORS["mid"],
-                alpha=0.25,
-                label="BAU interval",
-            )
-        ax.set_ylim(0, ymax * 1.1)
-        ax.set_ylabel("Funded-origin contracts per month")
-        ax.set_xlim(
-            series.month_start.min() if not series.empty else state["history_start"],
-            state["latest_complete"] + pd.DateOffset(months=3),
-        )
-        ax.xaxis.set_major_locator(mdates.AutoDateLocator(minticks=3, maxticks=6))
-        ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %y"))
-        ax.legend(frameon=False, fontsize=7.5, loc="upper left")
-        figure_id = f"T1_08{'A' if position == 0 else 'B'}_Shop_Actual_vs_BAU"
-        figures.append(
-            {
-                "figure_id": figure_id,
-                "figure": fig,
-                "status": "SUPPORTED",
-                "insight": "similar today, different BAU trajectory",
-                "evidence": f"Shop {shop_key}: 3-month actual {pair['actual_3m_funded'][shop_key]:,.0f}; "
-                f"BAU 3M total {pair['bau_3m_total'][shop_key]['point']:,.0f} "
-                f"(interval {pair['bau_3m_total'][shop_key]['lo']:,.0f} to "
-                f"{pair['bau_3m_total'][shop_key]['hi']:,.0f}).",
-                "implication": "Similar current volume does not imply the same forward trajectory.",
-                "limitation": "The pair is selected on pre-origin evidence; contrasts are observed, not causal.",
-            }
-        )
-    return figures
-
-
-# ---------------------------------------------------------------- audits
-
-
-def reconciliation_checks(state: dict[str, Any]) -> list[dict[str, Any]]:
-    window_start, window_end = state["history_start"], state["latest_complete"]
-    panel = state["panel"][state["panel"].month_start.between(window_start, window_end)]
-    funded_panel = float(panel.funded_contract_count.sum())
-    application_panel = float(panel.contract_application_event_rows.sum())
-    funded_month = state["funded_by_month"].copy()
-    funded_month["m"] = pd.to_datetime(funded_month.m)
-    funded_month = funded_month[funded_month.m.between(window_start, window_end)]
-    application_month = (
-        state["metrics"].get("join_reconciliation", {}).get("contract_month_event_rows")
-    )
-    checks = [
-        {
-            "check": "funded_rows_reconcile_to_contract_source",
-            "observed": funded_panel,
-            "expected": float(funded_month.funded.sum()),
-            "status": "PASS"
-            if funded_panel == float(funded_month.funded.sum())
-            else "FAIL",
-        },
-        {
-            "check": "application_rows_reconcile_to_phase1_month_rows",
-            "observed": application_panel,
-            "expected": None if application_month is None else float(application_month),
-            "status": "PASS"
-            if application_month is not None
-            and application_panel == float(application_month)
-            else "FAIL",
-        },
-        {
-            "check": "one_row_per_shop_outcome_horizon",
-            "observed": int(
-                state["forecasts"].duplicated(["shop_key", "outcome", "horizon"]).sum()
-            ),
-            "expected": 0,
-            "status": "PASS"
-            if not state["forecasts"]
-            .duplicated(["shop_key", "outcome", "horizon"])
-            .any()
-            else "FAIL",
-        },
-        {
-            "check": "fnd02_monthly_columns_superset",
-            "observed": sorted(state["phase2_monthly_columns"]),
-            "expected": [
-                "month_start",
-                "contract_application_rows",
-                "lead_assignment_rows",
-                "shops_with_any_recorded_event",
-            ],
-            "status": "PASS"
-            if {
-                "month_start",
-                "contract_application_rows",
-                "lead_assignment_rows",
-                "shops_with_any_recorded_event",
-            }.issubset(state["phase2_monthly_columns"])
-            else "FAIL",
-        },
-    ]
-    total_rows = state["forecasts"][
-        state["forecasts"].horizon == TOTAL_HORIZON
-    ].set_index(["shop_key", "outcome"])
-    horizon_rows = state["forecasts"][state["forecasts"].horizon != TOTAL_HORIZON]
-    mismatches = 0
-    for (shop_key, outcome), total in total_rows.iterrows():
-        parts = horizon_rows[
-            (horizon_rows.shop_key == shop_key) & (horizon_rows.outcome == outcome)
-        ]
-        if len(parts) == len(HORIZONS):
-            expected = float(parts.point.sum())
-            if abs(expected - float(total.point)) > 1e-6:
-                mismatches += 1
-    checks.append(
-        {
-            "check": "three_month_total_equals_horizon_sum",
-            "observed": mismatches,
-            "expected": 0,
-            "status": "PASS" if mismatches == 0 else "FAIL",
-        }
-    )
-    checks.append(
-        {
-            "check": "origin_precedes_all_targets",
-            "observed": str(state["forecasts"].target_month.min().date()),
-            "expected": f"later than origin {state['forecasts'].origin_month.max().date()}",
-            "status": "PASS"
-            if state["forecasts"].target_month.min() > state["forecasts"].origin_month.max()
-            else "FAIL",
-        }
-    )
-    source_pattern = (
-        r"\"(?:January|February|March|April|May|June|July|August|September|October|November|December) "
-        r"\d{4}\"|\"20\d{2}-\d{2}"
-    )
-    hard_coded = bool(re.search(source_pattern, Path(__file__).read_text(encoding="utf-8")))
-    checks.append(
-        {
-            "check": "no_hand_typed_month_year_in_text",
-            "observed": hard_coded,
-            "expected": False,
-            "status": "PASS" if not hard_coded else "FAIL",
-        }
-    )
-    return checks
-
-
-def holdout_subgroup_errors(state: dict[str, Any]) -> pd.DataFrame:
-    metrics = state["backtest"]
-    rows = []
+def build_task1() -> dict[str, Any]:
+    raw, lead_month, context = load_inputs()
+    months, latest = context["months"], context["latest"]
+    raw = raw[raw.month_start.isin(months)].copy()
+    raw["contract_observed"] = pd.to_numeric(raw.contract_application_event_rows, errors="coerce").fillna(0).gt(0)
+    for outcome, source_col in OUTCOMES.items():
+        raw[f"y_{outcome}"] = pd.to_numeric(raw[source_col], errors="coerce").where(raw.contract_observed)
+    summary = raw.groupby("shop_key", sort=True).agg(
+        shop_id=("skp_salesroom_id", "first"), category=("salesroom_category", "first"),
+        model=("salesroom_model", "first"), master_state=("shop_master_state", "first"),
+        observed_months=("contract_observed", "sum"),
+        first_recorded_activity=("month_start", lambda s: s[raw.loc[s.index,"contract_observed"]].min()),
+        last_recorded_activity=("month_start", lambda s: s[raw.loc[s.index,"contract_observed"]].max()),
+    ).reset_index()
+    summary["tier"] = tier_for_counts(summary.observed_months.to_numpy())
+    summary["forecast_eligible"] = (summary.shop_id.notna() & summary.observed_months.ge(3)
+                                     & summary.last_recorded_activity.ge(latest-pd.DateOffset(months=2)))
+    summary["eligibility_status"] = np.where(summary.forecast_eligible,"ELIGIBLE_HISTORY_BASELINE","INSUFFICIENT_OR_DORMANT_HISTORY")
+    all_backtest, all_forecasts, all_decisions = [], [], {}
     for outcome in OUTCOMES:
-        holdout = metrics[
-            (metrics.outcome == outcome) & (metrics.split == "holdout")
-        ].copy()
-        for tier in ("A", "B", "C"):
-            for horizon in HORIZONS:
-                model = state["decisions"][(outcome, tier, horizon)]["model"]
-                row = holdout[
-                    (holdout.tier == tier)
-                    & (holdout.horizon == horizon)
-                    & (holdout.model == model)
-                ]
-                if row.empty:
-                    continue
-                rows.append(
-                    {
-                        "outcome": outcome,
-                        "tier": tier,
-                        "horizon": horizon,
-                        "model": model,
-                        "n": int(row.n.iloc[0]),
-                        "wape": float(row.wape.iloc[0]),
-                        "bias": float(row.bias_actual_minus_forecast.iloc[0]),
-                    }
-                )
-    return pd.DataFrame(rows)
+        matrix=raw.pivot(index="shop_key",columns="month_start",values=f"y_{outcome}").reindex(index=summary.shop_key,columns=months)
+        mask=raw.pivot(index="shop_key",columns="month_start",values="contract_observed").reindex(index=summary.shop_key,columns=months).fillna(False).astype(bool)
+        y,observed=matrix.to_numpy(float),mask.to_numpy(bool)
+        actual=[]; actual_n=[]
+        for i in range(len(summary)):
+            value,n=complete_window_sum(y[i,-3:],observed[i,-3:]);actual.append(value);actual_n.append(n)
+        summary[f"current_actual_3m_{outcome}"]=actual
+        summary[f"current_actual_3m_months_{outcome}"]=actual_n
+        if outcome=="funded":
+            summary["current_actual_3m"]=actual
+            summary["current_actual_3m_observed_months"]=actual_n
+            summary["observation_quality_state"]=np.where(np.array(actual_n)==3,"COMPLETE_3M_OBSERVED",np.where(np.array(actual_n)>0,"PARTIAL_3M_OBSERVATION","NO_3M_OBSERVATION"))
+        backtest=rolling_backtest(y,observed,months,outcome)
+        decisions=choose_simple_model(backtest,outcome)
+        _choose_intervals(backtest,decisions)
+        forecasts=forecast_current(y,observed,months,summary,outcome,decisions)
+        all_backtest.append(backtest);all_forecasts.append(forecasts);all_decisions[outcome]=decisions
+    summary=_attach_constraints(summary,lead_month,latest)
+    return publish_task1(summary,pd.concat(all_forecasts,ignore_index=True),pd.concat([x["metrics"] for x in all_backtest],ignore_index=True),all_decisions,raw,months,latest,context)
 
 
-def missing_outcome_bounds(state: dict[str, Any]) -> pd.DataFrame:
-    coverage = state["backtest_coverage"]
-    coverage = coverage.groupby(
-        ["outcome", "tier", "split", "horizon"], as_index=False
-    ).agg(
-        candidate_shops=("candidate_shops", "sum"),
-        observed_targets=("observed_targets", "sum"),
-    )
-    coverage["missing_targets"] = coverage.candidate_shops - coverage.observed_targets
-    coverage["observed_share"] = (
-        coverage.observed_targets / coverage.candidate_shops.replace(0, np.nan)
-    )
-    return coverage
+def publish_task1(summary, forecasts, backtest, decisions_by_outcome, raw, months, latest, context):
+    global STATE_DECISIONS
+    STATE_DECISIONS={(outcome,tier,h):d for outcome,mapping in decisions_by_outcome.items() for (tier,h),d in mapping.items()}
+    candidate=select_similar_pair(summary,tolerance=.10)
+    pair={"status":"UNSUPPORTED","pair_ids":[],"reliability_reasons":["NO_COMPLETE_ACTUAL_PAIR_MET_A05"]}
+    if candidate:
+        ids=candidate["pair_ids"];reasons=[];actuals={};bau={};diagnostics={}
+        for sid in ids:
+            shop=summary.loc[summary.shop_key.eq(sid)].iloc[0]
+            actuals[sid]=float(shop.current_actual_3m_funded)
+            ft=forecasts[(forecasts.shop_key==sid)&(forecasts.outcome=="funded")&(forecasts.horizon==TOTAL)]
+            if ft.empty:
+                bau[sid]={"point":None,"lo":None,"hi":None};reasons.append(f"{sid}:NO_FORECAST")
+            else:
+                row=ft.iloc[0];bau[sid]={"point":row.point,"lo":row.lo,"hi":row.hi}
+                if row.downstream_usage_recommendation!="EVIDENCE_QUALIFIED_BAU":reasons.append(f"{sid}:DESCRIPTIVE_ONLY_BAU")
+            if int(shop.current_actual_3m_observed_months)!=3:reasons.append(f"{sid}:INCOMPLETE_3M_ACTUAL")
+            recent=raw[(raw.shop_key==sid)&raw.month_start.isin(months[-6:])].sort_values("month_start")
+            diagnostics[sid]={"actual_observed_months_of_3":int(shop.current_actual_3m_observed_months),
+                "observation_quality_state":shop.observation_quality_state,"last_recorded_activity":shop.last_recorded_activity,
+                "recent_observations":[{"month":r.month_start,"observed":bool(r.contract_observed),"funded":float(r.funded_contract_count) if r.contract_observed else None,"applications":float(r.contract_application_event_rows) if r.contract_observed else None} for r in recent.itertuples()],
+                "partial_3m_observed_funded_sum":float(recent[recent.month_start.isin(months[-3:])&recent.contract_observed].funded_contract_count.sum()),
+                "recent_lead_rows":shop.lead_rows_3m,"recent_lead_uuids":shop.lead_uuids_3m,"lead_match_rate":shop.lead_match_rate,
+                "forecast_path":forecasts[(forecasts.shop_key==sid)&(forecasts.outcome=="funded")&forecasts.horizon.isin(HORIZONS)][["horizon","point","model","forecast_reliability","interval_status","lo","hi"]].to_dict("records")}
+        pair={"status":"ILLUSTRATIVE_ONLY" if reasons else "SUPPORTED_PAIR","pair_ids":ids,
+              "selection_rule":"closest adjacent complete actuals within 10%, same available category/model, peer n>=30; lead-match contrast breaks ties",
+              "peer_group":candidate["peer_group"],"peer_support":candidate["peer_support"],"actual_delta_pct":candidate["actual_delta_pct"],
+              "current_actual_3m_funded":actuals,"bau_3m_total":bau,"reliability_diagnostics":diagnostics,
+              "reliability_reasons":reasons,"causal_claim":False}
+    calibration=pd.DataFrame([{"outcome":o,"tier":t,"horizon":h,"model":d["model"],"nominal_coverage":NOMINAL,
+        "empirical_holdout_coverage":d.get("holdout_empirical_coverage"),"holdout_n":d.get("holdout_n",0),"interval_status":d.get("interval_status")}
+        for o,mapping in decisions_by_outcome.items() for (t,h),d in mapping.items()])
+    OUT.mkdir(parents=True,exist_ok=True)
+    figures=_figures(summary,forecasts,backtest,calibration,raw,pair,latest)
+    app_total=float(raw.contract_application_event_rows.sum())
+    app_expected=context["metrics"].get("join_reconciliation",{}).get("contract_month_event_rows")
+    total=forecasts[forecasts.horizon==TOTAL];parts=forecasts[forecasts.horizon!=TOTAL]
+    total_bad=horizon_total_mismatches(parts,total)
+    checks=[
+        {"check":"phase1_revision2_gate","observed":context["gate"].get("execution_status"),"expected":"SUCCESS","status":"PASS" if context["gate"].get("execution_status")=="SUCCESS" and not context["gate"].get("fatal_failures") else "FAIL"},
+        {"check":"application_rows_reconcile","observed":app_total,"expected":app_expected,"status":"PASS" if app_expected is not None and app_total==float(app_expected) else "FAIL"},
+        {"check":"forecast_keys_unique","observed":int(forecasts.duplicated(["shop_key","outcome","horizon"]).sum()),"expected":0,"status":"PASS" if not forecasts.duplicated(["shop_key","outcome","horizon"]).any() else "FAIL"},
+        {"check":"targets_after_origin","observed":bool((forecasts.target_month>forecasts.origin_month).all()),"expected":True,"status":"PASS" if (forecasts.target_month>forecasts.origin_month).all() else "FAIL"},
+        {"check":"missing_contract_observations_not_zero","observed":int((~raw.contract_observed & raw.y_funded.notna()).sum()),"expected":0,"status":"PASS" if not ((~raw.contract_observed)&raw.y_funded.notna()).any() else "FAIL"},
+        {"check":"3M_TOTAL_reconciles_horizons","observed":total_bad,"expected":0,"status":"PASS" if total_bad==0 else "FAIL"},
+        {"check":"reliability_fields_present","observed":all(c in forecasts for c in ["forecast_reliability","eligibility_status","interval_status","observation_quality_state","downstream_usage_recommendation"]),"expected":True,"status":"PASS"},
+        {"check":"pair_actual_coverage_status","observed":pair.get("status"),"expected":"downgraded if actual incomplete","status":"PASS" if pair.get("status")!="SUPPORTED_PAIR" or all(x["actual_observed_months_of_3"]==3 for x in pair.get("reliability_diagnostics",{}).values()) else "FAIL"},
+    ]
+    split=split_origins(3,len(months)-max(HORIZONS));val=split["validation"]
+    tier_diag={o:{"tier_A_required_prior_observed_months":18,"validation_origin_indices":val,
+                  "validation_origin_months":[str(months[i-1].date()) for i in val],
+                  "maximum_prior_calendar_months":max(val,default=0),
+                  "reason":"Each origin assigns tiers using prior observed contract months only. This history ends validation before the 18-month Tier A threshold; missing shop months reduce per-shop history further. Threshold retained.",
+                  "status":"INSUFFICIENT_VALIDATION" if max(val,default=0)<18 else "CHECK_PER_SHOP_COUNTS"} for o in OUTCOMES}
+    audit={"status":"SUCCESS" if all(x["status"]=="PASS" for x in checks) else "FAILED","phase1_gate":context["gate"],
+           "window":{"history_start":months[0],"latest_complete":latest,"origin":months[-1],"contract_max_date":context["contract_max"]},
+           "tier_validation_diagnostic":tier_diag,"decision_policy":"Selection split chooses a model; validation confirms it against trailing_3m; holdout reports performance only and does not select models or interval bounds.",
+           "model_decisions":[{"outcome":o,"tier":t,"horizon":h,**d} for o,mapping in decisions_by_outcome.items() for (t,h),d in mapping.items()],
+           "interval_calibration":calibration,"pair":pair,"checks":checks,
+           "assumptions":{"current_actual":"Only complete three-month contract-observed windows; incomplete windows are null.","BAU":"Trailing mean of up to three prior observed months or linear trend over six prior observations; no seasonal or causal claim.","intervals":"Validation residual ranges checked on holdout; descriptive only, never claimed calibrated at 80%.","pair":"A05: closest adjacent complete actuals within ±10%, same available category/model, minimum peer n=30; observed lead-match contrast breaks ties; unmatched-master shops do not form one pseudo-peer group."},
+           "task2_usage":"Quantitative potential gaps may use only EVIDENCE_QUALIFIED_BAU; DESCRIPTIVE_ONLY forecasts are excluded."}
+    OUT.mkdir(parents=True,exist_ok=True)
+    summary.to_parquet(OUT/"shop_performance_summary.parquet",index=False,compression="zstd")
+    forecasts.to_parquet(OUT/"shop_bau_forecast.parquet",index=False,compression="zstd")
+    backtest.to_parquet(OUT/"task1_backtest.parquet",index=False,compression="zstd")
+    write_json(OUT/"task1_audit.json",audit);write_json(OUT/"task1_pair.json",pair)
+    notes=["# Task 1 — Shop performance and BAU","",f"Observed contract history: {months[0]:%b %Y} to {latest:%b %Y}.",
+           "Observed facts use contract-positive months; missing shop-months remain missing. Current actual is null unless all three months are observed.",
+           "BAU compares trailing three-observation mean with a simple linear trend. Selection and validation choose; holdout only evaluates.",
+           "Tier A has insufficient validation because validation origins do not contain 18 prior months; the 18-month threshold was retained.",
+           "Intervals are empirical residual ranges, not guaranteed 80% intervals.",f"Comparable pair {pair.get('pair_ids')} status={pair.get('status')}; flags={pair.get('reliability_reasons',[])}.",
+           "Task 2 may use only EVIDENCE_QUALIFIED_BAU rows quantitatively; DESCRIPTIVE_ONLY rows cannot support gap claims.",""]
+    for item in figures:notes.extend([f"## {item['figure_id']}",f"![{item['figure_id']}]({item['figure_id']}.png)",item["insight"],item["evidence"],item["limitation"],""])
+    (OUT/"task1_insights.md").write_text("\n".join(notes),encoding="utf-8")
+    for item in figures:
+        if item.get("figure") is not None:item["figure"].savefig(OUT/f"{item['figure_id']}.png",dpi=DPI,facecolor="white",bbox_inches="tight");plt.close(item["figure"])
+    return {"summary":summary,"forecasts":forecasts,"backtest":backtest,"audit":audit,"pair":pair,"figures":figures}
 
 
-def interval_calibration(state: dict[str, Any], backtests: dict[str, Any]) -> pd.DataFrame:
-    rows = []
-    for outcome in OUTCOMES:
-        quantiles_map = backtests[outcome]["interval_quantiles"]
-        for tier in ("A", "B", "C"):
-            for horizon in HORIZONS:
-                decision = state["decisions"][(outcome, tier, horizon)]
-                validation_key = (tier, "validation", horizon, decision["model"])
-                quantiles = quantiles_map.get(validation_key)
-                holdout_key = (tier, "holdout", horizon, decision["model"])
-                if quantiles is None or holdout_key not in quantiles_map:
-                    continue
-                low, high = quantiles
-                residuals = np.asarray(quantiles_map[holdout_key], dtype=float)
-                rows.append(
-                    {
-                        "outcome": outcome,
-                        "tier": tier,
-                        "horizon": horizon,
-                        "coverage": float(
-                            np.mean((residuals >= low) & (residuals <= high))
-                        )
-                        if len(residuals)
-                        else np.nan,
-                    }
-                )
-    frame = pd.DataFrame(rows)
-    if frame.empty:
-        return pd.DataFrame(columns=["horizon", "coverage"])
-    return frame.groupby("horizon", as_index=False).coverage.mean()
-
-
-def positive_only_sensitivity(
-    y: np.ndarray, observed: np.ndarray, months: pd.DatetimeIndex
-) -> dict[str, Any]:
-    positive = observed & np.isfinite(y) & (y > 0)
-    counts = positive.sum(axis=1)
-    baseline = observed.sum(axis=1)
-    result = run_backtest(y, positive, months, PRIMARY_OUTCOME)
-    decisions = choose_decisions(result, PRIMARY_OUTCOME)
-    tier_shift = {
-        tier: int(((tier_for_counts(baseline) == tier) != (tier_for_counts(counts) == tier)).sum())
-        for tier in ("A", "B", "C", "D")
-    }
-    return {
-        "tier_shift": {
-            tier: int(
-                (
-                    (tier_for_counts(baseline) == tier)
-                    != (tier_for_counts(counts) == tier)
-                ).sum()
-            )
-            for tier in ("A", "B", "C", "D")
-        },
-        "shops_tier_changed": int(
-            (tier_for_counts(baseline) != tier_for_counts(counts)).sum()
-        ),
-        "decision_status": {
-            f"{tier}_h{horizon}": decisions[(tier, horizon)]["status"]
-            for tier in ("A", "B", "C")
-            for horizon in HORIZONS
-        },
-    }
-
-
-# ---------------------------------------------------------------- insights
-
-
-def build_insights(state: dict[str, Any], figures: list[dict[str, Any]]) -> str:
-    pair = state["pair"]
-    pair_note = (
-        (
-            f"Pair {pair.get('pair_id')} selected with rule {pair.get('rule_used')} "
-            f"(tolerance ±{100 * pair.get('tolerance', 0):.0f}%)."
-        )
-        if pair.get("status") == "SUPPORTED"
-        else "No supported similar-current pair was found."
-    )
-    lines = ["# Task 1 — Shop performance and BAU", ""]
-    for figure in figures:
-        lines.extend(
-            [
-                f"## {figure['figure_id']}",
-                f"![{figure['figure_id']}]({figure['figure_id']}.png)",
-                "",
-                f"**Insight:** {figure['insight']}",
-                "",
-                f"**Evidence:** {figure['evidence']}",
-                "",
-                f"**Implication:** {figure['implication']}",
-                "",
-                f"**Limitations:** {figure['limitation']}",
-                "",
-            ]
-        )
-        if figure["figure_id"].startswith("T1_08A"):
-            lines.extend([f"**Pair evidence:** {pair_note}", ""])
-    lines.extend(
-        [
-            "## Scope",
-            "",
-            "Descriptive and BAU only. No attainable potential, ranking, recommendation or causal effect is produced.",
-            "Funded-origin contracts follow contest assumption A01; application volume is a demand indicator.",
-            "Assigned headcount is a descriptive assignment count (A11), never FTE and never a forecast feature.",
-            "Sample weights are not used. No-event shop-months remain missing rather than zero demand.",
-        ]
-    )
-    return "\n".join(lines) + "\n"
-
-
-# ---------------------------------------------------------------- orchestration
-
-
-def main() -> dict[str, Any]:
-    context = load_window()
-    panel, months = prepare_panel(context["panel"], context)
-    lead_product = lead_product_features()
-    summary = build_summary(panel, context, months, lead_product)
-    window = panel[panel.lifecycle_state.eq("IN_LIFECYCLE")]
-    forecast_pool = summary[summary.forecast_eligible].sort_values("shop_key")
-    y_by_outcome, mask_by_outcome = {}, {}
-    for outcome in OUTCOMES:
-        pivot = window.pivot(index="shop_key", columns="month_start", values=f"{outcome}_observed_value")
-        observed = window.pivot(index="shop_key", columns="month_start", values="contract_observed")
-        pivot = pivot.reindex(index=forecast_pool.shop_key, columns=months)
-        observed = observed.reindex(index=forecast_pool.shop_key, columns=months).fillna(False).astype(bool)
-        y_by_outcome[outcome] = pivot.to_numpy(dtype=float)
-        mask_by_outcome[outcome] = observed.to_numpy(dtype=bool)
-
-    origin = len(months)
-    backtests, decisions, pairs = {}, {}, {}
-    forecast_frames = []
-    for outcome in OUTCOMES:
-        backtests[outcome] = run_backtest(y_by_outcome[outcome], mask_by_outcome[outcome], months, outcome)
-        decisions[outcome] = choose_decisions(backtests[outcome], outcome)
-        ridge_model = fit_ridge(y_by_outcome[outcome], mask_by_outcome[outcome], origin, months)
-        frame = build_forecasts(outcome, y_by_outcome[outcome], mask_by_outcome[outcome], months,
-                                forecast_pool, decisions[outcome], ridge_model, origin)
-        forecast_frames.append(frame)
-        pairs[outcome] = select_pair(summary, frame)
-    forecasts = pd.concat(forecast_frames, ignore_index=True)
-    forecasts["horizon"] = forecasts["horizon"].astype(str)
-    horizon_months = forecasts["horizon"].map(lambda value: 3 if value == TOTAL_HORIZON else int(value))
-    forecast_periods = pd.PeriodIndex(forecasts["origin_month"], freq="M") + horizon_months.to_numpy()
-    forecasts["target_month"] = forecast_periods.to_timestamp(how="start")
-    pair = pairs[PRIMARY_OUTCOME]
-
-    monthly = window.groupby("month_start", as_index=False).agg(
-        funded_contract_rows=("funded_contract_count", "sum"),
-        contract_application_rows=("contract_application_event_rows", "sum"),
-        lead_assignment_rows=("lead_event_rows", "sum"))
-    phase2_monthly = pd.read_parquet(PHASE2_MONTHLY)
-
-    state: dict[str, Any] = {
-        "context": context, "panel": panel, "summary": summary, "monthly": monthly,
-        "phase2_monthly_columns": [str(column) for column in phase2_monthly.columns],
-        "backtest": pd.concat([backtests[outcome]["metrics"] for outcome in OUTCOMES], ignore_index=True),
-        "backtest_coverage": pd.concat([backtests[outcome]["coverage"] for outcome in OUTCOMES], ignore_index=True),
-        "decisions": {(outcome, tier, horizon): decision
-                      for outcome in OUTCOMES
-                      for (tier, horizon), decision in decisions[outcome].items()},
-        "forecasts": forecasts, "pairs": pairs, "pair": pair,
-        "history_start": context["history_start"], "latest_complete": context["latest_complete"],
-        "lead_start": context["lead_start"], "partial_lead": context["partial_lead"],
-        "funded_by_month": context["funded_by_month"], "metrics": context["metrics"],
-    }
-    state["coverage_summary"] = interval_calibration(state, backtests)
-    figures = figure_state(state)
-    state["insights"] = build_insights(
-        state, [{key: value for key, value in item.items() if key != "figure"} for item in figures])
-    checks = reconciliation_checks(state)
-    sensitivity = positive_only_sensitivity(y_by_outcome[PRIMARY_OUTCOME], mask_by_outcome[PRIMARY_OUTCOME], months)
-
-    primary_rank = forecasts[(forecasts.outcome == PRIMARY_OUTCOME) & (forecasts.horizon == TOTAL_HORIZON)].set_index("shop_key").point
-    application_rank = forecasts[(forecasts.outcome == "application") & (forecasts.horizon == TOTAL_HORIZON)].set_index("shop_key").point
-    common = primary_rank.index.intersection(application_rank.index)
-    rank_stability = {
-        "spearman_rank_correlation": float(primary_rank.loc[common].corr(application_rank.loc[common], method="spearman"))
-        if len(common) > 1 else None,
-        "pair_unchanged_when_outcome_switched": pair_stability_share(pair, pairs["application"]),
-        "common_shop_count": int(len(common)),
-    }
-    forecast_counts = (forecasts[forecasts.horizon == TOTAL_HORIZON]
-                       .groupby(["outcome", "tier"], as_index=False).shop_key.nunique()
-                       .rename(columns={"shop_key": "forecasted_shops"}))
-
-    audits = {
-        "gate": {"execution_status": context["gate"].get("execution_status"),
-                 "fatal_failures": context["gate"].get("fatal_failures"),
-                 "business_gates_pending": context["gate"].get("business_gates_pending"),
-                 "warnings": context["warnings"]},
-        "window": {"history_start": context["history_start"], "latest_complete": context["latest_complete"],
-                   "lead_start": context["lead_start"], "partial_lead": context["partial_lead"],
-                   "contract_max_date": context["contract_max"], "lead_max_date": context["lead_max"],
-                   "forecast_origin_month": months[origin - 1], "horizons": list(HORIZONS)},
-        "phase1_optional_columns": {"present": context["optional_present"],
-                                     "derived_when_missing": context["optional_missing"]},
-        "observation_audit": (panel.assign(state=np.select(
-            [panel.contract_observed & panel.contract_application_event_rows.gt(0),
-             panel.contract_observed & panel.contract_application_event_rows.eq(0),
-             panel.lifecycle_state.ne("IN_LIFECYCLE")],
-            ["OBSERVED_POSITIVE", "OBSERVED_ZERO", "OUTSIDE_LIFECYCLE"], default="MISSING_IN_LIFECYCLE"))
-            .groupby("state", as_index=False).agg(shop_month_rows=("shop_key", "size"),
-                                                  shop_ids=("shop_key", "nunique"),
-                                                  contract_rows=("contract_application_event_rows", "sum"))),
-        "in_lifecycle_zero_event_months": int(summary.in_lifecycle_zero_event_months.sum()),
-        "source_reconciliation": checks,
-        "positive_only_sensitivity_primary_outcome": sensitivity,
-        "holdout_subgroup_errors": holdout_subgroup_errors(state),
-        "missing_outcome_bounds": missing_outcome_bounds(state),
-        "interval_calibration": state["coverage_summary"],
-        "coverage": (summary[summary.identified_shop_id]
-                     .groupby(["observed_history_tier", "eligibility_status"], as_index=False)
-                     .agg(shop_ids=("shop_key", "nunique"),
-                          market_matched=("shop_master_state", lambda values: int(values.eq("UNIQUE_MASTER_ROW").sum())),
-                          median_3m_funded=("current_actual_3m_funded", "median"))),
-        "forecasted_by_tier_outcome": forecast_counts,
-        "pair": pair,
-        "rank_stability": rank_stability,
-        "model_decisions": [{"outcome": outcome, "tier": tier, "horizon": horizon, **decision}
-                            for (outcome, tier, horizon), decision in state["decisions"].items()],
-        "warnings": context["warnings"],
-        "failed_checks": [check["check"] for check in checks if check["status"] != "PASS"],
-    }
-
-    primary_total = forecasts[
-        (forecasts.outcome == PRIMARY_OUTCOME) & (forecasts.horizon == TOTAL_HORIZON)
-    ].set_index("shop_key")
-    summary["forecast_reliability"] = summary.shop_key.map(primary_total.reliability).fillna("UNSUPPORTED")
-    summary["forecast_status"] = summary.shop_key.map(primary_total.status).fillna(summary.eligibility_status)
-
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    summary_columns = ["shop_key", "shop_id", "salesroom_category", "salesroom_model", "salesroom_status",
-                       "shop_master_state", "lifecycle_state", "first_activity_month", "last_activity_month",
-                       "dormant_flag", "observed_months", "in_lifecycle_months", "in_lifecycle_zero_event_months",
-                       "observed_history_tier", "current_actual_1m_funded", "current_actual_3m_funded",
-                       "current_actual_1m_application", "current_actual_3m_application", "peer_group", "peer_n",
-                       "peer_median", "peer_q1", "peer_q3", "peer_supported", "forecast_eligible",
-                       "eligibility_status", "forecast_reliability", "forecast_status",
-                       "lead_rows_3m", "lead_uuids_3m", "assigned_headcount_proxy_3m",
-                       "lead_product_mix_3m"]
-    summary_out = summary[summary_columns].copy()
-    summary_out["lead_product_mix_3m"] = summary_out["lead_product_mix_3m"].map(
-        lambda value: json.dumps(value, ensure_ascii=False, sort_keys=True))
-    summary_out.to_parquet(OUTPUT_DIR / "shop_performance_summary.parquet", index=False, compression="zstd")
-    forecasts.to_parquet(OUTPUT_DIR / "shop_bau_forecast.parquet", index=False, compression="zstd")
-    state["backtest"].to_parquet(OUTPUT_DIR / "task1_backtest.parquet", index=False, compression="zstd")
-    write_json(OUTPUT_DIR / "task1_audit.json", audits)
-    write_json(OUTPUT_DIR / "task1_pair.json", pair)
-    (OUTPUT_DIR / "task1_insights.md").write_text(state["insights"], encoding="utf-8")
-    for figure in figures:
-        if figure.get("figure") is not None:
-            save_figure(figure["figure"], figure["figure_id"])
-    failed = audits["failed_checks"]
-    supported = sum(1 for figure in figures if figure["status"] == "SUPPORTED")
-    print(f"{'SUCCESS' if not failed else 'FAILED'} | figures={supported}/{len(figures)} "
-          f"| forecasted_shops={int(forecast_counts.forecasted_shops.sum()):,} | failed_checks={len(failed)}")
-    return {"status": "SUCCESS" if not failed else "FAILED", "figures": figures, "audit": audits}
-
+def main(): return build_task1()
 
 if __name__ == "__main__":
-    main()
+    result=main();print(f"Task 1 {result['audit']['status']}; forecasts={len(result['forecasts']):,}; pair={result['pair'].get('status')}")
+
+

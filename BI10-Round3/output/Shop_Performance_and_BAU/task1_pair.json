@@ -1,71 +1,130 @@
 {
-  "status": "SUPPORTED",
-  "pair_id": "115096693::99546349",
-  "shop_ids": [
-    "115096693",
-    "99546349"
+  "status": "ILLUSTRATIVE_ONLY",
+  "pair_ids": [
+    "99180387",
+    "99363629"
   ],
-  "rule_used": "A05_SIMILAR_ACTUAL_10PCT",
-  "tolerance": 0.1,
-  "peer_group": "Small | Non-Aldi",
-  "peer_n": 4237,
-  "actual_3m_funded": {
-    "115096693": 13.0,
-    "99546349": 14.0
+  "selection_rule": "closest adjacent complete actuals within 10%, same available category/model, peer n>=30; lead-match contrast breaks ties",
+  "peer_group": "Small|Non-Aldi",
+  "peer_support": 5593,
+  "actual_delta_pct": 0.0,
+  "current_actual_3m_funded": {
+    "99180387": 2.0,
+    "99363629": 2.0
   },
   "bau_3m_total": {
-    "115096693": {
-      "point": 69.36090982070917,
-      "lo": 61.990324120553026,
-      "hi": 75.45347745148149
+    "99180387": {
+      "point": 2.0,
+      "lo": 0.0,
+      "hi": 15.333333333333336
     },
-    "99546349": {
-      "point": 10.144755587421837,
-      "lo": 2.774169887265696,
-      "hi": 16.23732321819416
+    "99363629": {
+      "point": 2.0,
+      "lo": 0.0,
+      "hi": 13.0
     }
   },
-  "bau_ratio": {
-    "115096693": 5.335454601593013,
-    "99546349": 0.7246253991015598
-  },
-  "observed_contrasts": {
-    "115096693": {
-      "lead_rows_3m": 38.0,
-      "distinct_lead_uuids_3m": 38.0,
-      "assigned_headcount_proxy_3m": 20.0,
-      "lead_product_mix_3m": {
-        "CC": 0.15789473684210525,
-        "CD": 0.3157894736842105,
-        "CL": 0.5263157894736842,
-        "TW": 0.0
-      }
+  "reliability_diagnostics": {
+    "99180387": {
+      "actual_observed_months_of_3": 3,
+      "observation_quality_state": "COMPLETE_3M_OBSERVED",
+      "last_recorded_activity": "2026-09-01T00:00:00",
+      "recent_observations": [
+        {
+          "month": "2026-04-01T00:00:00",
+          "observed": true,
+          "funded": 4.0,
+          "applications": 4.0
+        },
+        {
+          "month": "2026-05-01T00:00:00",
+          "observed": true,
+          "funded": 1.0,
+          "applications": 1.0
+        },
+        {
+          "month": "2026-06-01T00:00:00",
+          "observed": true,
+          "funded": 1.0,
+          "applications": 1.0
+        },
+        {
+          "month": "2026-07-01T00:00:00",
+          "observed": true,
+          "funded": 0.0,
+          "applications": 1.0
+        },
+        {
+          "month": "2026-08-01T00:00:00",
+          "observed": true,
+          "funded": 1.0,
+          "applications": 1.0
+        },
+        {
+          "month": "2026-09-01T00:00:00",
+          "observed": true,
+          "funded": 1.0,
+          "applications": 2.0
+        }
+      ],
+      "partial_3m_observed_funded_sum": 2.0,
+      "recent_lead_rows": 11.0,
+      "recent_lead_uuids": 11.0,
+      "lead_match_rate": 0.0,
+      "forecast_path": []
     },
-    "99546349": {
-      "lead_rows_3m": 27.0,
-      "distinct_lead_uuids_3m": 27.0,
-      "assigned_headcount_proxy_3m": 21.333333333333332,
-      "lead_product_mix_3m": {
-        "CC": 0.18518518518518517,
-        "CD": 0.7037037037037037,
-        "CL": 0.1111111111111111,
-        "TW": 0.0
-      }
+    "99363629": {
+      "actual_observed_months_of_3": 3,
+      "observation_quality_state": "COMPLETE_3M_OBSERVED",
+      "last_recorded_activity": "2026-09-01T00:00:00",
+      "recent_observations": [
+        {
+          "month": "2026-04-01T00:00:00",
+          "observed": false,
+          "funded": null,
+          "applications": null
+        },
+        {
+          "month": "2026-05-01T00:00:00",
+          "observed": true,
+          "funded": 0.0,
+          "applications": 1.0
+        },
+        {
+          "month": "2026-06-01T00:00:00",
+          "observed": false,
+          "funded": null,
+          "applications": null
+        },
+        {
+          "month": "2026-07-01T00:00:00",
+          "observed": true,
+          "funded": 1.0,
+          "applications": 1.0
+        },
+        {
+          "month": "2026-08-01T00:00:00",
+          "observed": true,
+          "funded": 1.0,
+          "applications": 1.0
+        },
+        {
+          "month": "2026-09-01T00:00:00",
+          "observed": true,
+          "funded": 0.0,
+          "applications": 1.0
+        }
+      ],
+      "partial_3m_observed_funded_sum": 2.0,
+      "recent_lead_rows": 3.0,
+      "recent_lead_uuids": 3.0,
+      "lead_match_rate": 1.0,
+      "forecast_path": []
     }
   },
-  "note": "Observed contrasts are descriptive, not causal.",
-  "stability": {
-    "5pct": [
-      "111893539",
-      "115096693"
-    ],
-    "10pct": [
-      "115096693",
-      "99546349"
-    ],
-    "20pct": [
-      "103796122",
-      "115096693"
-    ]
-  }
+  "reliability_reasons": [
+    "99180387:DESCRIPTIVE_ONLY_BAU",
+    "99363629:DESCRIPTIVE_ONLY_BAU"
+  ],
+  "causal_claim": false
 }
